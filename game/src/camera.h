@@ -25,6 +25,7 @@ class Camera
 public:
 	glm::vec3 m_position;
 	glm::vec3 m_front;
+	glm::vec3 m_front_plane;
 	glm::vec3 m_up;
 	glm::vec3 m_right;
 
@@ -56,9 +57,9 @@ public:
 	{
 		float velocity = m_speed * delta_time;
 		if (direction == Camera_Movement::FORWARD)
-			m_position += m_front * velocity;
+			m_position += m_front_plane * velocity;
 		if (direction == Camera_Movement::BACKWARD)
-			m_position -= m_front * velocity;
+			m_position -= m_front_plane * velocity;
 		if (direction == Camera_Movement::LEFT)
 			m_position -= m_right * velocity;
 		if (direction == Camera_Movement::RIGHT)
@@ -104,5 +105,6 @@ private:
 
 		m_right = glm::normalize(glm::cross(m_front, glm::vec3(0.0f, 1.0f, 0.0f)));
 		m_up = glm::normalize(glm::cross(m_right, m_front));
+		m_front_plane = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), m_right));
 	}
 };
