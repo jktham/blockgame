@@ -10,15 +10,17 @@ enum class Camera_Movement {
 	FORWARD,
 	BACKWARD,
 	LEFT,
-	RIGHT
+	RIGHT,
+	JUMP
 };
 
 const float YAW = -90.0f;
 const float PITCH = 0.0f;
 const float SPEED = 5.0f;
-const float SHIFT_SPEED = 20.0f;
+const float SHIFT_SPEED = 10.0f;
 const float SENSITIVITY = 0.1f;
 const float FOV = 60.0f;
+const float GRAVITY = 9.81f;
 
 class Camera
 {
@@ -36,6 +38,8 @@ public:
 	float m_sensitivity;
 	float m_fov;
 
+	float m_vertical_velocity;
+
 	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH)
 	{
 		m_position = position;
@@ -46,6 +50,28 @@ public:
 		m_sensitivity = SENSITIVITY;
 		m_fov = FOV;
 		updateCameraVectors();
+	}
+
+	void applyGravity(float delta_time)
+	{
+		if (!checkGrounded())
+		{
+			m_vertical_velocity -= GRAVITY * delta_time;
+		}
+		else if (m_vertical_velocity < 0.0f)
+		{
+			m_vertical_velocity = 0.0f;
+		}
+
+		m_position += glm::vec3(0.0f, 1.0f, 0.0f) * m_vertical_velocity * delta_time;
+	}
+
+	bool checkGrounded()
+	{
+		if (m_position.y <= 3.0f)
+			return true;
+		else
+			return false;
 	}
 
 	glm::mat4 getViewMatrix()
@@ -64,6 +90,9 @@ public:
 			m_position -= m_right * velocity;
 		if (direction == Camera_Movement::RIGHT)
 			m_position += m_right * velocity;
+		if (direction == Camera_Movement::JUMP)
+			if (checkGrounded())
+				m_vertical_velocity = 5.0f;
 	}
 
 	void processMouseMovement(float offset_x, float offset_y, GLboolean constrain_pitch = true)

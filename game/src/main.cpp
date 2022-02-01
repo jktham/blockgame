@@ -20,7 +20,7 @@ const unsigned int WINDOW_WIDTH = 1280;
 const unsigned int WINDOW_HEIGHT = 720;
 
 // camera
-Camera camera(glm::vec3(10.0f, 3.0f, 10.0f));
+Camera camera(glm::vec3(10.0f, 4.0f, 10.0f));
 float last_x = WINDOW_WIDTH / 2.0f;
 float last_y = WINDOW_HEIGHT / 2.0f;
 bool first_mouse = true;
@@ -37,6 +37,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 int main()
 {
@@ -57,6 +58,7 @@ int main()
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
+	glfwSetKeyCallback(window, key_callback);
 
 	// vertex data
 	float vertices[] = {
@@ -104,7 +106,7 @@ int main()
 	};
 
 	const glm::vec3 origin = glm::vec3(0.0f, 0.0f, 0.0f);
-	const glm::vec3 step = glm::vec3(1.0f, 1.0f, 1.0f);
+	const glm::vec3 step = glm::vec3(1.0f, -10.0f, 1.0f);
 	const glm::vec3 size = glm::vec3(20, 1, 20);
 
 	std::vector<float> offsets;
@@ -197,7 +199,7 @@ int main()
 	// opengl settings
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glfwSwapInterval(0);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -218,6 +220,8 @@ int main()
 
 			// keyboard input
 			processInput(window);
+
+			camera.applyGravity(delta_time);
 
 			// clear buffers
 			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -251,6 +255,12 @@ int main()
 	glDeleteBuffers(1, &VBO);
 	glfwTerminate();
 	return 0;
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+		camera.processKeyboard(Camera_Movement::JUMP, delta_time);
 }
 
 void processInput(GLFWwindow* window)
