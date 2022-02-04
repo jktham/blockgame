@@ -1,3 +1,5 @@
+#pragma once
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -20,16 +22,16 @@ const unsigned int WINDOW_WIDTH = 1280;
 const unsigned int WINDOW_HEIGHT = 720;
 
 // camera
-Camera camera(glm::vec3(10.0f, 4.0f, 10.0f));
+Camera camera(glm::vec3(10.0f, 5.0f, 10.0f));
 float last_x = WINDOW_WIDTH / 2.0f;
 float last_y = WINDOW_HEIGHT / 2.0f;
 bool first_mouse = true;
+bool wireframe_mode = false;
 
 // timing
 float delta_time = 0.0f;
 float current_frame = 0.0f;
 float last_frame = 0.0f;
-float frame_rate = 0.0f;
 float frame_rate_limit = 120.0f;
 
 // callbacks
@@ -106,10 +108,10 @@ int main()
 	};
 
 	const glm::vec3 origin = glm::vec3(0.0f, 0.0f, 0.0f);
-	const glm::vec3 step = glm::vec3(1.0f, -10.0f, 1.0f);
-	const glm::vec3 size = glm::vec3(20, 1, 20);
+	const glm::vec3 step = glm::vec3(1.0f, 1.0f, 1.0f);
+	const glm::vec3 size = glm::vec3(10.0f, 1.0f, 10.0f);
 
-	std::vector<float> offsets;
+	std::vector<glm::vec3> offsets;
 
 	for (int i = 0; i < size.x; i++)
 	{
@@ -117,12 +119,12 @@ int main()
 		{
 			for (int k = 0; k < size.z; k++)
 			{
-				offsets.push_back(origin.x + i * step.x);
-				offsets.push_back(origin.y + j * step.y);
-				offsets.push_back(origin.z + k * step.z);
+				offsets.push_back(glm::vec3(origin.x + i * step.x, origin.y + j * step.y, origin.z + k * step.z));
 			}
 		}
 	}
+
+	camera.setOffsets(offsets);
 
 	// vertex array object
 	unsigned int VAO;
@@ -140,7 +142,7 @@ int main()
 	unsigned int instanceVBO;
 	glGenBuffers(1, &instanceVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-	glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(float) * (GLsizei)(size.x * size.y * size.z), &offsets[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * (GLsizei)(size.x * size.y * size.z), &offsets[0], GL_STATIC_DRAW);
 	glVertexAttribDivisor(1, 1);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -212,11 +214,10 @@ int main()
 			current_frame = (float)glfwGetTime();
 			delta_time = current_frame - last_frame;
 			last_frame = current_frame;
-			frame_rate = 1.0f / delta_time;
 
 			std::cout << std::fixed;
-			std::cout << std::setprecision(4);
-			std::cout << "time: " << (float)glfwGetTime() << ", delta: " << delta_time << ", fps: " << frame_rate << "\n";
+			std::cout << std::setprecision(2);
+			std::cout << "pos: (" << camera.m_position.x << ", " << camera.m_position.y << ", " << camera.m_position.z << "),  vert: " << camera.m_vertical_velocity << ",  fps: " << 1.0f / delta_time << "\n";
 
 			// keyboard input
 			processInput(window);
@@ -261,6 +262,14 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 {
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
 		camera.processKeyboard(Camera_Movement::JUMP, delta_time);
+	if (key == GLFW_KEY_Q && action == GLFW_PRESS)
+	{
+		wireframe_mode = !wireframe_mode;
+		if (wireframe_mode)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		else
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
 }
 
 void processInput(GLFWwindow* window)

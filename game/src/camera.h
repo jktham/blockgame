@@ -20,7 +20,7 @@ const float SPEED = 5.0f;
 const float SHIFT_SPEED = 10.0f;
 const float SENSITIVITY = 0.1f;
 const float FOV = 60.0f;
-const float GRAVITY = 9.81f;
+const float GRAVITY = 10.0f;
 
 class Camera
 {
@@ -38,6 +38,8 @@ public:
 	float m_sensitivity;
 	float m_fov;
 
+	float m_height = 2.0f;
+
 	float m_vertical_velocity;
 
 	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH)
@@ -54,24 +56,58 @@ public:
 
 	void applyGravity(float delta_time)
 	{
-		if (!checkGrounded())
+		float output = 0.0f;
+		if (checkGrounded(output))
+		{
+			m_vertical_velocity = 0.0f;
+			m_position.y = output + m_height;
+		}
+		else
 		{
 			m_vertical_velocity -= GRAVITY * delta_time;
 		}
-		else if (m_vertical_velocity < 0.0f)
-		{
-			m_vertical_velocity = 0.0f;
-		}
 
 		m_position += glm::vec3(0.0f, 1.0f, 0.0f) * m_vertical_velocity * delta_time;
+
+		if (m_vertical_velocity <= -50.0f)
+		{
+			m_vertical_velocity = -50.0f;
+		}
+
+		if (m_position.y < -50.0f)
+		{
+			m_position.y = 50.0f;
+		}
 	}
 
-	bool checkGrounded()
+	bool checkGrounded(float& output)
 	{
-		if (m_position.y <= 3.0f)
-			return true;
-		else
-			return false;
+		for (int i = 0; i < m_offsets.size(); i += 1)
+		{
+			glm::vec3 bottom_corner = m_offsets[i];
+			glm::vec3 top_corner = m_offsets[i] + glm::vec3(1.0f);
+			glm::vec3 collision_position = m_position - glm::vec3(0.0f, m_height, 0.0f);
+
+			if (((collision_position.x <= top_corner.x) &&
+				 (collision_position.y <= top_corner.y) &&
+				 (collision_position.z <= top_corner.z)) &&
+
+				((collision_position.x >= bottom_corner.x) &&
+				 (collision_position.y >= bottom_corner.y) &&
+				 (collision_position.z >= bottom_corner.z)))
+			{
+				output = top_corner.y;
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	std::vector<glm::vec3> m_offsets;
+	void setOffsets(std::vector<glm::vec3> offsets)
+	{
+		m_offsets = offsets;
 	}
 
 	glm::mat4 getViewMatrix()
@@ -81,6 +117,7 @@ public:
 
 	void processKeyboard(Camera_Movement direction, float delta_time)
 	{
+		float output = 0.0f;
 		float velocity = m_speed * delta_time;
 		if (direction == Camera_Movement::FORWARD)
 			m_position += m_front_plane * velocity;
@@ -91,8 +128,11 @@ public:
 		if (direction == Camera_Movement::RIGHT)
 			m_position += m_right * velocity;
 		if (direction == Camera_Movement::JUMP)
-			if (checkGrounded())
+			if (checkGrounded(output))
+			{
 				m_vertical_velocity = 5.0f;
+				m_position.y += 0.01f;
+			}
 	}
 
 	void processMouseMovement(float offset_x, float offset_y, GLboolean constrain_pitch = true)
