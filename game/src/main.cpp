@@ -16,6 +16,7 @@
 #include "stb_image.h"
 #include "shader.h"
 #include "camera.h"
+#include "terrain.h"
 
 // settings
 const unsigned int WINDOW_WIDTH = 1280;
@@ -27,6 +28,9 @@ float last_x = WINDOW_WIDTH / 2.0f;
 float last_y = WINDOW_HEIGHT / 2.0f;
 bool first_mouse = true;
 bool wireframe_mode = false;
+
+// terrain
+Terrain terrain;
 
 // timing
 float delta_time = 0.0f;
@@ -107,43 +111,20 @@ int main()
 	 0.0f, 1.0f, 1.0f, 0.0f, 0.0f
 	};
 
-	const glm::vec3 origin = glm::vec3(0.0f, 0.0f, 0.0f);
-	const glm::vec3 step = glm::vec3(1.0f, 1.0f, 1.0f);
-	const glm::vec3 size = glm::vec3(50.0f, 1.0f, 50.0f);
-
-	std::vector<glm::vec3> offsets;
-
-	for (int i = 0; i < size.x; i++)
-	{
-		for (int j = 0; j < size.y; j++)
-		{
-			for (int k = 0; k < size.z; k++)
-			{
-				offsets.push_back(glm::vec3(origin.x + i * step.x, origin.y + j * step.y + int(i / 5.0f) + int(k / 5.0f), origin.z + k * step.z));
-			}
-		}
-	}
-
-	camera.m_offsets = offsets;
-
 	// vertex array object
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
+
+	terrain.generateTerrainPlane();
+	terrain.setInstances();
+	camera.m_offsets = terrain.m_offsets;
 
 	// vertex buffer object
 	unsigned int VBO;
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	// instance vertex buffer object
-	unsigned int instanceVBO;
-	glGenBuffers(1, &instanceVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * (GLsizei)(size.x * size.y * size.z), &offsets[0], GL_STATIC_DRAW);
-	glVertexAttribDivisor(1, 1);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// texture attributes
@@ -172,12 +153,6 @@ int main()
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	// vertex attribute (instance offsets)
-	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// vertex attribute (texture)
@@ -245,7 +220,7 @@ int main()
 
 			// draw vertices
 			glBindVertexArray(VAO);
-			glDrawArraysInstanced(GL_TRIANGLES, 0, 36, (GLsizei)(size.x * size.y * size.z));
+			glDrawArraysInstanced(GL_TRIANGLES, 0, 36, (GLsizei)(terrain.m_offsets.size()));
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
