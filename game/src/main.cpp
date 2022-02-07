@@ -22,7 +22,7 @@ const unsigned int WINDOW_WIDTH = 1280;
 const unsigned int WINDOW_HEIGHT = 720;
 
 // camera
-Camera camera(glm::vec3(10.0f, 5.0f, 10.0f));
+Camera camera(glm::vec3(0.0f, 5.0f, 0.0f));
 float last_x = WINDOW_WIDTH / 2.0f;
 float last_y = WINDOW_HEIGHT / 2.0f;
 bool first_mouse = true;
@@ -119,12 +119,12 @@ int main()
 		{
 			for (int k = 0; k < size.z; k++)
 			{
-				offsets.push_back(glm::vec3(origin.x + i * step.x, origin.y + j * step.y + int(i/5.0f) + int(k / 5.0f), origin.z + k * step.z));
+				offsets.push_back(glm::vec3(origin.x + i * step.x, origin.y + j * step.y + int(i / 5.0f) + int(k / 5.0f), origin.z + k * step.z));
 			}
 		}
 	}
 
-	camera.setOffsets(offsets);
+	camera.m_offsets = offsets;
 
 	// vertex array object
 	unsigned int VAO;
@@ -262,13 +262,19 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 {
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
 		camera.processKeyboard(Camera_Movement::JUMP, delta_time);
-	if (key == GLFW_KEY_Q && action == GLFW_PRESS)
+
+	if (key == GLFW_KEY_TAB && action == GLFW_PRESS)
 	{
 		wireframe_mode = !wireframe_mode;
 		if (wireframe_mode)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		else
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+
+	if (key == GLFW_KEY_Q && action == GLFW_PRESS)
+	{
+		camera.m_noclip = !camera.m_noclip;
 	}
 }
 

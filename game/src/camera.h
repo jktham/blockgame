@@ -43,6 +43,10 @@ public:
 
 	float m_vertical_velocity;
 
+	bool m_noclip = false;
+
+	std::vector<glm::vec3> m_offsets;
+
 	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH)
 	{
 		m_position = position;
@@ -57,6 +61,9 @@ public:
 
 	void applyGravity(float delta_time)
 	{
+		if (m_noclip)
+			return;
+
 		float floor_height = 0.0f;
 
 		if (!checkCollisionVertical(floor_height))
@@ -106,7 +113,6 @@ public:
 				float velocity = m_speed * delta_time;
 				m_position += direction * velocity;
 			}
-
 		}
 	}
 
@@ -116,13 +122,16 @@ public:
 
 		if (checkCollisionVertical(floor_height))
 		{
-			m_vertical_velocity = 5.0f;
+			m_vertical_velocity = 7.5f;
 			m_position.y += 0.01f;
 		}
 	}
 
 	bool checkCollisionVertical(float& floor_height)
 	{
+		if (m_noclip)
+			return false;
+
 		for (int i = 0; i < m_offsets.size(); i += 1)
 		{
 			glm::vec3 block_collision_min = m_offsets[i];
@@ -137,12 +146,10 @@ public:
 			{
 				glm::vec3 collision_position = camera_collision_min - block_collision_min;
 
-
 				if (collision_position.y > abs(collision_position.x) && collision_position.y > abs(collision_position.z))
 				{
 					floor_height = block_collision_max.y;
 
-					//std::cout << collision_position.x << ", " << collision_position.y << ", " << collision_position.z << "\n";
 					std::cout << "vertical collision\n";
 					return true;
 				}
@@ -154,6 +161,9 @@ public:
 
 	bool checkCollisionHorizontal(glm::vec3& collision_position)
 	{
+		if (m_noclip)
+			return false;
+
 		for (int i = 0; i < m_offsets.size(); i += 1)
 		{
 			glm::vec3 block_collision_min = m_offsets[i];
@@ -175,7 +185,6 @@ public:
 					else
 						collision_position = glm::normalize(glm::vec3(0.0f, 0.0f, collision_position.z));
 
-					//std::cout << collision_position.x << ", " << collision_position.y << ", " << collision_position.z << "\n";
 					std::cout << "horizontal collision\n";
 					return true;
 				}
@@ -185,12 +194,6 @@ public:
 		return false;
 	}
 
-	std::vector<glm::vec3> m_offsets;
-	void setOffsets(std::vector<glm::vec3> offsets)
-	{
-		m_offsets = offsets;
-	}
-
 	glm::mat4 getViewMatrix()
 	{
 		return glm::lookAt(m_position, m_position + m_front, m_up);
@@ -198,6 +201,9 @@ public:
 
 	void processKeyboard(Camera_Movement direction, float delta_time)
 	{
+		if (m_noclip)
+			m_front_plane = m_front;
+
 		glm::vec3 movement_vector = glm::vec3(0.0f);
 
 		if (direction == Camera_Movement::FORWARD)
