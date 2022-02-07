@@ -109,7 +109,7 @@ int main()
 
 	const glm::vec3 origin = glm::vec3(0.0f, 0.0f, 0.0f);
 	const glm::vec3 step = glm::vec3(1.0f, 1.0f, 1.0f);
-	const glm::vec3 size = glm::vec3(10.0f, 1.0f, 10.0f);
+	const glm::vec3 size = glm::vec3(50.0f, 1.0f, 50.0f);
 
 	std::vector<glm::vec3> offsets;
 
@@ -119,7 +119,7 @@ int main()
 		{
 			for (int k = 0; k < size.z; k++)
 			{
-				offsets.push_back(glm::vec3(origin.x + i * step.x, origin.y + j * step.y, origin.z + k * step.z));
+				offsets.push_back(glm::vec3(origin.x + i * step.x, origin.y + j * step.y + int(i/5.0f) + int(k / 5.0f), origin.z + k * step.z));
 			}
 		}
 	}
@@ -277,7 +277,6 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	const float camera_speed = 3.0f * delta_time;
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		camera.processKeyboard(Camera_Movement::FORWARD, delta_time);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
