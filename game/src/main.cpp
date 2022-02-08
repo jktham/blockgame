@@ -8,10 +8,12 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include <string>
+#include <sstream>
 #include <fstream>
 #include <streambuf>
 #include <iostream>
 #include <iomanip>
+#include <vector>
 
 #include "stb_image.h"
 #include "shader.h"
