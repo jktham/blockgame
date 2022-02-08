@@ -46,15 +46,18 @@
     <ClInclude Include="src\terrain.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\perlin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\light.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\brick.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\wood.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="res\dirt.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\grass.jpg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

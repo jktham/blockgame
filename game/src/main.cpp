@@ -16,23 +16,26 @@
 #include <vector>
 
 #include "stb_image.h"
+#include "perlin.h"
 #include "shader.h"
 #include "camera.h"
 #include "terrain.h"
+#include "light.h"
 
 // settings
 const unsigned int WINDOW_WIDTH = 1280;
 const unsigned int WINDOW_HEIGHT = 720;
 
 // camera
-Camera camera(glm::vec3(0.0f, 5.0f, 0.0f));
 float last_x = WINDOW_WIDTH / 2.0f;
 float last_y = WINDOW_HEIGHT / 2.0f;
 bool first_mouse = true;
 bool wireframe_mode = false;
 
-// terrain
+// classes
+Camera camera(glm::vec3(0.0f, 10.0f, 0.0f));
 Terrain terrain;
+Light light;
 
 // timing
 float delta_time = 0.0f;
@@ -68,49 +71,49 @@ int main()
 	glfwSetScrollCallback(window, scroll_callback);
 	glfwSetKeyCallback(window, key_callback);
 
-	// vertex data
+	// vertex data (pos_x, pos_y, pos_z, tex_x, tex_y, norm_x, norm_y, norm_z)
 	float vertices[] = {
-	 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-	 1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-	 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-	 1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-	 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-	 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+	 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+	 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+	 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+	 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+	 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+	 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f,
 
-	 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-	 1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-	 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-	 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-	 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-	 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+	 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+	 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+	 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+	 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+	 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+	 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
 
-	 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-	 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-	 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-	 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-	 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-	 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+	 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+	 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+	 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+	 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+	 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+	 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
 
-	 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-	 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-	 1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-	 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-	 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-	 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+	 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+	 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+	 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+	 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+	 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+	 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
 
-	 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-	 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-	 1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-	 1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-	 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-	 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+	 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+	 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+	 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+	 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+	 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+	 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
 
-	 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-	 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-	 1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-	 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-	 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-	 0.0f, 1.0f, 1.0f, 0.0f, 0.0f
+	 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+	 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+	 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+	 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+	 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+	 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
 	};
 
 	// vertex array object
@@ -118,7 +121,7 @@ int main()
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
-	terrain.generateTerrainPlane();
+	terrain.generateTerrainPerlin();
 	terrain.setInstances();
 	camera.m_offsets = terrain.m_offsets;
 
@@ -151,16 +154,33 @@ int main()
 	}
 	stbi_image_free(data);
 
+	unsigned int grass_texture;
+	glGenTextures(1, &grass_texture);
+	glBindTexture(GL_TEXTURE_2D, grass_texture);
+	data = stbi_load("res/grass.jpg", &width, &height, &channels, 0);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	stbi_image_free(data);
+
 	// vertex attribute (position)
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// vertex attribute (texture)
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	// vertex attribute (normal)
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+	glEnableVertexAttribArray(3);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// shader program
@@ -169,6 +189,7 @@ int main()
 	// set texture uniforms
 	shader.use();
 	shader.setInt("dirt_texture", 0);
+	shader.setInt("grass_texture", 1);
 
 	// matrices
 	glm::mat4 model = glm::mat4(1.0f);
@@ -200,6 +221,7 @@ int main()
 			processInput(window);
 
 			camera.applyGravity(delta_time);
+			light.update(current_frame);
 
 			// clear buffers
 			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -215,10 +237,15 @@ int main()
 			shader.setMat4("model", model);
 			shader.setMat4("view", view);
 			shader.setMat4("projection", projection);
+			shader.setVec3("light.position", light.m_position);
+			shader.setVec3("light.color", light.m_color);
 
 			// bind textures
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, dirt_texture);
+
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, grass_texture);
 
 			// draw vertices
 			glBindVertexArray(VAO);

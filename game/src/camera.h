@@ -25,6 +25,7 @@ public:
 	glm::vec3 m_up;
 	glm::vec3 m_right;
 
+
 	float m_yaw;
 	float m_pitch;
 
@@ -85,22 +86,24 @@ public:
 
 	void applyMovement(glm::vec3 direction, float delta_time)
 	{
+		int collision_id = 0;
 		glm::vec3 collision_position = glm::vec3(0.0f);
+		glm::vec3 collision_normal = glm::vec3(0.0f);
 
-		if (!checkCollisionHorizontal(collision_position))
+		if (!checkCollisionHorizontal(collision_id, collision_position, collision_normal))
 		{
 			float velocity = m_speed * delta_time;
 			m_position += direction * velocity;
 		}
 		else
 		{
-			glm::vec3 collision_cross = glm::cross(glm::normalize(collision_position), glm::normalize(direction));
-			glm::vec3 collision_direction = glm::vec3(glm::vec4(collision_cross, 1.0f) * glm::rotate(glm::mat4(1.0f), 3.1415f / 2.0f, collision_position));
+			glm::vec3 collision_cross = glm::cross(glm::normalize(collision_normal), glm::normalize(direction));
+			glm::vec3 collision_direction = glm::vec3(glm::vec4(collision_cross, 1.0f) * glm::rotate(glm::mat4(1.0f), 3.1415f / 2.0f, collision_normal));
 			float collision_velocity = glm::length(collision_cross) * m_speed * delta_time;
 
-			if (glm::dot(glm::normalize(collision_position), glm::normalize(direction)) <= 0.0f)
+			if (glm::dot(glm::normalize(collision_normal), glm::normalize(direction)) <= 0.0f)
 			{
-				//m_position += collision_direction * collision_velocity;
+				m_position += collision_direction * collision_velocity;
 			}
 			else
 			{
@@ -134,9 +137,9 @@ public:
 			glm::vec3 camera_collision_min = m_position + glm::vec3(-m_width, -m_height, -m_width);
 			glm::vec3 camera_collision_max = m_position + glm::vec3(m_width, 0.0f, m_width);
 
-			if ((camera_collision_min.x <= block_collision_max.x && camera_collision_max.x >= block_collision_min.x) &&
+			if ((camera_collision_min.x < block_collision_max.x && camera_collision_max.x > block_collision_min.x) &&
 				(camera_collision_min.y <= block_collision_max.y && camera_collision_max.y >= block_collision_min.y) &&
-				(camera_collision_min.z <= block_collision_max.z && camera_collision_max.z >= block_collision_min.z))
+				(camera_collision_min.z < block_collision_max.z && camera_collision_max.z > block_collision_min.z))
 			{
 				glm::vec3 collision_position = camera_collision_min - block_collision_min;
 
@@ -153,7 +156,7 @@ public:
 		return false;
 	}
 
-	bool checkCollisionHorizontal(glm::vec3& collision_position)
+	bool checkCollisionHorizontal(int& collision_id, glm::vec3& collision_position, glm::vec3& collision_normal)
 	{
 		if (m_noclip)
 			return false;
@@ -175,10 +178,11 @@ public:
 				if (collision_position.y < abs(collision_position.x) || collision_position.y < abs(collision_position.z))
 				{
 					if (glm::abs(collision_position.x) > glm::abs(collision_position.z))
-						collision_position = glm::normalize(glm::vec3(collision_position.x, 0.0f, 0.0f));
+						collision_normal = glm::normalize(glm::vec3(collision_position.x, 0.0f, 0.0f));
 					else
-						collision_position = glm::normalize(glm::vec3(0.0f, 0.0f, collision_position.z));
+						collision_normal = glm::normalize(glm::vec3(0.0f, 0.0f, collision_position.z));
 
+					collision_id = i;
 					std::cout << "horizontal collision\n";
 					return true;
 				}
