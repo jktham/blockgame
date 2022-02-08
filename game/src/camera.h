@@ -10,8 +10,7 @@ enum class Camera_Movement {
 
 const float YAW = -90.0f;
 const float PITCH = 0.0f;
-const float SPEED = 5.0f;
-const float SHIFT_SPEED = 10.0f;
+const float SPEED = 7.5f;
 const float SENSITIVITY = 0.1f;
 const float FOV = 60.0f;
 const float GRAVITY = 10.0f;
@@ -57,7 +56,10 @@ public:
 	void applyGravity(float delta_time)
 	{
 		if (m_noclip)
+		{
+			m_vertical_velocity = 0.0f;
 			return;
+		}
 
 		float floor_height = 0.0f;
 

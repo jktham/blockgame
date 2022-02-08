@@ -239,6 +239,7 @@ int main()
 			shader.setMat4("projection", projection);
 			shader.setVec3("light.position", light.m_position);
 			shader.setVec3("light.color", light.m_color);
+			shader.setVec3("view_pos", camera.m_position);
 
 			// bind textures
 			glActiveTexture(GL_TEXTURE0);
@@ -297,7 +298,7 @@ void processInput(GLFWwindow* window)
 		camera.processKeyboard(Camera_Movement::RIGHT, delta_time);
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		camera.m_speed = SHIFT_SPEED;
+		camera.m_speed = SPEED * 2.0f;
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
 		camera.m_speed = SPEED;
 }
