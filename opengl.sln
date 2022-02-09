@@ -9,7 +9,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lighting", "lighting\lighti
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "scenes", "scenes\scenes.vcxproj", "{9B8C18E5-48EE-4B85-99B6-A7B46B935632}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "game", "game\game.vcxproj", "{C8B9D93B-734E-48F6-B90E-4E6A6A5475F5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "blockgame", "blockgame\blockgame.vcxproj", "{C8B9D93B-734E-48F6-B90E-4E6A6A5475F5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

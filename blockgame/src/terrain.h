@@ -77,15 +77,15 @@ public:
 	void setInstances()
 	{
 		// instance vertex buffer object
-		unsigned int instanceVBO;
-		glGenBuffers(1, &instanceVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+		unsigned int instance_VBO;
+		glGenBuffers(1, &instance_VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, instance_VBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * (m_offsets.size()), &m_offsets[0], GL_STATIC_DRAW);
 		glVertexAttribDivisor(1, 1);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		// vertex attribute (instance offsets)
-		glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, instance_VBO);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);

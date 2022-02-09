@@ -33,9 +33,11 @@ bool first_mouse = true;
 bool wireframe_mode = false;
 
 // classes
-Camera camera(glm::vec3(0.0f, 10.0f, 0.0f));
+Camera camera(glm::vec3(0.0f, 15.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 45.0f, 0.0f);
 Terrain terrain;
 Light light;
+
+int terrain_index = 0;
 
 // timing
 float delta_time = 0.0f;
@@ -230,7 +232,7 @@ int main()
 			// update matrices
 			model = glm::mat4(1.0f);
 			view = camera.getViewMatrix();
-			projection = glm::perspective(glm::radians(camera.m_fov), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+			projection = glm::perspective(glm::radians(camera.m_fov), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 200.0f);
 
 			// set uniforms
 			shader.use();
@@ -280,6 +282,35 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_Q && action == GLFW_PRESS)
 	{
 		camera.m_noclip = !camera.m_noclip;
+	}
+
+	if (key == GLFW_KEY_R && action == GLFW_PRESS)
+	{
+		int terrain_index_max = 2;
+		terrain_index += 1;
+
+		if (terrain_index > terrain_index_max)
+			terrain_index = 0;
+		if (terrain_index < 0)
+			terrain_index = terrain_index_max;
+
+		switch (terrain_index)
+		{
+		case 0:
+			terrain.generateTerrainPerlin();
+			break;
+		case 1:
+			terrain.generateTerrainPlane();
+			break;
+		case 2:
+			terrain.generateTerrainTest();
+			break;
+		default:
+			break;
+		}
+
+		terrain.setInstances();
+		camera.m_offsets = terrain.m_offsets;
 	}
 }
 
