@@ -65,8 +65,8 @@ public:
 			{
 				for (int k = 0; k < size.z; k++)
 				{
-					double height = perlin.octave2D_01(i*0.05f, k*0.05f, 4);
-					offsets.push_back(glm::vec3(i, int(height * 10.0f)-j, k));
+					double height = perlin.octave2D_01(i * 0.05f, k * 0.05f, 4);
+					offsets.push_back(glm::vec3(i, int(height * 10.0f) - j, k));
 				}
 			}
 		}

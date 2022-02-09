@@ -135,10 +135,10 @@ int main()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// texture attributes
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	// load textures
 	stbi_set_flip_vertically_on_load(true);
@@ -148,7 +148,7 @@ int main()
 	unsigned int dirt_texture;
 	glGenTextures(1, &dirt_texture);
 	glBindTexture(GL_TEXTURE_2D, dirt_texture);
-	data = stbi_load("res/dirt.jpg", &width, &height, &channels, 0);
+	data = stbi_load("res/dirt.png", &width, &height, &channels, 0);
 	if (data)
 	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -159,7 +159,7 @@ int main()
 	unsigned int grass_texture;
 	glGenTextures(1, &grass_texture);
 	glBindTexture(GL_TEXTURE_2D, grass_texture);
-	data = stbi_load("res/grass.jpg", &width, &height, &channels, 0);
+	data = stbi_load("res/grass.png", &width, &height, &channels, 0);
 	if (data)
 	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -241,6 +241,9 @@ int main()
 			shader.setMat4("projection", projection);
 			shader.setVec3("light.position", light.m_position);
 			shader.setVec3("light.color", light.m_color);
+			shader.setVec3("light.ambient", light.m_ambient);
+			shader.setVec3("light.diffuse", light.m_diffuse);
+			shader.setVec3("light.specular", light.m_specular);
 			shader.setVec3("view_pos", camera.m_position);
 
 			// bind textures

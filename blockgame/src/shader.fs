@@ -3,6 +3,9 @@
 struct Light {
     vec3 position;
     vec3 color;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
 };
 
 out vec4 frag_color;
@@ -31,9 +34,9 @@ void main()
     vec3 view_dir = normalize(view_pos - frag_pos);
     vec3 reflect_dir = reflect(-light_dir, normalize(normal));
 
-    vec3 ambient = light.color * vec3(0.5f);
-    vec3 diffuse = light.color * vec3(0.5f) * max(dot(normalize(normal), light_dir), 0.0f);
-    vec3 specular = light.color * vec3(0.5f) * pow(max(dot(view_dir, reflect_dir), 0.0), 16);
+    vec3 ambient = light.color * light.ambient;
+    vec3 diffuse = light.color * light.diffuse * max(dot(normalize(normal), light_dir), 0.0f);
+    vec3 specular = light.color * light.specular * pow(max(dot(view_dir, reflect_dir), 0.0), 16);
 
     vec3 lighting = ambient + diffuse + specular;
 

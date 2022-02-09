@@ -161,8 +161,8 @@
     <ClInclude Include="src\terrain.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\dirt.jpg" />
-    <Image Include="res\grass.jpg" />
+    <Image Include="res\dirt.png" />
+    <Image Include="res\grass.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
