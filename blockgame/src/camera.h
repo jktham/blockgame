@@ -18,7 +18,8 @@ const float GRAVITY = 10.0f;
 class Camera
 {
 public:
-	glm::vec3 m_position = glm::vec3(0.0f, 20.0f, 0.0f);
+	glm::vec3 m_up_global = glm::vec3(0.0f, 0.0f, 1.0f);
+	glm::vec3 m_position = glm::vec3(0.0f, 0.0f, 20.0f);
 	glm::vec3 m_up;
 	glm::vec3 m_front;
 	glm::vec3 m_front_plane;
@@ -62,15 +63,15 @@ public:
 		else
 		{
 			m_vertical_velocity = 0.0f;
-			m_position.y = floor_height + m_height;
+			m_position.z = floor_height + m_height;
 		}
 
-		m_position += glm::vec3(0.0f, 1.0f, 0.0f) * m_vertical_velocity * delta_time;
+		m_position += m_up_global * m_vertical_velocity * delta_time;
 
 		if (m_vertical_velocity <= -50.0f)
 			m_vertical_velocity = -50.0f;
-		if (m_position.y < -50.0f)
-			m_position.y = 50.0f;
+		if (m_position.z < -50.0f)
+			m_position.z = 50.0f;
 	}
 
 	void applyMovement(glm::vec3 direction, float delta_time)
@@ -109,7 +110,7 @@ public:
 		if (checkCollisionVertical(floor_height))
 		{
 			m_vertical_velocity = 7.5f;
-			m_position.y += 0.01f;
+			m_position.z += 0.01f;
 		}
 	}
 
@@ -123,18 +124,18 @@ public:
 			glm::vec3 block_collision_min = m_offsets[i];
 			glm::vec3 block_collision_max = m_offsets[i] + glm::vec3(1.0f);
 
-			glm::vec3 camera_collision_min = m_position + glm::vec3(-m_width, -m_height, -m_width);
-			glm::vec3 camera_collision_max = m_position + glm::vec3(m_width, 0.0f, m_width);
+			glm::vec3 camera_collision_min = m_position + glm::vec3(-m_width, -m_width, -m_height);
+			glm::vec3 camera_collision_max = m_position + glm::vec3(m_width, m_width, 0.0);
 
 			if ((camera_collision_min.x < block_collision_max.x && camera_collision_max.x > block_collision_min.x) &&
-				(camera_collision_min.y <= block_collision_max.y && camera_collision_max.y >= block_collision_min.y) &&
-				(camera_collision_min.z < block_collision_max.z && camera_collision_max.z > block_collision_min.z))
+				(camera_collision_min.y < block_collision_max.y && camera_collision_max.y > block_collision_min.y) &&
+				(camera_collision_min.z <= block_collision_max.z && camera_collision_max.z >= block_collision_min.z))
 			{
 				glm::vec3 collision_position = camera_collision_min - block_collision_min;
 
-				if (collision_position.y > abs(collision_position.x) && collision_position.y > abs(collision_position.z))
+				if (collision_position.z > abs(collision_position.x) && collision_position.z > abs(collision_position.y))
 				{
-					floor_height = block_collision_max.y;
+					floor_height = block_collision_max.z;
 
 					std::cout << "vertical collision\n";
 					return true;
@@ -155,8 +156,8 @@ public:
 			glm::vec3 block_collision_min = m_offsets[i];
 			glm::vec3 block_collision_max = m_offsets[i] + glm::vec3(1.0f);
 
-			glm::vec3 camera_collision_min = m_position + glm::vec3(-m_width, -m_height, -m_width);
-			glm::vec3 camera_collision_max = m_position + glm::vec3(m_width, 0.0f, m_width);
+			glm::vec3 camera_collision_min = m_position + glm::vec3(-m_width, -m_width, -m_height);
+			glm::vec3 camera_collision_max = m_position + glm::vec3(m_width, m_width, 0.0f);
 
 			if ((camera_collision_min.x <= block_collision_max.x && camera_collision_max.x >= block_collision_min.x) &&
 				(camera_collision_min.y <= block_collision_max.y && camera_collision_max.y >= block_collision_min.y) &&
@@ -164,12 +165,12 @@ public:
 			{
 				collision_position = camera_collision_min - block_collision_min;
 
-				if (collision_position.y < abs(collision_position.x) || collision_position.y < abs(collision_position.z))
+				if (collision_position.z < abs(collision_position.x) || collision_position.z < abs(collision_position.y))
 				{
-					if (glm::abs(collision_position.x) > glm::abs(collision_position.z))
+					if (glm::abs(collision_position.x) > glm::abs(collision_position.y))
 						collision_normal = glm::normalize(glm::vec3(collision_position.x, 0.0f, 0.0f));
 					else
-						collision_normal = glm::normalize(glm::vec3(0.0f, 0.0f, collision_position.z));
+						collision_normal = glm::normalize(glm::vec3(0.0f, collision_position.y, 0.0f));
 
 					collision_id = i;
 					std::cout << "horizontal collision\n";
@@ -186,25 +187,25 @@ public:
 		return glm::lookAt(m_position, m_position + m_front, m_up);
 	}
 
-	void processKeyboard(Camera_Movement direction, float delta_time)
+	void processKeyboard(Camera_Movement action, float delta_time)
 	{
 		if (m_noclip)
 			m_front_plane = m_front;
 
 		glm::vec3 movement_vector = glm::vec3(0.0f);
 
-		if (direction == Camera_Movement::FORWARD)
+		if (action == Camera_Movement::FORWARD)
 			movement_vector += m_front_plane;
-		if (direction == Camera_Movement::BACKWARD)
+		if (action == Camera_Movement::BACKWARD)
 			movement_vector -= m_front_plane;
-		if (direction == Camera_Movement::LEFT)
+		if (action == Camera_Movement::LEFT)
 			movement_vector -= m_right;
-		if (direction == Camera_Movement::RIGHT)
+		if (action == Camera_Movement::RIGHT)
 			movement_vector += m_right;
 
 		applyMovement(movement_vector, delta_time);
 
-		if (direction == Camera_Movement::JUMP)
+		if (action == Camera_Movement::JUMP)
 			applyJump();
 	}
 
@@ -218,10 +219,10 @@ public:
 
 		if (constrain_pitch)
 		{
-			if (m_pitch > 89.0f)
-				m_pitch = 89.0f;
-			if (m_pitch < -89.0f)
-				m_pitch = -89.0f;
+			if (m_pitch > 89.99f)
+				m_pitch = 89.99f;
+			if (m_pitch < -89.99f)
+				m_pitch = -89.99f;
 		}
 
 		updateCameraVectors();
@@ -240,13 +241,13 @@ private:
 	void updateCameraVectors()
 	{
 		glm::vec3 front{};
-		front.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
-		front.y = sin(glm::radians(m_pitch));
-		front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+		front.x = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+		front.y = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+		front.z = sin(glm::radians(m_pitch));
 		m_front = glm::normalize(front);
 
-		m_right = glm::normalize(glm::cross(m_front, glm::vec3(0.0f, 1.0f, 0.0f)));
+		m_right = glm::normalize(glm::cross(m_front, m_up_global));
 		m_up = glm::normalize(glm::cross(m_right, m_front));
-		m_front_plane = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), m_right));
+		m_front_plane = glm::normalize(glm::cross(m_up_global, m_right));
 	}
 };

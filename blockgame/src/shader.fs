@@ -21,7 +21,7 @@ uniform sampler2D grass_texture;
 
 void main()
 {
-    if (normal.y > 0.0f)
+    if (normal.z > 0.0f)
     {
         frag_color = texture(grass_texture, tex_coord);
     }
