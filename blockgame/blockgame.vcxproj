@@ -156,9 +156,8 @@
     <ClInclude Include="src\camera.h" />
     <ClInclude Include="src\light.h" />
     <ClInclude Include="src\perlin.h" />
-    <ClInclude Include="src\shader.h" />
     <ClInclude Include="src\stb_image.h" />
-    <ClInclude Include="src\terrain.h" />
+    <ClInclude Include="src\world.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\dirt.png" />

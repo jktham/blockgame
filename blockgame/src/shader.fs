@@ -35,7 +35,7 @@ void main()
     vec3 reflect_dir = reflect(-light_dir, normalize(normal));
 
     vec3 ambient = light.color * light.ambient;
-    vec3 diffuse = light.color * light.diffuse * max(dot(normalize(normal), light_dir), 0.0f);
+    vec3 diffuse = light.color * light.diffuse * max(dot(normalize(normal), light_dir), 0.0);
     vec3 specular = light.color * light.specular * pow(max(dot(view_dir, reflect_dir), 0.0), 16);
 
     vec3 lighting = ambient + diffuse + specular;

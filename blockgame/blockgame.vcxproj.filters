@@ -34,16 +34,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\shader.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\camera.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\terrain.h">
+    <ClInclude Include="src\world.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\perlin.h">

@@ -11,6 +11,6 @@ public:
 
 	void update(float time)
 	{
-		//m_position = glm::vec3(50.0f + sin(time * 3.0f) * 100.0f, cos(time * 3.0f) * 50.0f, 50.0f);
+		m_position = glm::vec3(50.0f + sin(time) * 100.0f, cos(time) * 50.0f, 50.0f);
 	}
 };

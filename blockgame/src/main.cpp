@@ -17,9 +17,8 @@
 
 #include "stb_image.h"
 #include "perlin.h"
-#include "shader.h"
 #include "camera.h"
-#include "terrain.h"
+#include "world.h"
 #include "light.h"
 
 // settings
@@ -33,8 +32,8 @@ bool first_mouse = true;
 bool wireframe_mode = false;
 
 // classes
-Camera camera(glm::vec3(0.0f, 15.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 45.0f, 0.0f);
-Terrain terrain;
+Camera camera;
+World world;
 Light light;
 
 int terrain_index = 0;
@@ -73,7 +72,7 @@ int main()
 	glfwSetScrollCallback(window, scroll_callback);
 	glfwSetKeyCallback(window, key_callback);
 
-	// vertex data (pos_x, pos_y, pos_z, tex_x, tex_y, norm_x, norm_y, norm_z)
+	// vertex data (pos.x, pos.y, pos.z, tex.x, tex.y, norm.x, norm.y, norm.z)
 	float vertices[] = {
 	 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
 	 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
@@ -123,9 +122,9 @@ int main()
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
-	terrain.generateTerrainPerlin();
-	terrain.setInstances();
-	camera.m_offsets = terrain.m_offsets;
+	world.generateTerrainPerlin();
+	world.setInstances();
+	camera.m_offsets = world.m_offsets;
 
 	// vertex buffer object
 	unsigned int VBO;
@@ -185,13 +184,49 @@ int main()
 	glEnableVertexAttribArray(3);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	// shader program
-	Shader shader("src/shader.vs", "src/shader.fs");
+	// vertex shader
+	const char* vert_source;
 
-	// set texture uniforms
-	shader.use();
-	shader.setInt("dirt_texture", 0);
-	shader.setInt("grass_texture", 1);
+	std::ifstream vert_file("src/shader.vs");
+	std::string vert_string((std::istreambuf_iterator<char>(vert_file)),
+		std::istreambuf_iterator<char>());
+	vert_source = vert_string.c_str();
+
+	unsigned int vert_shader;
+	vert_shader = glCreateShader(GL_VERTEX_SHADER);
+
+	glShaderSource(vert_shader, 1, &vert_source, NULL);
+	glCompileShader(vert_shader);
+
+	// fragment shader
+	const char* frag_source;
+
+	std::ifstream frag_file("src/shader.fs");
+	std::string frag_string((std::istreambuf_iterator<char>(frag_file)),
+		std::istreambuf_iterator<char>());
+	frag_source = frag_string.c_str();
+
+	unsigned int frag_shader;
+	frag_shader = glCreateShader(GL_FRAGMENT_SHADER);
+
+	glShaderSource(frag_shader, 1, &frag_source, NULL);
+	glCompileShader(frag_shader);
+
+	// shader program
+	unsigned int shader;
+	shader = glCreateProgram();
+
+	glAttachShader(shader, vert_shader);
+	glAttachShader(shader, frag_shader);
+	glLinkProgram(shader);
+
+	glDeleteShader(vert_shader);
+	glDeleteShader(frag_shader);
+
+	// texture uniforms
+	glUseProgram(shader);
+	glUniform1i(glGetUniformLocation(shader, "dirt_texture"), 0);
+	glUniform1i(glGetUniformLocation(shader, "grass_texture"), 1);
 
 	// matrices
 	glm::mat4 model = glm::mat4(1.0f);
@@ -235,16 +270,16 @@ int main()
 			projection = glm::perspective(glm::radians(camera.m_fov), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 200.0f);
 
 			// set uniforms
-			shader.use();
-			shader.setMat4("model", model);
-			shader.setMat4("view", view);
-			shader.setMat4("projection", projection);
-			shader.setVec3("light.position", light.m_position);
-			shader.setVec3("light.color", light.m_color);
-			shader.setVec3("light.ambient", light.m_ambient);
-			shader.setVec3("light.diffuse", light.m_diffuse);
-			shader.setVec3("light.specular", light.m_specular);
-			shader.setVec3("view_pos", camera.m_position);
+			glUseProgram(shader);
+			glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
+			glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
+			glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+			glUniform3f(glGetUniformLocation(shader, "light.position"), light.m_position.x, light.m_position.y, light.m_position.z);
+			glUniform3f(glGetUniformLocation(shader, "light.color"), light.m_color.x, light.m_color.y, light.m_color.z);
+			glUniform3f(glGetUniformLocation(shader, "light.ambient"), light.m_ambient.x, light.m_ambient.y, light.m_ambient.z);
+			glUniform3f(glGetUniformLocation(shader, "light.diffuse"), light.m_diffuse.x, light.m_diffuse.y, light.m_diffuse.z);
+			glUniform3f(glGetUniformLocation(shader, "light.specular"), light.m_specular.x, light.m_specular.y, light.m_specular.z);
+			glUniform3f(glGetUniformLocation(shader, "view_pos"), camera.m_position.x, camera.m_position.y, camera.m_position.z);
 
 			// bind textures
 			glActiveTexture(GL_TEXTURE0);
@@ -255,7 +290,7 @@ int main()
 
 			// draw vertices
 			glBindVertexArray(VAO);
-			glDrawArraysInstanced(GL_TRIANGLES, 0, 36, (GLsizei)(terrain.m_offsets.size()));
+			glDrawArraysInstanced(GL_TRIANGLES, 0, 36, (GLsizei)(world.m_offsets.size()));
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
@@ -300,20 +335,20 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		switch (terrain_index)
 		{
 		case 0:
-			terrain.generateTerrainPerlin();
+			world.generateTerrainPerlin();
 			break;
 		case 1:
-			terrain.generateTerrainPlane();
+			world.generateTerrainPlane();
 			break;
 		case 2:
-			terrain.generateTerrainTest();
+			world.generateTerrainTest();
 			break;
 		default:
 			break;
 		}
 
-		terrain.setInstances();
-		camera.m_offsets = terrain.m_offsets;
+		world.setInstances();
+		camera.m_offsets = world.m_offsets;
 	}
 }
 

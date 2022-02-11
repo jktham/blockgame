@@ -8,7 +8,7 @@ enum class Camera_Movement {
 	JUMP
 };
 
-const float YAW = -90.0f;
+const float YAW = 45.0f;
 const float PITCH = 0.0f;
 const float SPEED = 7.5f;
 const float SENSITIVITY = 0.1f;
@@ -18,37 +18,30 @@ const float GRAVITY = 10.0f;
 class Camera
 {
 public:
-	glm::vec3 m_position;
+	glm::vec3 m_position = glm::vec3(0.0f, 20.0f, 0.0f);
+	glm::vec3 m_up;
 	glm::vec3 m_front;
 	glm::vec3 m_front_plane;
-	glm::vec3 m_up;
 	glm::vec3 m_right;
 
-	float m_yaw;
-	float m_pitch;
+	float m_yaw = YAW;
+	float m_pitch = PITCH;
 
-	float m_speed;
-	float m_sensitivity;
-	float m_fov;
+	float m_speed = SPEED;
+	float m_sensitivity = SENSITIVITY;
+	float m_fov = FOV;
 
 	float m_height = 1.75f;
 	float m_width = 0.5f;
 
-	float m_vertical_velocity;
+	float m_vertical_velocity = 0.0f;
 
 	bool m_noclip = false;
 
 	std::vector<glm::vec3> m_offsets;
 
-	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH)
+	Camera()
 	{
-		m_position = position;
-		m_up = up;
-		m_yaw = yaw;
-		m_pitch = pitch;
-		m_speed = SPEED;
-		m_sensitivity = SENSITIVITY;
-		m_fov = FOV;
 		updateCameraVectors();
 	}
 
@@ -75,14 +68,9 @@ public:
 		m_position += glm::vec3(0.0f, 1.0f, 0.0f) * m_vertical_velocity * delta_time;
 
 		if (m_vertical_velocity <= -50.0f)
-		{
 			m_vertical_velocity = -50.0f;
-		}
-
 		if (m_position.y < -50.0f)
-		{
 			m_position.y = 50.0f;
-		}
 	}
 
 	void applyMovement(glm::vec3 direction, float delta_time)

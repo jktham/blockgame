@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-class Terrain
+class World
 {
 public:
 	std::vector<glm::vec3> m_offsets;
