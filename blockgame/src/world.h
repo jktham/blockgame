@@ -1,93 +1,140 @@
 ﻿#pragma once
 
+class Block
+{
+public:
+	int m_type = 0;
+};
+
+class Chunk
+{
+public:
+	glm::vec2 m_chunk_pos;
+
+	Block m_blocks[16][16][32];
+	std::vector<glm::vec3> m_blocks_pos;
+};
+
 class World
 {
 public:
-	std::vector<glm::vec3> m_offsets;
 
-	void generateTerrainTest()
+	std::vector<Chunk> m_chunks;
+	std::vector<float> m_mesh;
+
+	void generateChunks()
 	{
-		const glm::vec3 origin = glm::vec3(0.0f, 0.0f, 0.0f);
-		const glm::vec3 size = glm::vec3(50.0f, 50.0f, 1.0f);
-		const glm::vec3 step = glm::vec3(1.0f, 1.0f, 1.0f);
+		std::vector<Chunk> chunks;
 
-		std::vector<glm::vec3> offsets;
-
-		for (int i = 0; i < size.x; i++)
+		for (int x = 0; x < 2; x++)
 		{
-			for (int j = 0; j < size.y; j++)
+			for (int y = 0; y < 2; y++)
 			{
-				for (int k = 0; k < size.z; k++)
-				{
-					offsets.push_back(glm::vec3(origin.x + i * step.x, origin.y + j * step.y, origin.z + k * step.z + int(i / 5.0f) + int(j / 5.0f)));
-				}
+				Chunk chunk;
+				chunk.m_chunk_pos = glm::vec2(x * 16, y * 16);
+
+				chunks.push_back(chunk);
 			}
 		}
 
-		m_offsets = offsets;
+		m_chunks = chunks;
 	}
 
-	void generateTerrainPlane()
+	void generateTerrain()
 	{
-		const glm::vec3 origin = glm::vec3(0.0f, 0.0f, 0.0f);
-		const glm::vec3 size = glm::vec3(50.0f, 50.0f, 1.0f);
-		const glm::vec3 step = glm::vec3(1.0f, 1.0f, 1.0f);
-
-		std::vector<glm::vec3> offsets;
-
-		for (int i = 0; i < size.x; i++)
-		{
-			for (int j = 0; j < size.y; j++)
-			{
-				for (int k = 0; k < size.z; k++)
-				{
-					offsets.push_back(glm::vec3(origin.x + i * step.x, origin.y + j * step.y, origin.z + k * step.z));
-				}
-			}
-		}
-
-		m_offsets = offsets;
-	}
-
-	void generateTerrainPerlin()
-	{
-		const glm::vec3 origin = glm::vec3(0.0f, 0.0f, 0.0f);
-		const glm::vec3 size = glm::vec3(100.0f, 100.0f, 1.0f);
-
-		std::vector<glm::vec3> offsets;
-
 		const siv::PerlinNoise::seed_type seed = 123456u;
 		const siv::PerlinNoise perlin{ seed };
 
-		for (int i = 0; i < size.x; i++)
+		for (int c = 0; c < m_chunks.size(); c++)
 		{
-			for (int j = 0; j < size.y; j++)
+			for (int x = 0; x < 16; x++)
 			{
-				for (int k = 0; k < size.z; k++)
+				for (int y = 0; y < 16; y++)
 				{
-					double height = perlin.octave2D_01(i * 0.05f, j * 0.05f, 4);
-					offsets.push_back(glm::vec3(i, j, int(height * 10.0f) - k));
+					float ground_height = perlin.octave2D_01((x + m_chunks[c].m_chunk_pos.x) * 0.05f, (y + m_chunks[c].m_chunk_pos.y) * 0.05f, 4) * 12.0f + 10.0f;
+
+					for (int z = 0; z < ground_height; z++)
+					{
+						m_chunks[c].m_blocks[x][y][z].m_type = 1;
+						m_chunks[c].m_blocks_pos.push_back(glm::vec3(x, y, z));
+					}
 				}
 			}
 		}
-
-		m_offsets = offsets;
 	}
 
-	void setInstances()
+	void generateMesh()
 	{
-		// instance vertex buffer object
-		unsigned int instance_VBO;
-		glGenBuffers(1, &instance_VBO);
-		glBindBuffer(GL_ARRAY_BUFFER, instance_VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * (m_offsets.size()), &m_offsets[0], GL_STATIC_DRAW);
-		glVertexAttribDivisor(1, 1);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		std::vector<float> mesh;
 
-		// vertex attribute (instance offsets)
-		glBindBuffer(GL_ARRAY_BUFFER, instance_VBO);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		for (int c = 0; c < m_chunks.size(); c++)
+		{
+			for (int x = 0; x < 16; x++)
+			{
+				for (int y = 0; y < 16; y++)
+				{
+					for (int z = 0; z < 32; z++)
+					{
+						if (m_chunks[c].m_blocks[x][y][z].m_type > 0)
+						{
+							int a = m_chunks[c].m_chunk_pos.x;
+							int b = m_chunks[c].m_chunk_pos.y;
+
+							float vertices[288] = {
+								// bottom
+								0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+								1.0f + a + x, 1.0f + b + y, 0.0f + z, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+								1.0f + a + x, 0.0f + b + y, 0.0f + z, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+								1.0f + a + x, 1.0f + b + y, 0.0f + z, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+								0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+								0.0f + a + x, 1.0f + b + y, 0.0f + z, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+								// top
+								0.0f + a + x, 0.0f + b + y, 1.0f + z, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+								1.0f + a + x, 0.0f + b + y, 1.0f + z, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+								1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+								1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+								0.0f + a + x, 1.0f + b + y, 1.0f + z, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+								0.0f + a + x, 0.0f + b + y, 1.0f + z, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+								// left
+								0.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+								0.0f + a + x, 1.0f + b + y, 0.0f + z, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+								0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+								0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+								0.0f + a + x, 0.0f + b + y, 1.0f + z, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+								0.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+								// right
+								1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+								1.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+								1.0f + a + x, 1.0f + b + y, 0.0f + z, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+								1.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+								1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+								1.0f + a + x, 0.0f + b + y, 1.0f + z, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+								// front
+								0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+								1.0f + a + x, 0.0f + b + y, 0.0f + z, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+								1.0f + a + x, 0.0f + b + y, 1.0f + z, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+								1.0f + a + x, 0.0f + b + y, 1.0f + z, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+								0.0f + a + x, 0.0f + b + y, 1.0f + z, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+								0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+								// back
+								0.0f + a + x, 1.0f + b + y, 0.0f + z, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+								1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+								1.0f + a + x, 1.0f + b + y, 0.0f + z, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+								1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+								0.0f + a + x, 1.0f + b + y, 0.0f + z, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+								0.0f + a + x, 1.0f + b + y, 1.0f + z, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+							};
+
+							for (int i = 0; i < 288; i++)
+							{
+								mesh.push_back(vertices[i]);
+							}
+						}
+					}
+				}
+			}
+		}
+		m_mesh = mesh;
 	}
+
 };
