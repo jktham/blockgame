@@ -304,7 +304,7 @@ void processInput(GLFWwindow* window)
 		camera.processKeyboard(Camera_Movement::RIGHT, delta_time);
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		camera.m_speed = SPEED * 2.0f;
+		camera.m_speed = SPEED * 5.0f;
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
 		camera.m_speed = SPEED;
 }
