@@ -1,5 +1,8 @@
 ﻿#pragma once
 
+constexpr int WORLD_SIZE[2] = {9, 9};
+constexpr int CHUNK_SIZE[3] = {16, 16, 64};
+
 class Block
 {
 public:
@@ -11,7 +14,7 @@ class Chunk
 public:
 	glm::vec2 m_chunk_pos;
 
-	Block m_blocks[16][16][256];
+	Block m_blocks[CHUNK_SIZE[0]][CHUNK_SIZE[1]][CHUNK_SIZE[2]];
 	std::vector<glm::vec3> m_blocks_pos;
 };
 
@@ -19,25 +22,21 @@ class World
 {
 public:
 
-	std::vector<Chunk> m_chunks;
+	Chunk m_chunks[WORLD_SIZE[0]][WORLD_SIZE[1]];
 	std::vector<float> m_mesh;
 
 	void generateChunks()
 	{
-		std::vector<Chunk> chunks;
-
-		for (int x = 0; x < 8; x++)
+		for (int m = 0; m < WORLD_SIZE[0]; m++)
 		{
-			for (int y = 0; y < 8; y++)
+			for (int n = 0; n < WORLD_SIZE[1]; n++)
 			{
 				Chunk chunk;
-				chunk.m_chunk_pos = glm::vec2(x * 16, y * 16);
+				chunk.m_chunk_pos = glm::vec2(m * CHUNK_SIZE[0], n * CHUNK_SIZE[1]);
 
-				chunks.push_back(chunk);
+				m_chunks[m][n] = chunk;
 			}
 		}
-
-		m_chunks = chunks;
 	}
 
 	void generateTerrain()
@@ -45,144 +44,149 @@ public:
 		const siv::PerlinNoise::seed_type seed = 123456u;
 		const siv::PerlinNoise perlin{ seed };
 
-		for (int c = 0; c < m_chunks.size(); c++)
+		for (int m = 0; m < WORLD_SIZE[0]; m++)
 		{
-			for (int x = 0; x < 16; x++)
+			for (int n = 0; n < WORLD_SIZE[1]; n++)
 			{
-				for (int y = 0; y < 16; y++)
+				for (int x = 0; x < CHUNK_SIZE[0]; x++)
 				{
-					double ground_height = perlin.octave2D_01((x + m_chunks[c].m_chunk_pos.x) * 0.05f, (y + m_chunks[c].m_chunk_pos.y) * 0.05f, 4) * 12.0f + 100.0f;
-
-					for (int z = 0; z < ground_height; z++)
+					for (int y = 0; y < CHUNK_SIZE[1]; y++)
 					{
-						m_chunks[c].m_blocks[x][y][z].m_type = 1;
-						m_chunks[c].m_blocks_pos.push_back(glm::vec3(x, y, z));
+						double ground_height = perlin.octave2D_01((x + m_chunks[m][n].m_chunk_pos.x) * 0.05f, (y + m_chunks[m][n].m_chunk_pos.y) * 0.05f, 4) * 10.0f + (float)CHUNK_SIZE[2] / 2.0f;
+
+						for (int z = 0; z < ground_height; z++)
+						{
+							m_chunks[m][n].m_blocks[x][y][z].m_type = 1;
+							m_chunks[m][n].m_blocks_pos.push_back(glm::vec3(x, y, z));
+						}
 					}
 				}
 			}
 		}
+		std::cout << m_mesh.size();
 	}
 
 	void generateMesh()
 	{
-		std::vector<float> mesh;
-
-		for (int c = 0; c < m_chunks.size(); c++)
+		for (int m = 0; m < WORLD_SIZE[0]; m++)
 		{
-			for (int x = 0; x < 16; x++)
+			for (int n = 0; n < WORLD_SIZE[1]; n++)
 			{
-				for (int y = 0; y < 16; y++)
+				for (int x = 0; x < CHUNK_SIZE[0]; x++)
 				{
-					for (int z = 0; z < 256; z++)
+					for (int y = 0; y < CHUNK_SIZE[1]; y++)
 					{
-						if (m_chunks[c].m_blocks[x][y][z].m_type > 0)
+						for (int z = 0; z < CHUNK_SIZE[2]; z++)
 						{
-							float a = m_chunks[c].m_chunk_pos.x;
-							float b = m_chunks[c].m_chunk_pos.y;
-
-							float vertices[6][48] = {
-								// pos.x, pos.y, pos.z, tex.x, tex.y, norm.x, norm.y, norm.z
-								// bottom
-								{
-								0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-								1.0f + a + x, 1.0f + b + y, 0.0f + z, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
-								1.0f + a + x, 0.0f + b + y, 0.0f + z, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-								1.0f + a + x, 1.0f + b + y, 0.0f + z, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
-								0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-								0.0f + a + x, 1.0f + b + y, 0.0f + z, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f,
-								},
-								// top
-								{
-								0.0f + a + x, 0.0f + b + y, 1.0f + z, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-								1.0f + a + x, 0.0f + b + y, 1.0f + z, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-								1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-								1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-								0.0f + a + x, 1.0f + b + y, 1.0f + z, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-								0.0f + a + x, 0.0f + b + y, 1.0f + z, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-								},
-								// left
-								{
-								0.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-								0.0f + a + x, 1.0f + b + y, 0.0f + z, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-								0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-								0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-								0.0f + a + x, 0.0f + b + y, 1.0f + z, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-								0.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-								},
-								// right
-								{
-								1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-								1.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-								1.0f + a + x, 1.0f + b + y, 0.0f + z, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-								1.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-								1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-								1.0f + a + x, 0.0f + b + y, 1.0f + z, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-								},
-								// front
-								{
-								0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-								1.0f + a + x, 0.0f + b + y, 0.0f + z, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-								1.0f + a + x, 0.0f + b + y, 1.0f + z, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-								1.0f + a + x, 0.0f + b + y, 1.0f + z, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-								0.0f + a + x, 0.0f + b + y, 1.0f + z, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-								0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-								},
-								// back
-								{
-								0.0f + a + x, 1.0f + b + y, 0.0f + z, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-								1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-								1.0f + a + x, 1.0f + b + y, 0.0f + z, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-								1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-								0.0f + a + x, 1.0f + b + y, 0.0f + z, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-								0.0f + a + x, 1.0f + b + y, 1.0f + z, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-								},
-							};
-
-							if (z - 1 < 0 || m_chunks[c].m_blocks[x][y][z - 1].m_type == 0)
+							if (m_chunks[m][n].m_blocks[x][y][z].m_type > 0)
 							{
-								for (int i = 0; i < 48; i++)
+								float a = m_chunks[m][n].m_chunk_pos.x;
+								float b = m_chunks[m][n].m_chunk_pos.y;
+
+								float vertices[6][48] = {
+									// pos.x, pos.y, pos.z, tex.x, tex.y, norm.x, norm.y, norm.z
+									// left
+									{
+									0.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+									0.0f + a + x, 1.0f + b + y, 0.0f + z, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+									0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+									0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+									0.0f + a + x, 0.0f + b + y, 1.0f + z, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+									0.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+									},
+									// right
+									{
+									1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+									1.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+									1.0f + a + x, 1.0f + b + y, 0.0f + z, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+									1.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+									1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+									1.0f + a + x, 0.0f + b + y, 1.0f + z, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+									},
+									// front
+									{
+									0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+									1.0f + a + x, 0.0f + b + y, 0.0f + z, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+									1.0f + a + x, 0.0f + b + y, 1.0f + z, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+									1.0f + a + x, 0.0f + b + y, 1.0f + z, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+									0.0f + a + x, 0.0f + b + y, 1.0f + z, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+									0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+									},
+									// back
+									{
+									0.0f + a + x, 1.0f + b + y, 0.0f + z, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+									1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+									1.0f + a + x, 1.0f + b + y, 0.0f + z, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+									1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+									0.0f + a + x, 1.0f + b + y, 0.0f + z, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+									0.0f + a + x, 1.0f + b + y, 1.0f + z, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+									},
+									// bottom
+									{
+									0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+									1.0f + a + x, 1.0f + b + y, 0.0f + z, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+									1.0f + a + x, 0.0f + b + y, 0.0f + z, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+									1.0f + a + x, 1.0f + b + y, 0.0f + z, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+									0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+									0.0f + a + x, 1.0f + b + y, 0.0f + z, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+									},
+									// top
+									{
+									0.0f + a + x, 0.0f + b + y, 1.0f + z, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+									1.0f + a + x, 0.0f + b + y, 1.0f + z, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+									1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+									1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+									0.0f + a + x, 1.0f + b + y, 1.0f + z, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+									0.0f + a + x, 0.0f + b + y, 1.0f + z, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+									},
+								};
+
+								if (x - 1 < 0 || m_chunks[m][n].m_blocks[x - 1][y][z].m_type == 0)
 								{
-									mesh.push_back(vertices[0][i]);
+									for (int i = 0; i < 48; i++)
+									{
+										m_mesh.push_back(vertices[0][i]);
+									}
 								}
-							}
 
-							if (z + 1 > 256 || m_chunks[c].m_blocks[x][y][z + 1].m_type == 0)
-							{
-								for (int i = 0; i < 48; i++)
+								if (x + 1 > CHUNK_SIZE[0] - 1 || m_chunks[m][n].m_blocks[x + 1][y][z].m_type == 0)
 								{
-									mesh.push_back(vertices[1][i]);
+									for (int i = 0; i < 48; i++)
+									{
+										m_mesh.push_back(vertices[1][i]);
+									}
 								}
-							}
 
-							if (x - 1 < 0 || m_chunks[c].m_blocks[x - 1][y][z].m_type == 0)
-							{
-								for (int i = 0; i < 48; i++)
+								if (y - 1 < 0 || m_chunks[m][n].m_blocks[x][y - 1][z].m_type == 0)
 								{
-									mesh.push_back(vertices[2][i]);
+									for (int i = 0; i < 48; i++)
+									{
+										m_mesh.push_back(vertices[2][i]);
+									}
 								}
-							}
 
-							if (x + 1 > 15 || m_chunks[c].m_blocks[x + 1][y][z].m_type == 0)
-							{
-								for (int i = 0; i < 48; i++)
+								if (y + 1 > CHUNK_SIZE[1] - 1 || m_chunks[m][n].m_blocks[x][y + 1][z].m_type == 0)
 								{
-									mesh.push_back(vertices[3][i]);
+									for (int i = 0; i < 48; i++)
+									{
+										m_mesh.push_back(vertices[3][i]);
+									}
 								}
-							}
 
-							if (y - 1 < 0 || m_chunks[c].m_blocks[x][y - 1][z].m_type == 0)
-							{
-								for (int i = 0; i < 48; i++)
+								if (z - 1 < 0 || m_chunks[m][n].m_blocks[x][y][z - 1].m_type == 0)
 								{
-									mesh.push_back(vertices[4][i]);
+									for (int i = 0; i < 48; i++)
+									{
+										m_mesh.push_back(vertices[4][i]);
+									}
 								}
-							}
 
-							if (y + 1 > 15 || m_chunks[c].m_blocks[x][y + 1][z].m_type == 0)
-							{
-								for (int i = 0; i < 48; i++)
+								if (z + 1 > CHUNK_SIZE[2] - 1 || m_chunks[m][n].m_blocks[x][y][z + 1].m_type == 0)
 								{
-									mesh.push_back(vertices[5][i]);
+									for (int i = 0; i < 48; i++)
+									{
+										m_mesh.push_back(vertices[5][i]);
+									}
 								}
 							}
 						}
@@ -190,6 +194,5 @@ public:
 				}
 			}
 		}
-		m_mesh = mesh;
 	}
 };

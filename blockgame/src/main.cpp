@@ -191,6 +191,7 @@ int main()
 	// opengl settings
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEBUG_OUTPUT);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glfwSwapInterval(0);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
