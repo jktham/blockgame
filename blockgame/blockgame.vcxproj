@@ -154,6 +154,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\camera.h" />
+    <ClInclude Include="src\global.h" />
     <ClInclude Include="src\light.h" />
     <ClInclude Include="src\perlin.h" />
     <ClInclude Include="src\stb_image.h" />

@@ -8,22 +8,16 @@ enum class Camera_Movement {
 	JUMP
 };
 
-const float YAW = 45.0f;
-const float PITCH = 0.0f;
-const float SPEED = 7.5f;
-const float SENSITIVITY = 0.1f;
-const float FOV = 60.0f;
-const float GRAVITY = 10.0f;
-
 class Camera
 {
 public:
 	glm::vec3 m_up_global = glm::vec3(0.0f, 0.0f, 1.0f);
-	glm::vec3 m_position = glm::vec3(0.0f, 0.0f, 150.0f);
+	glm::vec3 m_position = glm::vec3(0.0f, 0.0f, 100.0f);
 	glm::vec3 m_up;
 	glm::vec3 m_front;
 	glm::vec3 m_front_plane;
 	glm::vec3 m_right;
+
 
 	float m_yaw = YAW;
 	float m_pitch = PITCH;
@@ -101,6 +95,8 @@ public:
 				m_position += direction * velocity;
 			}
 		}
+
+		current_chunk = glm::vec2(divideInt(m_position.x, (float)CHUNK_SIZE[0]) + WORLD_SIZE[0] / 2, divideInt(m_position.y, (float)CHUNK_SIZE[1]) + WORLD_SIZE[1] / 2);
 	}
 
 	void applyJump()
@@ -249,5 +245,10 @@ private:
 		m_right = glm::normalize(glm::cross(m_front, m_up_global));
 		m_up = glm::normalize(glm::cross(m_right, m_front));
 		m_front_plane = glm::normalize(glm::cross(m_up_global, m_right));
+	}
+
+	int divideInt(float a, float b) {
+		if (a < 0) a -= 1;
+		return (int)(a / b - ((int)a % (int)b < 0 ? 1 : 0));
 	}
 };

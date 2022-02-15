@@ -1,28 +1,26 @@
 ﻿#pragma once
 
-constexpr int WORLD_SIZE[2] = {9, 9};
-constexpr int CHUNK_SIZE[3] = {16, 16, 64};
-
 class Block
 {
 public:
 	int m_type = 0;
+	bool m_visible = false;
 };
 
 class Chunk
 {
 public:
-	glm::vec2 m_chunk_pos;
-
 	Block m_blocks[CHUNK_SIZE[0]][CHUNK_SIZE[1]][CHUNK_SIZE[2]];
+
+	glm::vec2 m_chunk_pos;
 	std::vector<glm::vec3> m_blocks_pos;
 };
 
 class World
 {
 public:
-
 	Chunk m_chunks[WORLD_SIZE[0]][WORLD_SIZE[1]];
+
 	std::vector<float> m_mesh;
 
 	void generateChunks()
@@ -32,7 +30,7 @@ public:
 			for (int n = 0; n < WORLD_SIZE[1]; n++)
 			{
 				Chunk chunk;
-				chunk.m_chunk_pos = glm::vec2(m * CHUNK_SIZE[0], n * CHUNK_SIZE[1]);
+				chunk.m_chunk_pos = glm::vec2((m - 4) * CHUNK_SIZE[0], (n - 4) * CHUNK_SIZE[1]);
 
 				m_chunks[m][n] = chunk;
 			}
@@ -63,7 +61,6 @@ public:
 				}
 			}
 		}
-		std::cout << m_mesh.size();
 	}
 
 	void generateMesh()
@@ -145,6 +142,7 @@ public:
 								{
 									for (int i = 0; i < 48; i++)
 									{
+										m_chunks[m][n].m_blocks[x][y][z].m_visible = true;
 										m_mesh.push_back(vertices[0][i]);
 									}
 								}
@@ -153,6 +151,7 @@ public:
 								{
 									for (int i = 0; i < 48; i++)
 									{
+										m_chunks[m][n].m_blocks[x][y][z].m_visible = true;
 										m_mesh.push_back(vertices[1][i]);
 									}
 								}
@@ -161,6 +160,7 @@ public:
 								{
 									for (int i = 0; i < 48; i++)
 									{
+										m_chunks[m][n].m_blocks[x][y][z].m_visible = true;
 										m_mesh.push_back(vertices[2][i]);
 									}
 								}
@@ -169,6 +169,7 @@ public:
 								{
 									for (int i = 0; i < 48; i++)
 									{
+										m_chunks[m][n].m_blocks[x][y][z].m_visible = true;
 										m_mesh.push_back(vertices[3][i]);
 									}
 								}
@@ -177,6 +178,7 @@ public:
 								{
 									for (int i = 0; i < 48; i++)
 									{
+										m_chunks[m][n].m_blocks[x][y][z].m_visible = true;
 										m_mesh.push_back(vertices[4][i]);
 									}
 								}
@@ -185,6 +187,7 @@ public:
 								{
 									for (int i = 0; i < 48; i++)
 									{
+										m_chunks[m][n].m_blocks[x][y][z].m_visible = true;
 										m_mesh.push_back(vertices[5][i]);
 									}
 								}

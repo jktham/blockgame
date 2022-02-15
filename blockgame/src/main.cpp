@@ -15,34 +15,17 @@
 #include <iomanip>
 #include <vector>
 
+#include "global.h"
 #include "stb_image.h"
 #include "perlin.h"
 #include "camera.h"
 #include "world.h"
 #include "light.h"
 
-// settings
-const unsigned int WINDOW_WIDTH = 1280;
-const unsigned int WINDOW_HEIGHT = 720;
-
-// camera
-float last_x = WINDOW_WIDTH / 2.0f;
-float last_y = WINDOW_HEIGHT / 2.0f;
-bool first_mouse = true;
-bool wireframe_mode = false;
-
 // classes
 Camera camera;
 World world;
 Light light;
-
-int terrain_index = 0;
-
-// timing
-float delta_time = 0.0f;
-float current_frame = 0.0f;
-float last_frame = 0.0f;
-float frame_rate_limit = 120.0f;
 
 // callbacks
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -208,7 +191,7 @@ int main()
 
 			std::cout << std::fixed;
 			std::cout << std::setprecision(2);
-			std::cout << "pos: (" << camera.m_position.x << ", " << camera.m_position.y << ", " << camera.m_position.z << "),  vert: " << camera.m_vertical_velocity << ",  fps: " << 1.0f / delta_time << "\n";
+			std::cout << "pos: (" << camera.m_position.x << ", " << camera.m_position.y << ", " << camera.m_position.z << "), chunk: (" << current_chunk.x << ", " << current_chunk.y << "), vert: " << camera.m_vertical_velocity << ", fps: " << 1.0f / delta_time << "\n";
 
 			// keyboard input
 			processInput(window);
@@ -246,7 +229,7 @@ int main()
 
 			// draw vertices
 			glBindVertexArray(VAO);
-			glDrawArrays(GL_TRIANGLES, 0, world.m_mesh.size()/3);
+			glDrawArrays(GL_TRIANGLES, 0, (GLsizei)world.m_mesh.size()/3);
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
@@ -276,17 +259,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_Q && action == GLFW_PRESS)
 	{
 		camera.m_noclip = !camera.m_noclip;
-	}
-
-	if (key == GLFW_KEY_R && action == GLFW_PRESS)
-	{
-		int terrain_index_max = 2;
-		terrain_index += 1;
-
-		if (terrain_index > terrain_index_max)
-			terrain_index = 0;
-		if (terrain_index < 0)
-			terrain_index = terrain_index_max;
 	}
 }
 
