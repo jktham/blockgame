@@ -136,7 +136,7 @@ public:
 									},
 								};
 
-								if (x - 1 < 0 || m_chunks[m][n].m_blocks[x - 1][y][z].m_type == 0)
+								if (x != 0 && m_chunks[m][n].m_blocks[x - 1][y][z].m_type == 0 || x == 0 && m != 0 && m_chunks[m - 1][n].m_blocks[CHUNK_SIZE.x - 1][y][z].m_type == 0)
 								{
 									for (int i = 0; i < 48; i++)
 									{
@@ -145,7 +145,7 @@ public:
 									m_chunks[m][n].m_blocks[x][y][z].m_exposed = true;
 								}
 
-								if (x + 1 > CHUNK_SIZE.x - 1 || m_chunks[m][n].m_blocks[x + 1][y][z].m_type == 0)
+								if (x != CHUNK_SIZE.x - 1 && m_chunks[m][n].m_blocks[x + 1][y][z].m_type == 0 || x == CHUNK_SIZE.x - 1 && m != WORLD_SIZE.x - 1 && m_chunks[m + 1][n].m_blocks[0][y][z].m_type == 0)
 								{
 									for (int i = 0; i < 48; i++)
 									{
@@ -154,7 +154,7 @@ public:
 									m_chunks[m][n].m_blocks[x][y][z].m_exposed = true;
 								}
 
-								if (y - 1 < 0 || m_chunks[m][n].m_blocks[x][y - 1][z].m_type == 0)
+								if (y != 0 && m_chunks[m][n].m_blocks[x][y - 1][z].m_type == 0 || y == 0 && n != 0 && m_chunks[m][n - 1].m_blocks[x][CHUNK_SIZE.y - 1][z].m_type == 0)
 								{
 									for (int i = 0; i < 48; i++)
 									{
@@ -163,7 +163,7 @@ public:
 									m_chunks[m][n].m_blocks[x][y][z].m_exposed = true;
 								}
 
-								if (y + 1 > CHUNK_SIZE.y - 1 || m_chunks[m][n].m_blocks[x][y + 1][z].m_type == 0)
+								if (y != CHUNK_SIZE.y - 1 && m_chunks[m][n].m_blocks[x][y + 1][z].m_type == 0 || y == CHUNK_SIZE.y - 1 && n != WORLD_SIZE.y - 1 && m_chunks[m][n + 1].m_blocks[x][0][z].m_type == 0)
 								{
 									for (int i = 0; i < 48; i++)
 									{
@@ -172,7 +172,7 @@ public:
 									m_chunks[m][n].m_blocks[x][y][z].m_exposed = true;
 								}
 
-								if (z - 1 < 0 || m_chunks[m][n].m_blocks[x][y][z - 1].m_type == 0)
+								if (z != 0 && m_chunks[m][n].m_blocks[x][y][z - 1].m_type == 0)
 								{
 									for (int i = 0; i < 48; i++)
 									{
@@ -181,7 +181,7 @@ public:
 									m_chunks[m][n].m_blocks[x][y][z].m_exposed = true;
 								}
 
-								if (z + 1 > CHUNK_SIZE.z - 1 || m_chunks[m][n].m_blocks[x][y][z + 1].m_type == 0)
+								if (z != CHUNK_SIZE.z - 1 && m_chunks[m][n].m_blocks[x][y][z + 1].m_type == 0)
 								{
 									for (int i = 0; i < 48; i++)
 									{

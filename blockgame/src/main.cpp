@@ -229,7 +229,7 @@ int main()
 
 			// draw vertices
 			glBindVertexArray(VAO);
-			glDrawArrays(GL_TRIANGLES, 0, (GLsizei)world.m_mesh.size()/3);
+			glDrawArrays(GL_TRIANGLES, 0, (GLsizei)world.m_mesh.size() / 3);
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
