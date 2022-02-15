@@ -18,7 +18,6 @@ public:
 	glm::vec3 m_front_plane;
 	glm::vec3 m_right;
 
-
 	float m_yaw = YAW;
 	float m_pitch = PITCH;
 
@@ -32,8 +31,6 @@ public:
 	float m_vertical_velocity = 0.0f;
 
 	bool m_noclip = false;
-
-	std::vector<glm::vec3> m_offsets;
 
 	Camera()
 	{
@@ -68,7 +65,7 @@ public:
 			m_position.z = 256.0f;
 	}
 
-	void applyMovement(glm::vec3 direction, float delta_time)
+	void applyMovement(glm::vec3 direction)
 	{
 		int collision_id = 0;
 		glm::vec3 collision_position = glm::vec3(0.0f);
@@ -115,10 +112,10 @@ public:
 		if (m_noclip)
 			return false;
 
-		for (int i = 0; i < m_offsets.size(); i += 1)
+		for (int i = 0; i < collision_blocks.size(); i += 1)
 		{
-			glm::vec3 block_collision_min = m_offsets[i];
-			glm::vec3 block_collision_max = m_offsets[i] + glm::vec3(1.0f);
+			glm::vec3 block_collision_min = collision_blocks[i];
+			glm::vec3 block_collision_max = collision_blocks[i] + glm::vec3(1.0f);
 
 			glm::vec3 camera_collision_min = m_position + glm::vec3(-m_width, -m_width, -m_height);
 			glm::vec3 camera_collision_max = m_position + glm::vec3(m_width, m_width, 0.0);
@@ -147,10 +144,10 @@ public:
 		if (m_noclip)
 			return false;
 
-		for (int i = 0; i < m_offsets.size(); i += 1)
+		for (int i = 0; i < collision_blocks.size(); i += 1)
 		{
-			glm::vec3 block_collision_min = m_offsets[i];
-			glm::vec3 block_collision_max = m_offsets[i] + glm::vec3(1.0f);
+			glm::vec3 block_collision_min = collision_blocks[i];
+			glm::vec3 block_collision_max = collision_blocks[i] + glm::vec3(1.0f);
 
 			glm::vec3 camera_collision_min = m_position + glm::vec3(-m_width, -m_width, -m_height);
 			glm::vec3 camera_collision_max = m_position + glm::vec3(m_width, m_width, 0.0f);
@@ -183,7 +180,7 @@ public:
 		return glm::lookAt(m_position, m_position + m_front, m_up);
 	}
 
-	void processKeyboard(Camera_Movement action, float delta_time)
+	void processKeyboard(Camera_Movement action)
 	{
 		if (m_noclip)
 			m_front_plane = m_front;
@@ -199,7 +196,7 @@ public:
 		if (action == Camera_Movement::RIGHT)
 			movement_vector += m_right;
 
-		applyMovement(movement_vector, delta_time);
+		applyMovement(movement_vector);
 
 		if (action == Camera_Movement::JUMP)
 			applyJump();

@@ -4,7 +4,7 @@ class Block
 {
 public:
 	int m_type = 0;
-	bool m_visible = false;
+	bool m_exposed = false;
 };
 
 class Chunk
@@ -13,7 +13,6 @@ public:
 	Block m_blocks[CHUNK_SIZE[0]][CHUNK_SIZE[1]][CHUNK_SIZE[2]];
 
 	glm::vec2 m_chunk_pos;
-	std::vector<glm::vec3> m_blocks_pos;
 };
 
 class World
@@ -55,7 +54,6 @@ public:
 						for (int z = 0; z < ground_height; z++)
 						{
 							m_chunks[m][n].m_blocks[x][y][z].m_type = 1;
-							m_chunks[m][n].m_blocks_pos.push_back(glm::vec3(x, y, z));
 						}
 					}
 				}
@@ -142,54 +140,59 @@ public:
 								{
 									for (int i = 0; i < 48; i++)
 									{
-										m_chunks[m][n].m_blocks[x][y][z].m_visible = true;
 										m_mesh.push_back(vertices[0][i]);
 									}
+									m_chunks[m][n].m_blocks[x][y][z].m_exposed = true;
 								}
 
 								if (x + 1 > CHUNK_SIZE[0] - 1 || m_chunks[m][n].m_blocks[x + 1][y][z].m_type == 0)
 								{
 									for (int i = 0; i < 48; i++)
 									{
-										m_chunks[m][n].m_blocks[x][y][z].m_visible = true;
 										m_mesh.push_back(vertices[1][i]);
 									}
+									m_chunks[m][n].m_blocks[x][y][z].m_exposed = true;
 								}
 
 								if (y - 1 < 0 || m_chunks[m][n].m_blocks[x][y - 1][z].m_type == 0)
 								{
 									for (int i = 0; i < 48; i++)
 									{
-										m_chunks[m][n].m_blocks[x][y][z].m_visible = true;
 										m_mesh.push_back(vertices[2][i]);
 									}
+									m_chunks[m][n].m_blocks[x][y][z].m_exposed = true;
 								}
 
 								if (y + 1 > CHUNK_SIZE[1] - 1 || m_chunks[m][n].m_blocks[x][y + 1][z].m_type == 0)
 								{
 									for (int i = 0; i < 48; i++)
 									{
-										m_chunks[m][n].m_blocks[x][y][z].m_visible = true;
 										m_mesh.push_back(vertices[3][i]);
 									}
+									m_chunks[m][n].m_blocks[x][y][z].m_exposed = true;
 								}
 
 								if (z - 1 < 0 || m_chunks[m][n].m_blocks[x][y][z - 1].m_type == 0)
 								{
 									for (int i = 0; i < 48; i++)
 									{
-										m_chunks[m][n].m_blocks[x][y][z].m_visible = true;
 										m_mesh.push_back(vertices[4][i]);
 									}
+									m_chunks[m][n].m_blocks[x][y][z].m_exposed = true;
 								}
 
 								if (z + 1 > CHUNK_SIZE[2] - 1 || m_chunks[m][n].m_blocks[x][y][z + 1].m_type == 0)
 								{
 									for (int i = 0; i < 48; i++)
 									{
-										m_chunks[m][n].m_blocks[x][y][z].m_visible = true;
 										m_mesh.push_back(vertices[5][i]);
 									}
+									m_chunks[m][n].m_blocks[x][y][z].m_exposed = true;
+								}
+
+								if (m_chunks[m][n].m_blocks[x][y][z].m_exposed)
+								{
+									collision_blocks.push_back(glm::vec3(m_chunks[m][n].m_chunk_pos.x + x, m_chunks[m][n].m_chunk_pos.y + y, z));
 								}
 							}
 						}

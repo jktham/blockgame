@@ -245,7 +245,7 @@ int main()
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
-		camera.processKeyboard(Camera_Movement::JUMP, delta_time);
+		camera.processKeyboard(Camera_Movement::JUMP);
 
 	if (key == GLFW_KEY_TAB && action == GLFW_PRESS)
 	{
@@ -268,13 +268,13 @@ void processInput(GLFWwindow* window)
 		glfwSetWindowShouldClose(window, true);
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.processKeyboard(Camera_Movement::FORWARD, delta_time);
+		camera.processKeyboard(Camera_Movement::FORWARD);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.processKeyboard(Camera_Movement::BACKWARD, delta_time);
+		camera.processKeyboard(Camera_Movement::BACKWARD);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.processKeyboard(Camera_Movement::LEFT, delta_time);
+		camera.processKeyboard(Camera_Movement::LEFT);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.processKeyboard(Camera_Movement::RIGHT, delta_time);
+		camera.processKeyboard(Camera_Movement::RIGHT);
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 		camera.m_speed = SPEED * 5.0f;

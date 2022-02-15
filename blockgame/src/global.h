@@ -22,6 +22,7 @@ glm::vec2 current_chunk = glm::vec2(4, 4);
 // world
 constexpr int WORLD_SIZE[2] = { 9, 9 };
 constexpr int CHUNK_SIZE[3] = { 16, 16, 64 };
+std::vector<glm::vec3> collision_blocks;
 
 // timing
 float delta_time = 0.0f;
