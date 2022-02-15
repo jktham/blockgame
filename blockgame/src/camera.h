@@ -93,7 +93,7 @@ public:
 			}
 		}
 
-		current_chunk = glm::vec2(divideInt(m_position.x, (float)CHUNK_SIZE[0]) + WORLD_SIZE[0] / 2, divideInt(m_position.y, (float)CHUNK_SIZE[1]) + WORLD_SIZE[1] / 2);
+		current_chunk = glm::vec2(divideInt(m_position.x, (float)CHUNK_SIZE.x) + WORLD_SIZE.x / 2, divideInt(m_position.y, (float)CHUNK_SIZE.y) + WORLD_SIZE.y / 2);
 	}
 
 	void applyJump()

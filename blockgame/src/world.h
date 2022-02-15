@@ -10,7 +10,7 @@ public:
 class Chunk
 {
 public:
-	Block m_blocks[CHUNK_SIZE[0]][CHUNK_SIZE[1]][CHUNK_SIZE[2]];
+	Block m_blocks[CHUNK_SIZE.x][CHUNK_SIZE.y][CHUNK_SIZE.z];
 
 	glm::vec2 m_chunk_pos;
 };
@@ -18,18 +18,18 @@ public:
 class World
 {
 public:
-	Chunk m_chunks[WORLD_SIZE[0]][WORLD_SIZE[1]];
+	Chunk m_chunks[WORLD_SIZE.x][WORLD_SIZE.y];
 
 	std::vector<float> m_mesh;
 
 	void generateChunks()
 	{
-		for (int m = 0; m < WORLD_SIZE[0]; m++)
+		for (int m = 0; m < WORLD_SIZE.x; m++)
 		{
-			for (int n = 0; n < WORLD_SIZE[1]; n++)
+			for (int n = 0; n < WORLD_SIZE.y; n++)
 			{
 				Chunk chunk;
-				chunk.m_chunk_pos = glm::vec2((m - 4) * CHUNK_SIZE[0], (n - 4) * CHUNK_SIZE[1]);
+				chunk.m_chunk_pos = glm::vec2((m - 4) * CHUNK_SIZE.x, (n - 4) * CHUNK_SIZE.y);
 
 				m_chunks[m][n] = chunk;
 			}
@@ -41,15 +41,15 @@ public:
 		const siv::PerlinNoise::seed_type seed = 123456u;
 		const siv::PerlinNoise perlin{ seed };
 
-		for (int m = 0; m < WORLD_SIZE[0]; m++)
+		for (int m = 0; m < WORLD_SIZE.x; m++)
 		{
-			for (int n = 0; n < WORLD_SIZE[1]; n++)
+			for (int n = 0; n < WORLD_SIZE.y; n++)
 			{
-				for (int x = 0; x < CHUNK_SIZE[0]; x++)
+				for (int x = 0; x < CHUNK_SIZE.x; x++)
 				{
-					for (int y = 0; y < CHUNK_SIZE[1]; y++)
+					for (int y = 0; y < CHUNK_SIZE.y; y++)
 					{
-						double ground_height = perlin.octave2D_01((x + m_chunks[m][n].m_chunk_pos.x) * 0.05f, (y + m_chunks[m][n].m_chunk_pos.y) * 0.05f, 4) * 10.0f + (float)CHUNK_SIZE[2] / 2.0f;
+						double ground_height = perlin.octave2D_01((x + m_chunks[m][n].m_chunk_pos.x) * 0.05f, (y + m_chunks[m][n].m_chunk_pos.y) * 0.05f, 4) * 10.0f + (float)CHUNK_SIZE.z / 2.0f;
 
 						for (int z = 0; z < ground_height; z++)
 						{
@@ -63,15 +63,15 @@ public:
 
 	void generateMesh()
 	{
-		for (int m = 0; m < WORLD_SIZE[0]; m++)
+		for (int m = 0; m < WORLD_SIZE.x; m++)
 		{
-			for (int n = 0; n < WORLD_SIZE[1]; n++)
+			for (int n = 0; n < WORLD_SIZE.y; n++)
 			{
-				for (int x = 0; x < CHUNK_SIZE[0]; x++)
+				for (int x = 0; x < CHUNK_SIZE.x; x++)
 				{
-					for (int y = 0; y < CHUNK_SIZE[1]; y++)
+					for (int y = 0; y < CHUNK_SIZE.y; y++)
 					{
-						for (int z = 0; z < CHUNK_SIZE[2]; z++)
+						for (int z = 0; z < CHUNK_SIZE.z; z++)
 						{
 							if (m_chunks[m][n].m_blocks[x][y][z].m_type > 0)
 							{
@@ -145,7 +145,7 @@ public:
 									m_chunks[m][n].m_blocks[x][y][z].m_exposed = true;
 								}
 
-								if (x + 1 > CHUNK_SIZE[0] - 1 || m_chunks[m][n].m_blocks[x + 1][y][z].m_type == 0)
+								if (x + 1 > CHUNK_SIZE.x - 1 || m_chunks[m][n].m_blocks[x + 1][y][z].m_type == 0)
 								{
 									for (int i = 0; i < 48; i++)
 									{
@@ -163,7 +163,7 @@ public:
 									m_chunks[m][n].m_blocks[x][y][z].m_exposed = true;
 								}
 
-								if (y + 1 > CHUNK_SIZE[1] - 1 || m_chunks[m][n].m_blocks[x][y + 1][z].m_type == 0)
+								if (y + 1 > CHUNK_SIZE.y - 1 || m_chunks[m][n].m_blocks[x][y + 1][z].m_type == 0)
 								{
 									for (int i = 0; i < 48; i++)
 									{
@@ -181,7 +181,7 @@ public:
 									m_chunks[m][n].m_blocks[x][y][z].m_exposed = true;
 								}
 
-								if (z + 1 > CHUNK_SIZE[2] - 1 || m_chunks[m][n].m_blocks[x][y][z + 1].m_type == 0)
+								if (z + 1 > CHUNK_SIZE.z - 1 || m_chunks[m][n].m_blocks[x][y][z + 1].m_type == 0)
 								{
 									for (int i = 0; i < 48; i++)
 									{
