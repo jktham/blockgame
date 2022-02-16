@@ -4,7 +4,6 @@ class Block
 {
 public:
 	int m_type = 0;
-	bool m_exposed = false;
 };
 
 class Chunk
@@ -15,6 +14,7 @@ public:
 	glm::vec2 m_chunk_pos;
 
 	std::vector<float> m_mesh;
+	std::vector<glm::vec3> m_exposed_blocks;
 
 	void generateTerrain()
 	{
@@ -69,6 +69,8 @@ public:
 	{
 		if (current_chunk != last_chunk)
 		{
+			std::cout << "chunk changed\n";
+
 			if (current_chunk.x - last_chunk.x == 1)
 			{
 				for (int m = 0; m < WORLD_SIZE.x; m++)
@@ -158,6 +160,7 @@ public:
 			for (int n = n_start; n < n_end; n++)
 			{
 				m_chunks[m][n].m_mesh = {};
+				m_chunks[m][n].m_exposed_blocks = {};
 
 				for (int x = 0; x < CHUNK_SIZE.x; x++)
 				{
@@ -165,7 +168,7 @@ public:
 					{
 						for (int z = 0; z < CHUNK_SIZE.z; z++)
 						{
-							m_chunks[m][n].m_blocks[x][y][z].m_exposed = false;
+							bool exposed = false;
 
 							if (m_chunks[m][n].m_blocks[x][y][z].m_type > 0)
 							{
@@ -236,7 +239,7 @@ public:
 									{
 										m_chunks[m][n].m_mesh.push_back(vertices[0][i]);
 									}
-									m_chunks[m][n].m_blocks[x][y][z].m_exposed = true;
+									exposed = true;
 								}
 
 								if (x != CHUNK_SIZE.x - 1 && m_chunks[m][n].m_blocks[x + 1][y][z].m_type == 0 || x == CHUNK_SIZE.x - 1 && m != CHUNK_SIZE.x - 1 && m_chunks[m + 1][n].m_blocks[0][y][z].m_type == 0)
@@ -245,7 +248,7 @@ public:
 									{
 										m_chunks[m][n].m_mesh.push_back(vertices[1][i]);
 									}
-									m_chunks[m][n].m_blocks[x][y][z].m_exposed = true;
+									exposed = true;
 								}
 
 								if (y != 0 && m_chunks[m][n].m_blocks[x][y - 1][z].m_type == 0 || y == 0 && n != 0 && m_chunks[m][n - 1].m_blocks[x][CHUNK_SIZE.y - 1][z].m_type == 0)
@@ -254,7 +257,7 @@ public:
 									{
 										m_chunks[m][n].m_mesh.push_back(vertices[2][i]);
 									}
-									m_chunks[m][n].m_blocks[x][y][z].m_exposed = true;
+									exposed = true;
 								}
 
 								if (y != CHUNK_SIZE.y - 1 && m_chunks[m][n].m_blocks[x][y + 1][z].m_type == 0 || y == CHUNK_SIZE.y - 1 && n != CHUNK_SIZE.y - 1 && m_chunks[m][n + 1].m_blocks[x][0][z].m_type == 0)
@@ -263,7 +266,7 @@ public:
 									{
 										m_chunks[m][n].m_mesh.push_back(vertices[3][i]);
 									}
-									m_chunks[m][n].m_blocks[x][y][z].m_exposed = true;
+									exposed = true;
 								}
 
 								if (z != 0 && m_chunks[m][n].m_blocks[x][y][z - 1].m_type == 0)
@@ -272,7 +275,7 @@ public:
 									{
 										m_chunks[m][n].m_mesh.push_back(vertices[4][i]);
 									}
-									m_chunks[m][n].m_blocks[x][y][z].m_exposed = true;
+									exposed = true;
 								}
 
 								if (z != CHUNK_SIZE.z - 1 && m_chunks[m][n].m_blocks[x][y][z + 1].m_type == 0)
@@ -281,7 +284,12 @@ public:
 									{
 										m_chunks[m][n].m_mesh.push_back(vertices[5][i]);
 									}
-									m_chunks[m][n].m_blocks[x][y][z].m_exposed = true;
+									exposed = true;
+								}
+
+								if (exposed)
+								{
+									m_chunks[m][n].m_exposed_blocks.push_back(glm::vec3(m_chunks[m][n].m_chunk_pos.x + x, m_chunks[m][n].m_chunk_pos.y + y, z));
 								}
 							}
 						}
@@ -296,25 +304,15 @@ public:
 		{
 			for (int n = WORLD_SIZE.y / 2 - 1; n < WORLD_SIZE.y / 2 + 2; n++)
 			{
-				for (int x = 0; x < CHUNK_SIZE.x; x++)
-				{
-					for (int y = 0; y < CHUNK_SIZE.y; y++)
-					{
-						for (int z = 0; z < CHUNK_SIZE.z; z++)
-						{
-							if (m_chunks[m][n].m_blocks[x][y][z].m_exposed)
-							{
-								collision_blocks.push_back(glm::vec3(m_chunks[m][n].m_chunk_pos.x + x, m_chunks[m][n].m_chunk_pos.y + y, z));
-							}
-						}
-					}
-				}
+				collision_blocks.insert(collision_blocks.end(), m_chunks[m][n].m_exposed_blocks.begin(), m_chunks[m][n].m_exposed_blocks.end());
 			}
 		}
 	}
 
 	void setMesh()
 	{
+		std::cout << "updating mesh\n";
+
 		m_mesh = {};
 
 		for (int m = 0; m < WORLD_SIZE.x; m++)
