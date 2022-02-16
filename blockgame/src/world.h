@@ -45,7 +45,6 @@ public:
 	void generateMesh()
 	{
 		m_mesh = {};
-		collision_blocks = {};
 
 		for (int x = 0; x < CHUNK_SIZE.x; x++)
 		{
@@ -53,6 +52,8 @@ public:
 			{
 				for (int z = 0; z < CHUNK_SIZE.z; z++)
 				{
+					m_blocks[x][y][z].m_exposed = false;
+
 					if (m_blocks[x][y][z].m_type > 0)
 					{
 						float a = m_chunk_pos.x;
@@ -124,7 +125,8 @@ public:
 							}
 							m_blocks[x][y][z].m_exposed = true;
 						}
-						else if (x == CHUNK_SIZE.x - 1 || m_blocks[x + 1][y][z].m_type == 0)
+
+						if (x == CHUNK_SIZE.x - 1 || m_blocks[x + 1][y][z].m_type == 0)
 						{
 							for (int i = 0; i < 48; i++)
 							{
@@ -132,7 +134,8 @@ public:
 							}
 							m_blocks[x][y][z].m_exposed = true;
 						}
-						else if (y == 0 || m_blocks[x][y - 1][z].m_type == 0)
+
+						if (y == 0 || m_blocks[x][y - 1][z].m_type == 0)
 						{
 							for (int i = 0; i < 48; i++)
 							{
@@ -140,7 +143,8 @@ public:
 							}
 							m_blocks[x][y][z].m_exposed = true;
 						}
-						else if (y == CHUNK_SIZE.y - 1 || m_blocks[x][y + 1][z].m_type == 0)
+
+						if (y == CHUNK_SIZE.y - 1 || m_blocks[x][y + 1][z].m_type == 0)
 						{
 							for (int i = 0; i < 48; i++)
 							{
@@ -148,7 +152,8 @@ public:
 							}
 							m_blocks[x][y][z].m_exposed = true;
 						}
-						else if (z == 0 || m_blocks[x][y][z - 1].m_type == 0)
+
+						if (z == 0 || m_blocks[x][y][z - 1].m_type == 0)
 						{
 							for (int i = 0; i < 48; i++)
 							{
@@ -156,17 +161,14 @@ public:
 							}
 							m_blocks[x][y][z].m_exposed = true;
 						}
-						else if (z == CHUNK_SIZE.z - 1 || m_blocks[x][y][z + 1].m_type == 0)
+
+						if (z == CHUNK_SIZE.z - 1 || m_blocks[x][y][z + 1].m_type == 0)
 						{
 							for (int i = 0; i < 48; i++)
 							{
 								m_mesh.push_back(vertices[5][i]);
 							}
 							m_blocks[x][y][z].m_exposed = true;
-						}
-						else
-						{
-							m_blocks[x][y][z].m_exposed = false;
 						}
 
 						if (m_blocks[x][y][z].m_exposed)
@@ -306,6 +308,7 @@ public:
 	void generateWorldMesh()
 	{
 		m_mesh = {};
+		collision_blocks = {};
 
 		for (int m = 0; m < WORLD_SIZE.x; m++)
 		{
@@ -317,6 +320,8 @@ public:
 					{
 						for (int z = 0; z < CHUNK_SIZE.z; z++)
 						{
+							m_chunks[m][n].m_blocks[x][y][z].m_exposed = false;
+
 							if (m_chunks[m][n].m_blocks[x][y][z].m_type > 0)
 							{
 								float a = m_chunks[m][n].m_chunk_pos.x;
