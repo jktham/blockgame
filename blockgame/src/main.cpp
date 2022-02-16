@@ -55,22 +55,6 @@ int main()
 	glfwSetScrollCallback(window, scroll_callback);
 	glfwSetKeyCallback(window, key_callback);
 
-	// vertex array object
-	unsigned int VAO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-
-	world.generateChunks();
-	world.generateTerrain();
-	world.generateMesh();
-
-	// vertex buffer object
-	unsigned int VBO;
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * world.m_mesh.size(), world.m_mesh.data(), GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
 	// texture attributes
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -103,24 +87,6 @@ int main()
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	stbi_image_free(data);
-
-	// vertex attribute (position)
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	// vertex attribute (texture)
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	// vertex attribute (normal)
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// vertex shader
 	const char* vert_source;
@@ -179,6 +145,11 @@ int main()
 	glfwSwapInterval(0);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+	world.generateChunks();
+	world.generateWorldMesh();
+	world.setMesh();
+	camera.m_noclip = true;
+
 	// render loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -213,7 +184,7 @@ int main()
 			glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
 			glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
 			glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-			glUniform3f(glGetUniformLocation(shader, "light.position"), light.m_position.x, light.m_position.y, light.m_position.z);
+			glUniform3f(glGetUniformLocation(shader, "light.direction"), light.m_direction.x, light.m_direction.y, light.m_direction.z);
 			glUniform3f(glGetUniformLocation(shader, "light.color"), light.m_color.x, light.m_color.y, light.m_color.z);
 			glUniform3f(glGetUniformLocation(shader, "light.ambient"), light.m_ambient.x, light.m_ambient.y, light.m_ambient.z);
 			glUniform3f(glGetUniformLocation(shader, "light.diffuse"), light.m_diffuse.x, light.m_diffuse.y, light.m_diffuse.z);
@@ -227,9 +198,8 @@ int main()
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, grass_texture);
 
-			// draw vertices
-			glBindVertexArray(VAO);
-			glDrawArrays(GL_TRIANGLES, 0, (GLsizei)world.m_mesh.size() / 3);
+			world.shiftChunks();
+			world.drawMesh();
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();

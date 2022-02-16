@@ -12,7 +12,7 @@ class Camera
 {
 public:
 	glm::vec3 m_up_global = glm::vec3(0.0f, 0.0f, 1.0f);
-	glm::vec3 m_position = glm::vec3(0.0f, 0.0f, 100.0f);
+	glm::vec3 m_position = glm::vec3(0.0f, 0.0f, 64.0f);
 	glm::vec3 m_up;
 	glm::vec3 m_front;
 	glm::vec3 m_front_plane;
@@ -93,7 +93,7 @@ public:
 			}
 		}
 
-		current_chunk = glm::vec2(divideInt(m_position.x, (float)CHUNK_SIZE.x) + WORLD_SIZE.x / 2, divideInt(m_position.y, (float)CHUNK_SIZE.y) + WORLD_SIZE.y / 2);
+		current_chunk = glm::vec2(divideInt(m_position.x, (float)CHUNK_SIZE.x), divideInt(m_position.y, (float)CHUNK_SIZE.y));
 	}
 
 	void applyJump()

@@ -17,13 +17,18 @@ const float SENSITIVITY = 0.1f;
 const float FOV = 60.0f;
 const float GRAVITY = 10.0f;
 
-glm::vec2 current_chunk = glm::vec2(4, 4);
+glm::ivec2 current_chunk = glm::ivec2(0, 0);
+glm::ivec2 last_chunk = glm::ivec2(0, 0);
 
 // world
 constexpr glm::ivec2 WORLD_SIZE = glm::ivec2(9, 9);
 constexpr glm::ivec3 CHUNK_SIZE = glm::ivec3(16, 16, 64);
 
 std::vector<glm::vec3> collision_blocks;
+
+// rendering
+unsigned int VAO;
+unsigned int VBO;
 
 // timing
 float delta_time = 0.0f;

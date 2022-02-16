@@ -3,7 +3,7 @@
 class Light
 {
 public:
-	glm::vec3 m_position = glm::vec3(200.0f, -100.0f, 400.0f);;
+	glm::vec3 m_direction = glm::vec3(3.0f, -2.0f, 5.0f);;
 	glm::vec3 m_color = glm::vec3(1.0f, 1.0f, 1.0f);
 	glm::vec3 m_ambient = glm::vec3(0.4f);
 	glm::vec3 m_diffuse = glm::vec3(0.5f);

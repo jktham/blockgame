@@ -1,7 +1,7 @@
 #version 460 core
 
 struct Light {
-    vec3 position;
+    vec3 direction;
     vec3 color;
     vec3 ambient;
     vec3 diffuse;
@@ -30,7 +30,8 @@ void main()
         frag_color = texture(dirt_texture, tex_coord);
     }
 
-    vec3 light_dir = normalize(light.position - frag_pos);
+    //vec3 light_dir = normalize(light.position - frag_pos);
+    vec3 light_dir = normalize(light.direction);
     vec3 view_dir = normalize(view_pos - frag_pos);
     vec3 reflect_dir = reflect(-light_dir, normalize(normal));
 
