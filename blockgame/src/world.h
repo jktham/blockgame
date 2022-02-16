@@ -196,7 +196,7 @@ public:
 			for (int n = 0; n < WORLD_SIZE.y; n++)
 			{
 				Chunk chunk;
-				chunk.m_chunk_pos = glm::vec2((m - (int)WORLD_SIZE.x / 2) * CHUNK_SIZE.x, (n - (int)WORLD_SIZE.y / 2) * CHUNK_SIZE.y);
+				chunk.m_chunk_pos = glm::vec2((m - WORLD_SIZE.x / 2) * CHUNK_SIZE.x, (n - WORLD_SIZE.y / 2) * CHUNK_SIZE.y);
 				chunk.generateTerrain();
 
 				m_chunks[m][n] = chunk;
@@ -439,7 +439,9 @@ public:
 									m_chunks[m][n].m_blocks[x][y][z].m_exposed = true;
 								}
 
-								if (m_chunks[m][n].m_blocks[x][y][z].m_exposed)
+								glm::vec2(chunk_distance) = m_chunks[m][n].m_chunk_pos - m_chunks[WORLD_SIZE.x / 2][WORLD_SIZE.y / 2].m_chunk_pos;
+
+								if (m_chunks[m][n].m_blocks[x][y][z].m_exposed && abs(chunk_distance.x) < 20.0f && abs(chunk_distance.y) < 20.0f)
 								{
 									collision_blocks.push_back(glm::vec3(m_chunks[m][n].m_chunk_pos.x + x, m_chunks[m][n].m_chunk_pos.y + y, z));
 								}
