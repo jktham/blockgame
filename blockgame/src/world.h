@@ -16,6 +16,7 @@ public:
 	std::vector<float> m_mesh;
 	std::vector<glm::vec3> m_exposed_blocks;
 
+	// generate terrain for a chunk
 	void generateTerrain()
 	{
 		const siv::PerlinNoise::seed_type seed = 123456u;
@@ -50,21 +51,20 @@ public:
 
 	std::vector<float> m_mesh;
 
-	void generateChunks()
+	// set up initial grid of chunks
+	void createChunks()
 	{
 		for (int m = 0; m < WORLD_SIZE.x; m++)
 		{
 			for (int n = 0; n < WORLD_SIZE.y; n++)
 			{
-				Chunk chunk;
-				chunk.m_chunk_pos = glm::vec2((m - WORLD_SIZE.x / 2) * CHUNK_SIZE.x, (n - WORLD_SIZE.y / 2) * CHUNK_SIZE.y);
-				chunk.generateTerrain();
-
-				m_chunks[m][n] = chunk;
+				m_chunks[m][n].m_chunk_pos = glm::vec2((m - WORLD_SIZE.x / 2) * CHUNK_SIZE.x, (n - WORLD_SIZE.y / 2) * CHUNK_SIZE.y);
+				m_chunks[m][n].generateTerrain();
 			}
 		}
 	}
 
+	// check for chunk change and shift chunks accordingly, while generating a row of new chunks
 	void shiftChunks()
 	{
 		if (current_chunk != last_chunk)
@@ -88,7 +88,7 @@ public:
 						}
 					}
 				}
-				generateWorldMesh(WORLD_SIZE.y - 2, WORLD_SIZE.y, 0, WORLD_SIZE.y);
+				generateMesh(WORLD_SIZE.y - 2, WORLD_SIZE.y, 0, WORLD_SIZE.y);
 			}
 			else if (current_chunk.y - last_chunk.y == 1)
 			{
@@ -107,7 +107,7 @@ public:
 						}
 					}
 				}
-				generateWorldMesh(0, WORLD_SIZE.x, WORLD_SIZE.y-2, WORLD_SIZE.y);
+				generateMesh(0, WORLD_SIZE.x, WORLD_SIZE.y-2, WORLD_SIZE.y);
 			}
 			else if (current_chunk.x - last_chunk.x == -1)
 			{
@@ -126,7 +126,7 @@ public:
 						}
 					}
 				}
-				generateWorldMesh(0, 2, 0, WORLD_SIZE.y);
+				generateMesh(0, 2, 0, WORLD_SIZE.y);
 			}
 			else if (current_chunk.y - last_chunk.y == -1)
 			{
@@ -145,15 +145,16 @@ public:
 						}
 					}
 				}
-				generateWorldMesh(0, WORLD_SIZE.x, 0, 2);
+				generateMesh(0, WORLD_SIZE.x, 0, 2);
 			}
 
-			bindMesh();
+			updateMesh();
 		}
 		last_chunk = current_chunk;
 	}
 
-	void generateWorldMesh(int m_start = 0, int m_end = WORLD_SIZE.x, int n_start = 0, int n_end = WORLD_SIZE.y)
+	// generate meshes for given range of chunks, cull all hidden faces (including chunk borders) and keep track of exposed blocks per chunk
+	void generateMesh(int m_start = 0, int m_end = WORLD_SIZE.x, int n_start = 0, int n_end = WORLD_SIZE.y)
 	{
 		for (int m = m_start; m < m_end; m++)
 		{
@@ -280,18 +281,19 @@ public:
 			}
 		}
 
-		collision_blocks = {};
+		exposed_blocks = {};
 
 		for (int m = WORLD_SIZE.x / 2 - 1; m < WORLD_SIZE.x / 2 + 2; m++)
 		{
 			for (int n = WORLD_SIZE.y / 2 - 1; n < WORLD_SIZE.y / 2 + 2; n++)
 			{
-				collision_blocks.insert(collision_blocks.end(), m_chunks[m][n].m_exposed_blocks.begin(), m_chunks[m][n].m_exposed_blocks.end());
+				exposed_blocks.insert(exposed_blocks.end(), m_chunks[m][n].m_exposed_blocks.begin(), m_chunks[m][n].m_exposed_blocks.end());
 			}
 		}
 	}
 
-	void bindMesh()
+	// stitch together chunk meshes and update VAO and VBO
+	void updateMesh()
 	{
 		std::cout << "updating mesh\n";
 
@@ -305,15 +307,10 @@ public:
 			}
 		}
 
-		glDeleteBuffers(1, &VAO);
-		glDeleteBuffers(1, &VBO);
-
 		// vertex array object
-		glGenVertexArrays(1, &VAO);
 		glBindVertexArray(VAO);
 
 		// vertex buffer object
-		glGenBuffers(1, &VBO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m_mesh.size(), m_mesh.data(), GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -335,12 +332,7 @@ public:
 		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
 		glEnableVertexAttribArray(2);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-	}
 
-	void drawMesh()
-	{
-		// draw vertices
-		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, (GLsizei)m_mesh.size() / 3);
+		glBindVertexArray(0);
 	}
 };

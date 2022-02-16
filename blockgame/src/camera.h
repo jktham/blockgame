@@ -37,7 +37,7 @@ public:
 		updateCameraVectors();
 	}
 
-	void applyGravity(float delta_time)
+	void applyGravity()
 	{
 		if (m_noclip)
 		{
@@ -112,10 +112,10 @@ public:
 		if (m_noclip)
 			return false;
 
-		for (int i = 0; i < collision_blocks.size(); i += 1)
+		for (int i = 0; i < exposed_blocks.size(); i += 1)
 		{
-			glm::vec3 block_collision_min = collision_blocks[i];
-			glm::vec3 block_collision_max = collision_blocks[i] + glm::vec3(1.0f);
+			glm::vec3 block_collision_min = exposed_blocks[i];
+			glm::vec3 block_collision_max = exposed_blocks[i] + glm::vec3(1.0f);
 
 			glm::vec3 camera_collision_min = m_position + glm::vec3(-m_width, -m_width, -m_height);
 			glm::vec3 camera_collision_max = m_position + glm::vec3(m_width, m_width, 0.0);
@@ -144,10 +144,10 @@ public:
 		if (m_noclip)
 			return false;
 
-		for (int i = 0; i < collision_blocks.size(); i += 1)
+		for (int i = 0; i < exposed_blocks.size(); i += 1)
 		{
-			glm::vec3 block_collision_min = collision_blocks[i];
-			glm::vec3 block_collision_max = collision_blocks[i] + glm::vec3(1.0f);
+			glm::vec3 block_collision_min = exposed_blocks[i];
+			glm::vec3 block_collision_max = exposed_blocks[i] + glm::vec3(1.0f);
 
 			glm::vec3 camera_collision_min = m_position + glm::vec3(-m_width, -m_width, -m_height);
 			glm::vec3 camera_collision_max = m_position + glm::vec3(m_width, m_width, 0.0f);
@@ -161,9 +161,13 @@ public:
 				if (collision_position.z < abs(collision_position.x) || collision_position.z < abs(collision_position.y))
 				{
 					if (glm::abs(collision_position.x) > glm::abs(collision_position.y))
+					{
 						collision_normal = glm::normalize(glm::vec3(collision_position.x, 0.0f, 0.0f));
+					}
 					else
+					{
 						collision_normal = glm::normalize(glm::vec3(0.0f, collision_position.y, 0.0f));
+					}
 
 					collision_id = i;
 					std::cout << "horizontal collision\n";
@@ -202,7 +206,7 @@ public:
 			applyJump();
 	}
 
-	void processMouseMovement(float offset_x, float offset_y, GLboolean constrain_pitch = true)
+	void processMouseMovement(float offset_x, float offset_y)
 	{
 		offset_x *= m_sensitivity;
 		offset_y *= m_sensitivity;
@@ -210,20 +214,18 @@ public:
 		m_yaw += offset_x;
 		m_pitch += offset_y;
 
-		if (constrain_pitch)
-		{
-			if (m_pitch > 89.99f)
-				m_pitch = 89.99f;
-			if (m_pitch < -89.99f)
-				m_pitch = -89.99f;
-		}
+		if (m_pitch > 89.99f)
+			m_pitch = 89.99f;
+		if (m_pitch < -89.99f)
+			m_pitch = -89.99f;
 
 		updateCameraVectors();
 	}
 
 	void processMouseScroll(float offset_y)
 	{
-		m_fov -= (float)offset_y;
+		m_fov -= (float)offset_y * 3.0f;
+
 		if (m_fov < 10.0f)
 			m_fov = 10.0f;
 		if (m_fov > 90.0f)

@@ -55,6 +55,10 @@ int main()
 	glfwSetScrollCallback(window, scroll_callback);
 	glfwSetKeyCallback(window, key_callback);
 
+	// buffers
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+
 	// texture attributes
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -68,32 +72,27 @@ int main()
 
 	unsigned int dirt_texture;
 	glGenTextures(1, &dirt_texture);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, dirt_texture);
 	data = stbi_load("res/dirt.png", &width, &height, &channels, 0);
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(data);
 
 	unsigned int grass_texture;
 	glGenTextures(1, &grass_texture);
+	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, grass_texture);
 	data = stbi_load("res/grass.png", &width, &height, &channels, 0);
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(data);
 
 	// vertex shader
 	const char* vert_source;
 
 	std::ifstream vert_file("src/shader.vs");
-	std::string vert_string((std::istreambuf_iterator<char>(vert_file)),
-		std::istreambuf_iterator<char>());
+	std::string vert_string((std::istreambuf_iterator<char>(vert_file)), std::istreambuf_iterator<char>());
 	vert_source = vert_string.c_str();
 
 	unsigned int vert_shader;
@@ -106,8 +105,7 @@ int main()
 	const char* frag_source;
 
 	std::ifstream frag_file("src/shader.fs");
-	std::string frag_string((std::istreambuf_iterator<char>(frag_file)),
-		std::istreambuf_iterator<char>());
+	std::string frag_string((std::istreambuf_iterator<char>(frag_file)), std::istreambuf_iterator<char>());
 	frag_source = frag_string.c_str();
 
 	unsigned int frag_shader;
@@ -131,6 +129,7 @@ int main()
 	glUseProgram(shader);
 	glUniform1i(glGetUniformLocation(shader, "dirt_texture"), 0);
 	glUniform1i(glGetUniformLocation(shader, "grass_texture"), 1);
+	glUseProgram(0);
 
 	// matrices
 	glm::mat4 model = glm::mat4(1.0f);
@@ -145,10 +144,10 @@ int main()
 	glfwSwapInterval(0);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	world.generateChunks();
-	world.generateWorldMesh();
-	world.bindMesh();
-	camera.m_noclip = true;
+	// world setup
+	world.createChunks();
+	world.generateMesh();
+	world.updateMesh();
 
 	// render loop
 	while (!glfwWindowShouldClose(window))
@@ -164,15 +163,17 @@ int main()
 			std::cout << std::setprecision(2);
 			std::cout << "pos: (" << camera.m_position.x << ", " << camera.m_position.y << ", " << camera.m_position.z << "), chunk: (" << current_chunk.x << ", " << current_chunk.y << "), vert: " << camera.m_vertical_velocity << ", fps: " << 1.0f / delta_time << "\n";
 
-			// keyboard input
-			processInput(window);
-
-			camera.applyGravity(delta_time);
-			light.update(current_frame);
-
 			// clear buffers
 			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			// keyboard input
+			processInput(window);
+
+			// update
+			camera.applyGravity();
+			light.update();
+			world.shiftChunks();
 
 			// update matrices
 			model = glm::mat4(1.0f);
@@ -191,15 +192,12 @@ int main()
 			glUniform3f(glGetUniformLocation(shader, "light.specular"), light.m_specular.x, light.m_specular.y, light.m_specular.z);
 			glUniform3f(glGetUniformLocation(shader, "view_pos"), camera.m_position.x, camera.m_position.y, camera.m_position.z);
 
-			// bind textures
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, dirt_texture);
+			// draw vertices
+			glBindVertexArray(VAO);
+			glDrawArrays(GL_TRIANGLES, 0, (GLsizei)world.m_mesh.size() / 3);
 
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, grass_texture);
-
-			world.shiftChunks();
-			world.drawMesh();
+			glBindVertexArray(0);
+			glUseProgram(0);
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
@@ -212,6 +210,7 @@ int main()
 	return 0;
 }
 
+// discrete key press
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
@@ -220,6 +219,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_TAB && action == GLFW_PRESS)
 	{
 		wireframe_mode = !wireframe_mode;
+
 		if (wireframe_mode)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		else
@@ -227,11 +227,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 
 	if (key == GLFW_KEY_Q && action == GLFW_PRESS)
-	{
 		camera.m_noclip = !camera.m_noclip;
-	}
 }
 
+// continuous key press
 void processInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)

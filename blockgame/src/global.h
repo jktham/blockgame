@@ -21,10 +21,10 @@ glm::ivec2 current_chunk = glm::ivec2(0, 0);
 glm::ivec2 last_chunk = glm::ivec2(0, 0);
 
 // world
-constexpr glm::ivec2 WORLD_SIZE = glm::ivec2(9, 9); // must be odd, larger than 1
-constexpr glm::ivec3 CHUNK_SIZE = glm::ivec3(16, 16, 64); // weird stuff <= 8, investigate
+constexpr glm::ivec2 WORLD_SIZE = glm::ivec2(9, 9); // should be odd, larger than 1
+constexpr glm::ivec3 CHUNK_SIZE = glm::ivec3(16, 16, 64); // weird behavior <= 8, investigate
 
-std::vector<glm::vec3> collision_blocks;
+std::vector<glm::vec3> exposed_blocks;
 
 // rendering
 unsigned int VAO;

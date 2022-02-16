@@ -9,8 +9,8 @@ public:
 	glm::vec3 m_diffuse = glm::vec3(0.5f);
 	glm::vec3 m_specular = glm::vec3(0.3f);
 
-	void update(float time)
+	void update()
 	{
-		//m_position = glm::vec3(50.0f, 50.0f + sin(time) * 100.0f, cos(time) * 50.0f);
+		//m_direction = glm::vec3(50.0f, 50.0f + sin(current_frame) * 100.0f, cos(current_frame) * 50.0f);
 	}
 };
