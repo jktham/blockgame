@@ -147,7 +147,7 @@ int main()
 
 	world.generateChunks();
 	world.generateWorldMesh();
-	world.setMesh();
+	world.bindMesh();
 	camera.m_noclip = true;
 
 	// render loop

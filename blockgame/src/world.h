@@ -148,7 +148,7 @@ public:
 				generateWorldMesh(0, WORLD_SIZE.x, 0, 2);
 			}
 
-			setMesh();
+			bindMesh();
 		}
 		last_chunk = current_chunk;
 	}
@@ -235,55 +235,37 @@ public:
 
 								if (x != 0 && m_chunks[m][n].m_blocks[x - 1][y][z].m_type == 0 || x == 0 && m != 0 && m_chunks[m - 1][n].m_blocks[CHUNK_SIZE.x - 1][y][z].m_type == 0)
 								{
-									for (int i = 0; i < 48; i++)
-									{
-										m_chunks[m][n].m_mesh.push_back(vertices[0][i]);
-									}
+									m_chunks[m][n].m_mesh.insert(m_chunks[m][n].m_mesh.end(), &vertices[0][0], &vertices[0][48]);
 									exposed = true;
 								}
 
 								if (x != CHUNK_SIZE.x - 1 && m_chunks[m][n].m_blocks[x + 1][y][z].m_type == 0 || x == CHUNK_SIZE.x - 1 && m != CHUNK_SIZE.x - 1 && m_chunks[m + 1][n].m_blocks[0][y][z].m_type == 0)
 								{
-									for (int i = 0; i < 48; i++)
-									{
-										m_chunks[m][n].m_mesh.push_back(vertices[1][i]);
-									}
+									m_chunks[m][n].m_mesh.insert(m_chunks[m][n].m_mesh.end(), &vertices[1][0], &vertices[1][48]);
 									exposed = true;
 								}
 
 								if (y != 0 && m_chunks[m][n].m_blocks[x][y - 1][z].m_type == 0 || y == 0 && n != 0 && m_chunks[m][n - 1].m_blocks[x][CHUNK_SIZE.y - 1][z].m_type == 0)
 								{
-									for (int i = 0; i < 48; i++)
-									{
-										m_chunks[m][n].m_mesh.push_back(vertices[2][i]);
-									}
+									m_chunks[m][n].m_mesh.insert(m_chunks[m][n].m_mesh.end(), &vertices[2][0], &vertices[2][48]);
 									exposed = true;
 								}
 
 								if (y != CHUNK_SIZE.y - 1 && m_chunks[m][n].m_blocks[x][y + 1][z].m_type == 0 || y == CHUNK_SIZE.y - 1 && n != CHUNK_SIZE.y - 1 && m_chunks[m][n + 1].m_blocks[x][0][z].m_type == 0)
 								{
-									for (int i = 0; i < 48; i++)
-									{
-										m_chunks[m][n].m_mesh.push_back(vertices[3][i]);
-									}
+									m_chunks[m][n].m_mesh.insert(m_chunks[m][n].m_mesh.end(), &vertices[3][0], &vertices[3][48]);
 									exposed = true;
 								}
 
 								if (z != 0 && m_chunks[m][n].m_blocks[x][y][z - 1].m_type == 0)
 								{
-									for (int i = 0; i < 48; i++)
-									{
-										m_chunks[m][n].m_mesh.push_back(vertices[4][i]);
-									}
+									m_chunks[m][n].m_mesh.insert(m_chunks[m][n].m_mesh.end(), &vertices[4][0], &vertices[4][48]);
 									exposed = true;
 								}
 
 								if (z != CHUNK_SIZE.z - 1 && m_chunks[m][n].m_blocks[x][y][z + 1].m_type == 0)
 								{
-									for (int i = 0; i < 48; i++)
-									{
-										m_chunks[m][n].m_mesh.push_back(vertices[5][i]);
-									}
+									m_chunks[m][n].m_mesh.insert(m_chunks[m][n].m_mesh.end(), &vertices[5][0], &vertices[5][48]);
 									exposed = true;
 								}
 
@@ -309,7 +291,7 @@ public:
 		}
 	}
 
-	void setMesh()
+	void bindMesh()
 	{
 		std::cout << "updating mesh\n";
 
