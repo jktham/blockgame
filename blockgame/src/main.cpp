@@ -59,34 +59,25 @@ int main()
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 
-	// texture attributes
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
 	// load textures
 	stbi_set_flip_vertically_on_load(true);
 	int width, height, channels;
 	unsigned char* data;
 
-	unsigned int dirt_texture;
-	glGenTextures(1, &dirt_texture);
+	unsigned int atlas_texture;
+	glGenTextures(1, &atlas_texture);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, dirt_texture);
-	data = stbi_load("res/dirt.png", &width, &height, &channels, 0);
+	glBindTexture(GL_TEXTURE_2D, atlas_texture);
+	data = stbi_load("res/atlas.png", &width, &height, &channels, 0);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(data);
 
-	unsigned int grass_texture;
-	glGenTextures(1, &grass_texture);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, grass_texture);
-	data = stbi_load("res/grass.png", &width, &height, &channels, 0);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	stbi_image_free(data);
+	// texture attributes
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	// vertex shader
 	const char* vert_source;
@@ -127,8 +118,7 @@ int main()
 
 	// texture uniforms
 	glUseProgram(shader);
-	glUniform1i(glGetUniformLocation(shader, "dirt_texture"), 0);
-	glUniform1i(glGetUniformLocation(shader, "grass_texture"), 1);
+	glUniform1i(glGetUniformLocation(shader, "atlas_texture"), 0);
 	glUseProgram(0);
 
 	// matrices

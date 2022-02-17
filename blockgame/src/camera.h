@@ -12,7 +12,7 @@ class Camera
 {
 public:
 	glm::vec3 m_up_global = glm::vec3(0.0f, 0.0f, 1.0f);
-	glm::vec3 m_position = glm::vec3(0.0f, 0.0f, 64.0f);
+	glm::vec3 m_position = glm::vec3(0.0f, 0.0f, CHUNK_SIZE.z / 2.0f + 16.0f);
 	glm::vec3 m_up;
 	glm::vec3 m_front;
 	glm::vec3 m_front_plane;
@@ -61,17 +61,16 @@ public:
 
 		if (m_vertical_velocity <= -50.0f)
 			m_vertical_velocity = -50.0f;
-		if (m_position.z < -50.0f)
+		if (m_position.z < -32.0f)
 			m_position.z = 256.0f;
 	}
 
 	void applyMovement(glm::vec3 direction)
 	{
-		int collision_id = 0;
 		glm::vec3 collision_position = glm::vec3(0.0f);
 		glm::vec3 collision_normal = glm::vec3(0.0f);
 
-		if (!checkCollisionHorizontal(collision_id, collision_position, collision_normal))
+		if (!checkCollisionHorizontal(collision_position, collision_normal))
 		{
 			float velocity = m_speed * delta_time;
 			m_position += direction * velocity;
@@ -130,7 +129,7 @@ public:
 				{
 					floor_height = block_collision_max.z;
 
-					std::cout << "vertical collision\n";
+					std::cout << "vertical collision: (" << i << "/" << exposed_blocks.size() << ")\n";
 					return true;
 				}
 			}
@@ -139,7 +138,7 @@ public:
 		return false;
 	}
 
-	bool checkCollisionHorizontal(int& collision_id, glm::vec3& collision_position, glm::vec3& collision_normal)
+	bool checkCollisionHorizontal(glm::vec3& collision_position, glm::vec3& collision_normal)
 	{
 		if (m_noclip)
 			return false;
@@ -169,8 +168,7 @@ public:
 						collision_normal = glm::normalize(glm::vec3(0.0f, collision_position.y, 0.0f));
 					}
 
-					collision_id = i;
-					std::cout << "horizontal collision\n";
+					std::cout << "horizontal collision: (" << i << "/" << exposed_blocks.size() << ")\n";
 					return true;
 				}
 			}

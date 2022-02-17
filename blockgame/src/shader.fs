@@ -16,19 +16,11 @@ in vec3 normal;
 
 uniform Light light;
 uniform vec3 view_pos;
-uniform sampler2D dirt_texture;
-uniform sampler2D grass_texture;
+uniform sampler2D atlas_texture;
 
 void main()
 {
-    if (normal.z > 0.0f)
-    {
-        frag_color = texture(grass_texture, tex_coord);
-    }
-    else
-    {
-        frag_color = texture(dirt_texture, tex_coord);
-    }
+    frag_color = texture(atlas_texture, tex_coord);
 
     //vec3 light_dir = normalize(light.position - frag_pos);
     vec3 light_dir = normalize(light.direction);

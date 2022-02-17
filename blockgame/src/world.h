@@ -16,14 +16,13 @@ public:
 
 	std::vector<float> m_mesh;
 	std::vector<glm::vec3> m_exposed_blocks;
-	int m_min_air;
+	int m_min_z = CHUNK_SIZE.z - 1;
 
 	// generate terrain for a chunk
 	void generateTerrain()
 	{
 		const siv::PerlinNoise::seed_type seed = 123456u;
 		const siv::PerlinNoise perlin{ seed };
-		int min_air = CHUNK_SIZE.z - 1;
 
 		for (int x = 0; x < CHUNK_SIZE.x; x++)
 		{
@@ -33,23 +32,33 @@ public:
 
 				for (int z = 0; z < CHUNK_SIZE.z; z++)
 				{
-					if (z < ground_height)
+					if (z < ground_height - 5)
+					{
+						m_blocks[x][y][z].m_type = 3;
+					}
+					else if (z < ground_height - 1)
+					{
+						m_blocks[x][y][z].m_type = 2;
+					}
+					else if (z < ground_height - 0)
 					{
 						m_blocks[x][y][z].m_type = 1;
 					}
 					else
 					{
 						m_blocks[x][y][z].m_type = 0;
+					}
 
-						if (z < min_air)
+					if (m_blocks[x][y][z].m_type == 0)
+					{
+						if (z - 1 < m_min_z)
 						{
-							min_air = z;
+							m_min_z = z - 1;
 						}
 					}
 				}
 			}
 		}
-		m_min_air = min_air;
 	}
 };
 
@@ -78,9 +87,11 @@ public:
 	{
 		if (current_chunk != last_chunk)
 		{
-			std::cout << "chunk changed\n";
+			auto t1 = std::chrono::high_resolution_clock::now();
 
-			if (current_chunk.x - last_chunk.x == 1)
+			glm::ivec2 shift_dir = current_chunk - last_chunk;
+
+			if (shift_dir.x == 1)
 			{
 				for (int m = 0; m < WORLD_SIZE.x; m++)
 				{
@@ -99,7 +110,7 @@ public:
 				}
 				generateMesh(WORLD_SIZE.y - 2, WORLD_SIZE.y, 0, WORLD_SIZE.y);
 			}
-			else if (current_chunk.y - last_chunk.y == 1)
+			if (shift_dir.y == 1)
 			{
 				for (int m = 0; m < WORLD_SIZE.x; m++)
 				{
@@ -118,7 +129,7 @@ public:
 				}
 				generateMesh(0, WORLD_SIZE.x, WORLD_SIZE.y - 2, WORLD_SIZE.y);
 			}
-			else if (current_chunk.x - last_chunk.x == -1)
+			if (shift_dir.x == -1)
 			{
 				for (int m = WORLD_SIZE.x - 1; m >= 0; m--)
 				{
@@ -137,7 +148,7 @@ public:
 				}
 				generateMesh(0, 2, 0, WORLD_SIZE.y);
 			}
-			else if (current_chunk.y - last_chunk.y == -1)
+			if (shift_dir.y == -1)
 			{
 				for (int m = 0; m < WORLD_SIZE.x; m++)
 				{
@@ -158,7 +169,12 @@ public:
 			}
 
 			updateMesh();
+
+			auto t2 = std::chrono::high_resolution_clock::now();
+			auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
+			std::cout << "shifted chunks: (" << shift_dir.x << ", " << shift_dir.y << "), " << ms_int << "\n";
 		}
+
 		last_chunk = current_chunk;
 	}
 
@@ -174,98 +190,100 @@ public:
 				m_chunks[m][n].m_mesh = {};
 				m_chunks[m][n].m_exposed_blocks = {};
 
-				int min_air = m_chunks[m][n].m_min_air;
+				int min_z = m_chunks[m][n].m_min_z;
 
-				if (m != 0 && m_chunks[m - 1][n].m_min_air < m_chunks[m][n].m_min_air)
+				if (m != 0 && m_chunks[m - 1][n].m_min_z < m_chunks[m][n].m_min_z)
 				{
-					min_air = m_chunks[m - 1][n].m_min_air;
+					min_z = m_chunks[m - 1][n].m_min_z;
 				}
-				if (m != WORLD_SIZE.x - 1 && m_chunks[m + 1][n].m_min_air < m_chunks[m][n].m_min_air)
+				if (m != WORLD_SIZE.x - 1 && m_chunks[m + 1][n].m_min_z < m_chunks[m][n].m_min_z)
 				{
-					min_air = m_chunks[m + 1][n].m_min_air;
+					min_z = m_chunks[m + 1][n].m_min_z;
 				}
-				if (n != 0 && m_chunks[m][n - 1].m_min_air < m_chunks[m][n].m_min_air)
+				if (n != 0 && m_chunks[m][n - 1].m_min_z < m_chunks[m][n].m_min_z)
 				{
-					min_air = m_chunks[m][n - 1].m_min_air;
+					min_z = m_chunks[m][n - 1].m_min_z;
 				}
-				if (n != WORLD_SIZE.y && m_chunks[m][n + 1].m_min_air < m_chunks[m][n].m_min_air)
+				if (n != WORLD_SIZE.y && m_chunks[m][n + 1].m_min_z < m_chunks[m][n].m_min_z)
 				{
-					min_air = m_chunks[m][n + 1].m_min_air;
+					min_z = m_chunks[m][n + 1].m_min_z;
 				}
 
-				if (min_air == 0)
+				if (min_z < 0)
 				{
-					min_air = 1;
+					min_z = 0;
 				}
 
 				for (int x = 0; x < CHUNK_SIZE.x; x++)
 				{
 					for (int y = 0; y < CHUNK_SIZE.y; y++)
 					{
-						for (int z = 0; z < CHUNK_SIZE.z; z++)
+						for (int z = min_z; z < CHUNK_SIZE.z; z++)
 						{
 							bool exposed = false;
 
-							if (m_chunks[m][n].m_blocks[x][y][z].m_type > 0 && z >= min_air - 1)
+							if (m_chunks[m][n].m_blocks[x][y][z].m_type > 0)
 							{
 								float a = m_chunks[m][n].m_chunk_pos.x;
 								float b = m_chunks[m][n].m_chunk_pos.y;
+								int c = 6 - m_chunks[m][n].m_blocks[x][y][z].m_type;
+								float d = 1.0f / 6.0f;
 
 								float vertices[6][48] = {
 									// pos.x, pos.y, pos.z, tex.x, tex.y, norm.x, norm.y, norm.z
 									// left
 									{
-									0.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-									0.0f + a + x, 1.0f + b + y, 0.0f + z, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-									0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-									0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-									0.0f + a + x, 0.0f + b + y, 1.0f + z, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-									0.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+									0.0f + a + x, 1.0f + b + y, 1.0f + z, (1.0f + 0.0f) * d, (1.0f + c) * d, -1.0f, 0.0f, 0.0f,
+									0.0f + a + x, 1.0f + b + y, 0.0f + z, (1.0f + 0.0f) * d, (0.0f + c) * d, -1.0f, 0.0f, 0.0f,
+									0.0f + a + x, 0.0f + b + y, 0.0f + z, (0.0f + 0.0f) * d, (0.0f + c) * d, -1.0f, 0.0f, 0.0f,
+									0.0f + a + x, 0.0f + b + y, 0.0f + z, (0.0f + 0.0f) * d, (0.0f + c) * d, -1.0f, 0.0f, 0.0f,
+									0.0f + a + x, 0.0f + b + y, 1.0f + z, (0.0f + 0.0f) * d, (1.0f + c) * d, -1.0f, 0.0f, 0.0f,
+									0.0f + a + x, 1.0f + b + y, 1.0f + z, (1.0f + 0.0f) * d, (1.0f + c) * d, -1.0f, 0.0f, 0.0f,
 									},
 									// right
 									{
-									1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-									1.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-									1.0f + a + x, 1.0f + b + y, 0.0f + z, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-									1.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-									1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-									1.0f + a + x, 0.0f + b + y, 1.0f + z, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+									1.0f + a + x, 1.0f + b + y, 1.0f + z, (1.0f + 1.0f) * d, (1.0f + c) * d, 1.0f, 0.0f, 0.0f,
+									1.0f + a + x, 0.0f + b + y, 0.0f + z, (0.0f + 1.0f) * d, (0.0f + c) * d, 1.0f, 0.0f, 0.0f,
+									1.0f + a + x, 1.0f + b + y, 0.0f + z, (1.0f + 1.0f) * d, (0.0f + c) * d, 1.0f, 0.0f, 0.0f,
+									1.0f + a + x, 0.0f + b + y, 0.0f + z, (0.0f + 1.0f) * d, (0.0f + c) * d, 1.0f, 0.0f, 0.0f,
+									1.0f + a + x, 1.0f + b + y, 1.0f + z, (1.0f + 1.0f) * d, (1.0f + c) * d, 1.0f, 0.0f, 0.0f,
+									1.0f + a + x, 0.0f + b + y, 1.0f + z, (0.0f + 1.0f) * d, (1.0f + c) * d, 1.0f, 0.0f, 0.0f,
 									},
 									// front
 									{
-									0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-									1.0f + a + x, 0.0f + b + y, 0.0f + z, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-									1.0f + a + x, 0.0f + b + y, 1.0f + z, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-									1.0f + a + x, 0.0f + b + y, 1.0f + z, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-									0.0f + a + x, 0.0f + b + y, 1.0f + z, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-									0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+									0.0f + a + x, 0.0f + b + y, 0.0f + z, (0.0f + 2.0f) * d, (0.0f + c) * d, 0.0f, -1.0f, 0.0f,
+									1.0f + a + x, 0.0f + b + y, 0.0f + z, (1.0f + 2.0f) * d, (0.0f + c) * d, 0.0f, -1.0f, 0.0f,
+									1.0f + a + x, 0.0f + b + y, 1.0f + z, (1.0f + 2.0f) * d, (1.0f + c) * d, 0.0f, -1.0f, 0.0f,
+									1.0f + a + x, 0.0f + b + y, 1.0f + z, (1.0f + 2.0f) * d, (1.0f + c) * d, 0.0f, -1.0f, 0.0f,
+									0.0f + a + x, 0.0f + b + y, 1.0f + z, (0.0f + 2.0f) * d, (1.0f + c) * d, 0.0f, -1.0f, 0.0f,
+									0.0f + a + x, 0.0f + b + y, 0.0f + z, (0.0f + 2.0f) * d, (0.0f + c) * d, 0.0f, -1.0f, 0.0f,
 									},
 									// back
 									{
-									0.0f + a + x, 1.0f + b + y, 0.0f + z, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-									1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-									1.0f + a + x, 1.0f + b + y, 0.0f + z, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-									1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-									0.0f + a + x, 1.0f + b + y, 0.0f + z, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-									0.0f + a + x, 1.0f + b + y, 1.0f + z, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+									0.0f + a + x, 1.0f + b + y, 0.0f + z, (0.0f + 3.0f) * d, (0.0f + c) * d, 0.0f, 1.0f, 0.0f,
+									1.0f + a + x, 1.0f + b + y, 1.0f + z, (1.0f + 3.0f) * d, (1.0f + c) * d, 0.0f, 1.0f, 0.0f,
+									1.0f + a + x, 1.0f + b + y, 0.0f + z, (1.0f + 3.0f) * d, (0.0f + c) * d, 0.0f, 1.0f, 0.0f,
+									1.0f + a + x, 1.0f + b + y, 1.0f + z, (1.0f + 3.0f) * d, (1.0f + c) * d, 0.0f, 1.0f, 0.0f,
+									0.0f + a + x, 1.0f + b + y, 0.0f + z, (0.0f + 3.0f) * d, (0.0f + c) * d, 0.0f, 1.0f, 0.0f,
+									0.0f + a + x, 1.0f + b + y, 1.0f + z, (0.0f + 3.0f) * d, (1.0f + c) * d, 0.0f, 1.0f, 0.0f,
 									},
 									// bottom
 									{
-									0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-									1.0f + a + x, 1.0f + b + y, 0.0f + z, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
-									1.0f + a + x, 0.0f + b + y, 0.0f + z, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-									1.0f + a + x, 1.0f + b + y, 0.0f + z, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
-									0.0f + a + x, 0.0f + b + y, 0.0f + z, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-									0.0f + a + x, 1.0f + b + y, 0.0f + z, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+									0.0f + a + x, 0.0f + b + y, 0.0f + z, (0.0f + 4.0f) * d, (0.0f + c) * d, 0.0f, 0.0f, -1.0f,
+									1.0f + a + x, 1.0f + b + y, 0.0f + z, (1.0f + 4.0f) * d, (1.0f + c) * d, 0.0f, 0.0f, -1.0f,
+									1.0f + a + x, 0.0f + b + y, 0.0f + z, (1.0f + 4.0f) * d, (0.0f + c) * d, 0.0f, 0.0f, -1.0f,
+									1.0f + a + x, 1.0f + b + y, 0.0f + z, (1.0f + 4.0f) * d, (1.0f + c) * d, 0.0f, 0.0f, -1.0f,
+									0.0f + a + x, 0.0f + b + y, 0.0f + z, (0.0f + 4.0f) * d, (0.0f + c) * d, 0.0f, 0.0f, -1.0f,
+									0.0f + a + x, 1.0f + b + y, 0.0f + z, (0.0f + 4.0f) * d, (1.0f + c) * d, 0.0f, 0.0f, -1.0f,
 									},
 									// top
 									{
-									0.0f + a + x, 0.0f + b + y, 1.0f + z, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-									1.0f + a + x, 0.0f + b + y, 1.0f + z, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-									1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-									1.0f + a + x, 1.0f + b + y, 1.0f + z, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-									0.0f + a + x, 1.0f + b + y, 1.0f + z, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-									0.0f + a + x, 0.0f + b + y, 1.0f + z, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+									0.0f + a + x, 0.0f + b + y, 1.0f + z, (0.0f + 5.0f) * d, (0.0f + c) * d, 0.0f, 0.0f, 1.0f,
+									1.0f + a + x, 0.0f + b + y, 1.0f + z, (1.0f + 5.0f) * d, (0.0f + c) * d, 0.0f, 0.0f, 1.0f,
+									1.0f + a + x, 1.0f + b + y, 1.0f + z, (1.0f + 5.0f) * d, (1.0f + c) * d, 0.0f, 0.0f, 1.0f,
+									1.0f + a + x, 1.0f + b + y, 1.0f + z, (1.0f + 5.0f) * d, (1.0f + c) * d, 0.0f, 0.0f, 1.0f,
+									0.0f + a + x, 1.0f + b + y, 1.0f + z, (0.0f + 5.0f) * d, (1.0f + c) * d, 0.0f, 0.0f, 1.0f,
+									0.0f + a + x, 0.0f + b + y, 1.0f + z, (0.0f + 5.0f) * d, (0.0f + c) * d, 0.0f, 0.0f, 1.0f,
 									},
 								};
 
@@ -334,6 +352,8 @@ public:
 	// stitch together chunk meshes and update VAO and VBO
 	void updateMesh()
 	{
+		auto t1 = std::chrono::high_resolution_clock::now();
+
 		m_mesh = {};
 
 		for (int m = 0; m < WORLD_SIZE.x; m++)
@@ -371,5 +391,9 @@ public:
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glBindVertexArray(0);
+
+		auto t2 = std::chrono::high_resolution_clock::now();
+		auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
+		std::cout << "updated mesh: " << m_mesh.size() << " verts, " << ms_int << "\n";
 	}
 };
