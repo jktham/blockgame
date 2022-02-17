@@ -161,7 +161,13 @@ int main()
 
 			std::cout << std::fixed;
 			std::cout << std::setprecision(2);
-			std::cout << "pos: (" << camera.m_position.x << ", " << camera.m_position.y << ", " << camera.m_position.z << "), chunk: (" << current_chunk.x << ", " << current_chunk.y << "), vert: " << camera.m_vertical_velocity << ", fps: " << 1.0f / delta_time << "\n";
+			std::cout << "pos: (" << camera.m_position.x << ", " << camera.m_position.y << ", " << camera.m_position.z << "),  ";
+			std::cout << "chunk: (" << current_chunk.x << ", " << current_chunk.y << "),  ";
+			std::cout << "vert: " << camera.m_vertical_velocity << ",  ";
+			std::cout << std::setprecision(4);
+			std::cout << "delta: " << delta_time << ",  ";
+			std::cout << std::setprecision(2);
+			std::cout << "fps: " << 1.0f / delta_time << "\n";
 
 			// clear buffers
 			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

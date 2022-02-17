@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <chrono>
 
 class Block
 {
@@ -15,12 +16,14 @@ public:
 
 	std::vector<float> m_mesh;
 	std::vector<glm::vec3> m_exposed_blocks;
+	int m_min_air;
 
 	// generate terrain for a chunk
 	void generateTerrain()
 	{
 		const siv::PerlinNoise::seed_type seed = 123456u;
 		const siv::PerlinNoise perlin{ seed };
+		int min_air = CHUNK_SIZE.z - 1;
 
 		for (int x = 0; x < CHUNK_SIZE.x; x++)
 		{
@@ -37,10 +40,16 @@ public:
 					else
 					{
 						m_blocks[x][y][z].m_type = 0;
+
+						if (z < min_air)
+						{
+							min_air = z;
+						}
 					}
 				}
 			}
 		}
+		m_min_air = min_air;
 	}
 };
 
@@ -107,7 +116,7 @@ public:
 						}
 					}
 				}
-				generateMesh(0, WORLD_SIZE.x, WORLD_SIZE.y-2, WORLD_SIZE.y);
+				generateMesh(0, WORLD_SIZE.x, WORLD_SIZE.y - 2, WORLD_SIZE.y);
 			}
 			else if (current_chunk.x - last_chunk.x == -1)
 			{
@@ -156,12 +165,38 @@ public:
 	// generate meshes for given range of chunks, cull all hidden faces (including chunk borders) and keep track of exposed blocks per chunk
 	void generateMesh(int m_start = 0, int m_end = WORLD_SIZE.x, int n_start = 0, int n_end = WORLD_SIZE.y)
 	{
+		auto t1 = std::chrono::high_resolution_clock::now();
+
 		for (int m = m_start; m < m_end; m++)
 		{
 			for (int n = n_start; n < n_end; n++)
 			{
 				m_chunks[m][n].m_mesh = {};
 				m_chunks[m][n].m_exposed_blocks = {};
+
+				int min_air = m_chunks[m][n].m_min_air;
+
+				if (m != 0 && m_chunks[m - 1][n].m_min_air < m_chunks[m][n].m_min_air)
+				{
+					min_air = m_chunks[m - 1][n].m_min_air;
+				}
+				if (m != WORLD_SIZE.x - 1 && m_chunks[m + 1][n].m_min_air < m_chunks[m][n].m_min_air)
+				{
+					min_air = m_chunks[m + 1][n].m_min_air;
+				}
+				if (n != 0 && m_chunks[m][n - 1].m_min_air < m_chunks[m][n].m_min_air)
+				{
+					min_air = m_chunks[m][n - 1].m_min_air;
+				}
+				if (n != WORLD_SIZE.y && m_chunks[m][n + 1].m_min_air < m_chunks[m][n].m_min_air)
+				{
+					min_air = m_chunks[m][n + 1].m_min_air;
+				}
+
+				if (min_air == 0)
+				{
+					min_air = 1;
+				}
 
 				for (int x = 0; x < CHUNK_SIZE.x; x++)
 				{
@@ -171,7 +206,7 @@ public:
 						{
 							bool exposed = false;
 
-							if (m_chunks[m][n].m_blocks[x][y][z].m_type > 0)
+							if (m_chunks[m][n].m_blocks[x][y][z].m_type > 0 && z >= min_air - 1)
 							{
 								float a = m_chunks[m][n].m_chunk_pos.x;
 								float b = m_chunks[m][n].m_chunk_pos.y;
@@ -290,13 +325,15 @@ public:
 				exposed_blocks.insert(exposed_blocks.end(), m_chunks[m][n].m_exposed_blocks.begin(), m_chunks[m][n].m_exposed_blocks.end());
 			}
 		}
+
+		auto t2 = std::chrono::high_resolution_clock::now();
+		auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
+		std::cout << "generated mesh: " << (m_end - m_start) * (n_end - n_start) << " chunks, " << ms_int << "\n";
 	}
 
 	// stitch together chunk meshes and update VAO and VBO
 	void updateMesh()
 	{
-		std::cout << "updating mesh\n";
-
 		m_mesh = {};
 
 		for (int m = 0; m < WORLD_SIZE.x; m++)
