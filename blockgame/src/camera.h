@@ -8,6 +8,7 @@ public:
 	glm::vec3 m_up;
 	glm::vec3 m_front;
 	glm::vec3 m_front_plane;
+	glm::vec3 m_front_move;
 	glm::vec3 m_right;
 
 	float m_yaw = YAW;
@@ -171,7 +172,24 @@ public:
 
 	glm::vec3 getRayIntersect()
 	{
-		return m_position;
+		for (float r = 0; r < 10.0f; r += 0.1f)
+		{
+			glm::vec3 ray = m_position + m_front * r;
+
+			for (int i = 0; i < exposed_blocks.size(); i++)
+			{
+				glm::vec3 block_collision_min = exposed_blocks[i];
+				glm::vec3 block_collision_max = exposed_blocks[i] + glm::vec3(1.0f);
+
+				if ((ray.x <= block_collision_max.x && ray.x >= block_collision_min.x) &&
+					(ray.y <= block_collision_max.y && ray.y >= block_collision_min.y) &&
+					(ray.z <= block_collision_max.z && ray.z >= block_collision_min.z))
+				{
+					return exposed_blocks[i];
+				}
+			}
+		}
+		return glm::vec3(0.0f, 0.0f, -1.0f);
 	}
 
 	glm::mat4 getViewMatrix()
@@ -182,14 +200,16 @@ public:
 	void processKeyboard(int key)
 	{
 		if (m_noclip)
-			m_front_plane = m_front;
+			m_front_move = m_front;
+		else
+			m_front_move = m_front_plane;
 
 		glm::vec3 movement_vector = glm::vec3(0.0f);
 
 		if (key == GLFW_KEY_W)
-			movement_vector += m_front_plane;
+			movement_vector += m_front_move;
 		if (key == GLFW_KEY_S)
-			movement_vector -= m_front_plane;
+			movement_vector -= m_front_move;
 		if (key == GLFW_KEY_A)
 			movement_vector -= m_right;
 		if (key == GLFW_KEY_D)

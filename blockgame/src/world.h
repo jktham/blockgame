@@ -351,26 +351,58 @@ public:
 
 	void placeBlock(glm::vec3 position)
 	{
+		auto t1 = std::chrono::high_resolution_clock::now();
+		int type = 1;
+
 		if (position.z >= 0 && position.z < CHUNK_SIZE.z)
 		{
-			m_chunks[4][4].m_blocks[(int)(position.x - m_chunks[4][4].m_chunk_pos.x)][(int)(position.y - m_chunks[4][4].m_chunk_pos.y)][(int)position.z].m_type = 1;
-			generateMesh(3, 6, 3, 6);
-			updateMesh();
+			for (int m = WORLD_SIZE.x / 2 - 1; m < WORLD_SIZE.x / 2 + 2; m++)
+			{
+				for (int n = WORLD_SIZE.y / 2 - 1; n < WORLD_SIZE.y / 2 + 2; n++)
+				{
+					if (position.x >= m_chunks[m][n].m_chunk_pos.x && position.x < m_chunks[m][n].m_chunk_pos.x + CHUNK_SIZE.x && position.y >= m_chunks[m][n].m_chunk_pos.y && position.y < m_chunks[m][n].m_chunk_pos.y + CHUNK_SIZE.y)
+					{
+						m_chunks[m][n].m_blocks[(int)(position.x - m_chunks[m][n].m_chunk_pos.x)][(int)(position.y - m_chunks[m][n].m_chunk_pos.y)][(int)position.z].m_type = type;
+						generateMesh(WORLD_SIZE.x / 2 - 1, WORLD_SIZE.x / 2 + 2, WORLD_SIZE.y / 2 - 1, WORLD_SIZE.y / 2 + 2);
+						updateMesh();
+					}
+				}
+			}
 		}
+		auto t2 = std::chrono::high_resolution_clock::now();
+		auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
+		std::cout << "placed block: (" << (int)position.x << ", " << (int)position.y << ", " << (int)position.z << "), " << type << ", " << ms_int << "\n";
 	}
 
 	void destroyBlock(glm::vec3 position)
 	{
+		auto t1 = std::chrono::high_resolution_clock::now();
+
 		if (position.z >= 0 && position.z < CHUNK_SIZE.z)
 		{
-			m_chunks[4][4].m_blocks[(int)(position.x - m_chunks[4][4].m_chunk_pos.x)][(int)(position.y - m_chunks[4][4].m_chunk_pos.y)][(int)position.z].m_type = 0;
-			if (position.z - 1 < m_chunks[4][4].m_min_z)
+			for (int m = WORLD_SIZE.x / 2 - 1; m < WORLD_SIZE.x / 2 + 2; m++)
 			{
-				m_chunks[4][4].m_min_z = (int)position.z - 1;
+				for (int n = WORLD_SIZE.y / 2 - 1; n < WORLD_SIZE.y / 2 + 2; n++)
+				{
+					if (position.x >= m_chunks[m][n].m_chunk_pos.x && position.x < m_chunks[m][n].m_chunk_pos.x + CHUNK_SIZE.x && position.y >= m_chunks[m][n].m_chunk_pos.y && position.y < m_chunks[m][n].m_chunk_pos.y + CHUNK_SIZE.y)
+					{
+						m_chunks[m][n].m_blocks[(int)(position.x - m_chunks[m][n].m_chunk_pos.x)][(int)(position.y - m_chunks[m][n].m_chunk_pos.y)][(int)position.z].m_type = 0;
+
+						if (position.z - 1 < m_chunks[4][4].m_min_z)
+						{
+							m_chunks[m][n].m_min_z = (int)position.z - 1;
+						}
+
+						generateMesh(WORLD_SIZE.x / 2 - 1, WORLD_SIZE.x / 2 + 2, WORLD_SIZE.y / 2 - 1, WORLD_SIZE.y / 2 + 2);
+						updateMesh();
+					}
+				}
 			}
-			generateMesh(3, 6, 3, 6);
-			updateMesh();
 		}
+
+		auto t2 = std::chrono::high_resolution_clock::now();
+		auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
+		std::cout << "destroyed block: (" << (int)position.x << ", " << (int)position.y << ", " << (int)position.z << "), " << ms_int << "\n";
 	}
 
 	// stitch together chunk meshes and update VAO and VBO
