@@ -32,7 +32,11 @@ public:
 
 				for (int z = 0; z < CHUNK_SIZE.z; z++)
 				{
-					if (z < ground_height - 5)
+					if (z == 0)
+					{
+						m_blocks[x][y][z].m_type = 4;
+					}
+					else if (z < ground_height - 5)
 					{
 						m_blocks[x][y][z].m_type = 3;
 					}
@@ -352,7 +356,7 @@ public:
 	void placeBlock(glm::vec3 position)
 	{
 		auto t1 = std::chrono::high_resolution_clock::now();
-		int type = 1;
+		int type = 5;
 
 		if (position.z >= 0 && position.z < CHUNK_SIZE.z)
 		{
@@ -363,7 +367,8 @@ public:
 					if (position.x >= m_chunks[m][n].m_chunk_pos.x && position.x < m_chunks[m][n].m_chunk_pos.x + CHUNK_SIZE.x && position.y >= m_chunks[m][n].m_chunk_pos.y && position.y < m_chunks[m][n].m_chunk_pos.y + CHUNK_SIZE.y)
 					{
 						m_chunks[m][n].m_blocks[(int)(position.x - m_chunks[m][n].m_chunk_pos.x)][(int)(position.y - m_chunks[m][n].m_chunk_pos.y)][(int)position.z].m_type = type;
-						generateMesh(WORLD_SIZE.x / 2 - 1, WORLD_SIZE.x / 2 + 2, WORLD_SIZE.y / 2 - 1, WORLD_SIZE.y / 2 + 2);
+
+						generateMesh(m - 1, m + 2, n - 1, n + 2);
 						updateMesh();
 					}
 				}
@@ -386,15 +391,18 @@ public:
 				{
 					if (position.x >= m_chunks[m][n].m_chunk_pos.x && position.x < m_chunks[m][n].m_chunk_pos.x + CHUNK_SIZE.x && position.y >= m_chunks[m][n].m_chunk_pos.y && position.y < m_chunks[m][n].m_chunk_pos.y + CHUNK_SIZE.y)
 					{
-						m_chunks[m][n].m_blocks[(int)(position.x - m_chunks[m][n].m_chunk_pos.x)][(int)(position.y - m_chunks[m][n].m_chunk_pos.y)][(int)position.z].m_type = 0;
-
-						if (position.z - 1 < m_chunks[4][4].m_min_z)
+						if (m_chunks[m][n].m_blocks[(int)(position.x - m_chunks[m][n].m_chunk_pos.x)][(int)(position.y - m_chunks[m][n].m_chunk_pos.y)][(int)position.z].m_type != 4)
 						{
-							m_chunks[m][n].m_min_z = (int)position.z - 1;
-						}
+							m_chunks[m][n].m_blocks[(int)(position.x - m_chunks[m][n].m_chunk_pos.x)][(int)(position.y - m_chunks[m][n].m_chunk_pos.y)][(int)position.z].m_type = 0;
 
-						generateMesh(WORLD_SIZE.x / 2 - 1, WORLD_SIZE.x / 2 + 2, WORLD_SIZE.y / 2 - 1, WORLD_SIZE.y / 2 + 2);
-						updateMesh();
+							if (position.z - 1 < m_chunks[m][n].m_min_z)
+							{
+								m_chunks[m][n].m_min_z = (int)position.z - 1;
+							}
+
+							generateMesh(m - 1, m + 2, n - 1, n + 2);
+							updateMesh();
+						}
 					}
 				}
 			}
