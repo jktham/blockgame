@@ -192,19 +192,19 @@ public:
 
 				int min_z = m_chunks[m][n].m_min_z;
 
-				if (m != 0 && m_chunks[m - 1][n].m_min_z < m_chunks[m][n].m_min_z)
+				if (m != 0 && m_chunks[m - 1][n].m_min_z < m_chunks[m][n].m_min_z && m_chunks[m - 1][n].m_min_z < min_z)
 				{
 					min_z = m_chunks[m - 1][n].m_min_z;
 				}
-				if (m != WORLD_SIZE.x - 1 && m_chunks[m + 1][n].m_min_z < m_chunks[m][n].m_min_z)
+				if (m != WORLD_SIZE.x - 1 && m_chunks[m + 1][n].m_min_z < m_chunks[m][n].m_min_z && m_chunks[m + 1][n].m_min_z < min_z)
 				{
 					min_z = m_chunks[m + 1][n].m_min_z;
 				}
-				if (n != 0 && m_chunks[m][n - 1].m_min_z < m_chunks[m][n].m_min_z)
+				if (n != 0 && m_chunks[m][n - 1].m_min_z < m_chunks[m][n].m_min_z && m_chunks[m][n - 1].m_min_z < min_z)
 				{
 					min_z = m_chunks[m][n - 1].m_min_z;
 				}
-				if (n != WORLD_SIZE.y && m_chunks[m][n + 1].m_min_z < m_chunks[m][n].m_min_z)
+				if (n != WORLD_SIZE.y && m_chunks[m][n + 1].m_min_z < m_chunks[m][n].m_min_z && m_chunks[m][n + 1].m_min_z < min_z)
 				{
 					min_z = m_chunks[m][n + 1].m_min_z;
 				}
