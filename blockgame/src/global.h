@@ -10,21 +10,14 @@ float last_y = WINDOW_HEIGHT / 2.0f;
 bool first_mouse = true;
 bool wireframe_mode = false;
 
-const float YAW = 45.0f;
-const float PITCH = 0.0f;
-const float SPEED = 7.5f;
-const float SENSITIVITY = 0.1f;
-const float FOV = 60.0f;
-const float GRAVITY = 10.0f;
-
-glm::ivec2 current_chunk = glm::ivec2(0, 0);
-glm::ivec2 last_chunk = glm::ivec2(0, 0);
-
 // world
 constexpr glm::ivec2 WORLD_SIZE = glm::ivec2(9, 9); // should be odd, larger than 1
 constexpr glm::ivec3 CHUNK_SIZE = glm::ivec3(16, 16, 64); // weird behavior <= 8, investigate
 
-std::vector<glm::vec3> exposed_blocks;
+glm::ivec2 current_chunk = glm::ivec2(0, 0);
+glm::ivec2 last_chunk = glm::ivec2(0, 0);
+
+std::vector<glm::ivec3> exposed_blocks;
 
 // rendering
 unsigned int VAO;

@@ -3,7 +3,6 @@
 class Camera
 {
 public:
-	glm::vec3 m_up_global = glm::vec3(0.0f, 0.0f, 1.0f);
 	glm::vec3 m_position = glm::vec3(0.0f, 0.0f, CHUNK_SIZE.z / 2.0f + 16.0f);
 	glm::vec3 m_up;
 	glm::vec3 m_front;
@@ -11,20 +10,21 @@ public:
 	glm::vec3 m_front_move;
 	glm::vec3 m_right;
 
-	float m_yaw = YAW;
-	float m_pitch = PITCH;
+	float m_yaw = 45.0f;
+	float m_pitch = 0.0f;
 
-	float m_speed = SPEED;
-	float m_sensitivity = SENSITIVITY;
-	float m_fov = FOV;
+	float m_speed = 7.5f;
+	float m_sensitivity = 0.1f;
+	float m_fov = 60.0f;
 
 	float m_height = 1.75f;
 	float m_width = 0.25f;
 
+	float m_gravity = 10.0f;
+	float m_vertical_velocity = 0.0f;
+
 	float m_ray_length = 8.0f;
 	float m_ray_step = 0.1f;
-
-	float m_vertical_velocity = 0.0f;
 
 	bool m_noclip = false;
 
@@ -45,7 +45,7 @@ public:
 
 		if (!checkCollisionVertical(floor_height))
 		{
-			m_vertical_velocity -= GRAVITY * delta_time;
+			m_vertical_velocity -= m_gravity * delta_time;
 		}
 		else
 		{
@@ -53,7 +53,7 @@ public:
 			m_position.z = floor_height + m_height;
 		}
 
-		m_position += m_up_global * m_vertical_velocity * delta_time;
+		m_position += glm::vec3(0.0f, 0.0f, 1.0f) * m_vertical_velocity * delta_time;
 
 		if (m_vertical_velocity <= -50.0f)
 			m_vertical_velocity = -50.0f;
@@ -110,7 +110,7 @@ public:
 		for (int i = 0; i < exposed_blocks.size(); i += 1)
 		{
 			glm::vec3 block_collision_min = exposed_blocks[i];
-			glm::vec3 block_collision_max = exposed_blocks[i] + glm::vec3(1.0f);
+			glm::vec3 block_collision_max = exposed_blocks[i] + glm::ivec3(1);
 
 			glm::vec3 camera_collision_min = m_position + glm::vec3(-m_width, -m_width, -m_height);
 			glm::vec3 camera_collision_max = m_position + glm::vec3(m_width, m_width, 0.0);
@@ -142,7 +142,7 @@ public:
 		for (int i = 0; i < exposed_blocks.size(); i += 1)
 		{
 			glm::vec3 block_collision_min = exposed_blocks[i];
-			glm::vec3 block_collision_max = exposed_blocks[i] + glm::vec3(1.0f);
+			glm::vec3 block_collision_max = exposed_blocks[i] + glm::ivec3(1);
 
 			glm::vec3 camera_collision_min = m_position + glm::vec3(-m_width, -m_width, -m_height);
 			glm::vec3 camera_collision_max = m_position + glm::vec3(m_width, m_width, 0.0f);
@@ -173,7 +173,7 @@ public:
 		return false;
 	}
 
-	std::tuple<glm::vec3, glm::vec3> getRayIntersect()
+	std::tuple<glm::ivec3, glm::vec3> getRayIntersect()
 	{
 		for (float r = 0; r < m_ray_length; r += m_ray_step)
 		{
@@ -182,17 +182,17 @@ public:
 			for (int i = 0; i < exposed_blocks.size(); i++)
 			{
 				glm::vec3 block_collision_min = exposed_blocks[i];
-				glm::vec3 block_collision_max = exposed_blocks[i] + glm::vec3(1.0f);
+				glm::vec3 block_collision_max = exposed_blocks[i] + glm::ivec3(1);
 
 				if ((m_position.x + ray.x <= block_collision_max.x && m_position.x + ray.x >= block_collision_min.x) &&
 					(m_position.y + ray.y <= block_collision_max.y && m_position.y + ray.y >= block_collision_min.y) &&
 					(m_position.z + ray.z <= block_collision_max.z && m_position.z + ray.z >= block_collision_min.z))
 				{
-					return std::make_tuple (exposed_blocks[i], m_position + ray - (exposed_blocks[i] + glm::vec3(0.5f)));
+					return std::make_tuple(exposed_blocks[i], m_position + ray - (glm::vec3(exposed_blocks[i]) + glm::vec3(0.5f)));
 				}
 			}
 		}
-		return std::make_tuple (glm::vec3(-1.0f), glm::vec3(-1.0f));
+		return std::make_tuple(glm::ivec3(-1), glm::vec3(-1.0f));
 	}
 
 	glm::mat4 getViewMatrix()
@@ -259,9 +259,9 @@ private:
 		front.z = sin(glm::radians(m_pitch));
 		m_front = glm::normalize(front);
 
-		m_right = glm::normalize(glm::cross(m_front, m_up_global));
+		m_right = glm::normalize(glm::cross(m_front, glm::vec3(0.0f, 0.0f, 1.0f)));
 		m_up = glm::normalize(glm::cross(m_right, m_front));
-		m_front_plane = glm::normalize(glm::cross(m_up_global, m_right));
+		m_front_plane = glm::normalize(glm::cross(glm::vec3(0.0f, 0.0f, 1.0f), m_right));
 	}
 
 	int divideInt(float a, float b) {

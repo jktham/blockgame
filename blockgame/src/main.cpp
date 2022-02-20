@@ -3,9 +3,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/string_cast.hpp>
 
 #include <string>
 #include <sstream>
@@ -244,9 +242,9 @@ void processInput(GLFWwindow* window)
 		camera.processKeyboard(GLFW_KEY_D);
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		camera.m_speed = SPEED * 5.0f;
+		camera.m_speed = 7.5f * 5.0f;
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
-		camera.m_speed = SPEED;
+		camera.m_speed = 7.5f;
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)

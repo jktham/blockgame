@@ -57,23 +57,5 @@
     <Image Include="res\atlas.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="res\dirt.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\grass_side.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\grass_side_overlay.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\grass_top.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\grass_top_overlay.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\stone.png">
-      <Filter>Resource Files</Filter>
-    </Image>
   </ItemGroup>
 </Project>

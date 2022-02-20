@@ -329,7 +329,7 @@ public:
 
 								if (exposed)
 								{
-									m_chunks[m][n].m_exposed_blocks.push_back(glm::vec3(m_chunks[m][n].m_chunk_pos.x + x, m_chunks[m][n].m_chunk_pos.y + y, z));
+									m_chunks[m][n].m_exposed_blocks.push_back(glm::ivec3(m_chunks[m][n].m_chunk_pos.x + x, m_chunks[m][n].m_chunk_pos.y + y, z));
 								}
 							}
 						}
@@ -353,25 +353,25 @@ public:
 		std::cout << "generated mesh: " << (m_end - m_start) * (n_end - n_start) << " chunks, " << ms_int << "\n";
 	}
 
-	void placeBlock(std::tuple<glm::vec3, glm::vec3> tuple)
+	void placeBlock(std::tuple<glm::ivec3, glm::vec3> tuple)
 	{
 		auto t1 = std::chrono::high_resolution_clock::now();
 
 		int type = 5;
-		glm::vec3 position = std::get<0>(tuple);
+		glm::ivec3 position = std::get<0>(tuple);
 		glm::vec3 offset = std::get<1>(tuple);
 
 		if (abs(offset.x) > abs(offset.y) && abs(offset.x) > abs(offset.z))
 		{
-			position.x += glm::sign(offset.x);
+			position.x += (int)glm::sign(offset.x);
 		}
 		if (abs(offset.y) > abs(offset.z) && abs(offset.y) > abs(offset.x))
 		{
-			position.y += glm::sign(offset.y);
+			position.y += (int)glm::sign(offset.y);
 		}
 		if (abs(offset.z) > abs(offset.x) && abs(offset.z) > abs(offset.y))
 		{
-			position.z += glm::sign(offset.z);
+			position.z += (int)glm::sign(offset.z);
 		}
 
 		if (position.z >= 0 && position.z < CHUNK_SIZE.z)
@@ -398,11 +398,11 @@ public:
 		std::cout << "placed block: (" << (int)position.x << ", " << (int)position.y << ", " << (int)position.z << "), " << type << ", " << ms_int << "\n";
 	}
 
-	void destroyBlock(std::tuple<glm::vec3, glm::vec3> tuple)
+	void destroyBlock(std::tuple<glm::ivec3, glm::vec3> tuple)
 	{
 		auto t1 = std::chrono::high_resolution_clock::now();
 
-		glm::vec3 position = std::get<0>(tuple);
+		glm::ivec3 position = std::get<0>(tuple);
 		glm::vec3 offset = std::get<1>(tuple);
 
 		if (position.z >= 0 && position.z < CHUNK_SIZE.z)
