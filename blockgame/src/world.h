@@ -12,10 +12,10 @@ class Chunk
 public:
 	Block m_blocks[CHUNK_SIZE.x][CHUNK_SIZE.y][CHUNK_SIZE.z];
 
-	glm::vec2 m_chunk_pos;
+	glm::ivec2 m_chunk_pos;
 
 	std::vector<float> m_mesh;
-	std::vector<glm::vec3> m_exposed_blocks;
+	std::vector<glm::ivec3> m_exposed_blocks;
 	int m_min_z = CHUNK_SIZE.z - 1;
 
 	// generate terrain for a chunk
@@ -224,8 +224,8 @@ public:
 
 							if (m_chunks[m][n].m_blocks[x][y][z].m_type > 0)
 							{
-								float a = m_chunks[m][n].m_chunk_pos.x;
-								float b = m_chunks[m][n].m_chunk_pos.y;
+								int a = m_chunks[m][n].m_chunk_pos.x;
+								int b = m_chunks[m][n].m_chunk_pos.y;
 								int c = 6 - m_chunks[m][n].m_blocks[x][y][z].m_type;
 								float d = 1.0f / 6.0f;
 
@@ -317,7 +317,7 @@ public:
 									exposed = true;
 								}
 
-								if (z != CHUNK_SIZE.z - 1 && m_chunks[m][n].m_blocks[x][y][z + 1].m_type == 0)
+								if (z == CHUNK_SIZE.z - 1 || m_chunks[m][n].m_blocks[x][y][z + 1].m_type == 0)
 								{
 									m_chunks[m][n].m_mesh.insert(m_chunks[m][n].m_mesh.end(), &vertices[5][0], &vertices[5][48]);
 									exposed = true;
@@ -347,6 +347,30 @@ public:
 		auto t2 = std::chrono::high_resolution_clock::now();
 		auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
 		std::cout << "generated mesh: " << (m_end - m_start) * (n_end - n_start) << " chunks, " << ms_int << "\n";
+	}
+
+	void placeBlock(glm::vec3 position)
+	{
+		if (position.z >= 0 && position.z < CHUNK_SIZE.z)
+		{
+			m_chunks[4][4].m_blocks[(int)(position.x - m_chunks[4][4].m_chunk_pos.x)][(int)(position.y - m_chunks[4][4].m_chunk_pos.y)][(int)position.z].m_type = 1;
+			generateMesh(3, 6, 3, 6);
+			updateMesh();
+		}
+	}
+
+	void destroyBlock(glm::vec3 position)
+	{
+		if (position.z >= 0 && position.z < CHUNK_SIZE.z)
+		{
+			m_chunks[4][4].m_blocks[(int)(position.x - m_chunks[4][4].m_chunk_pos.x)][(int)(position.y - m_chunks[4][4].m_chunk_pos.y)][(int)position.z].m_type = 0;
+			if (position.z - 1 < m_chunks[4][4].m_min_z)
+			{
+				m_chunks[4][4].m_min_z = (int)position.z - 1;
+			}
+			generateMesh(3, 6, 3, 6);
+			updateMesh();
+		}
 	}
 
 	// stitch together chunk meshes and update VAO and VBO

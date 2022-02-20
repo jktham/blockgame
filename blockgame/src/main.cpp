@@ -30,7 +30,8 @@ Light light;
 // callbacks
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
-void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void mouse_cursor_callback(GLFWwindow* window, double xpos, double ypos);
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
@@ -51,7 +52,8 @@ int main()
 
 	// callbacks
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetCursorPosCallback(window, mouse_cursor_callback);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 	glfwSetKeyCallback(window, key_callback);
 
@@ -210,7 +212,7 @@ int main()
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
-		camera.processKeyboard(Camera_Movement::JUMP);
+		camera.processKeyboard(GLFW_KEY_SPACE);
 
 	if (key == GLFW_KEY_TAB && action == GLFW_PRESS)
 	{
@@ -233,13 +235,13 @@ void processInput(GLFWwindow* window)
 		glfwSetWindowShouldClose(window, true);
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.processKeyboard(Camera_Movement::FORWARD);
+		camera.processKeyboard(GLFW_KEY_W);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.processKeyboard(Camera_Movement::BACKWARD);
+		camera.processKeyboard(GLFW_KEY_S);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.processKeyboard(Camera_Movement::LEFT);
+		camera.processKeyboard(GLFW_KEY_A);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.processKeyboard(Camera_Movement::RIGHT);
+		camera.processKeyboard(GLFW_KEY_D);
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 		camera.m_speed = SPEED * 5.0f;
@@ -252,7 +254,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-void mouse_callback(GLFWwindow* window, double pos_x, double pos_y)
+void mouse_cursor_callback(GLFWwindow* window, double pos_x, double pos_y)
 {
 	if (first_mouse)
 	{
@@ -272,4 +274,12 @@ void mouse_callback(GLFWwindow* window, double pos_x, double pos_y)
 void scroll_callback(GLFWwindow* window, double offset_x, double offset_y)
 {
 	camera.processMouseScroll(static_cast<float>(offset_y));
+}
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+		world.destroyBlock(camera.getRayIntersect());
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+		world.placeBlock(camera.getRayIntersect());
 }

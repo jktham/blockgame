@@ -1,13 +1,5 @@
 ﻿#pragma once
 
-enum class Camera_Movement {
-	FORWARD,
-	BACKWARD,
-	LEFT,
-	RIGHT,
-	JUMP
-};
-
 class Camera
 {
 public:
@@ -177,30 +169,35 @@ public:
 		return false;
 	}
 
+	glm::vec3 getRayIntersect()
+	{
+		return m_position;
+	}
+
 	glm::mat4 getViewMatrix()
 	{
 		return glm::lookAt(m_position, m_position + m_front, m_up);
 	}
 
-	void processKeyboard(Camera_Movement action)
+	void processKeyboard(int key)
 	{
 		if (m_noclip)
 			m_front_plane = m_front;
 
 		glm::vec3 movement_vector = glm::vec3(0.0f);
 
-		if (action == Camera_Movement::FORWARD)
+		if (key == GLFW_KEY_W)
 			movement_vector += m_front_plane;
-		if (action == Camera_Movement::BACKWARD)
+		if (key == GLFW_KEY_S)
 			movement_vector -= m_front_plane;
-		if (action == Camera_Movement::LEFT)
+		if (key == GLFW_KEY_A)
 			movement_vector -= m_right;
-		if (action == Camera_Movement::RIGHT)
+		if (key == GLFW_KEY_D)
 			movement_vector += m_right;
 
 		applyMovement(movement_vector);
 
-		if (action == Camera_Movement::JUMP)
+		if (key == GLFW_KEY_SPACE)
 			applyJump();
 	}
 
