@@ -353,10 +353,26 @@ public:
 		std::cout << "generated mesh: " << (m_end - m_start) * (n_end - n_start) << " chunks, " << ms_int << "\n";
 	}
 
-	void placeBlock(glm::vec3 position)
+	void placeBlock(std::tuple<glm::vec3, glm::vec3> tuple)
 	{
 		auto t1 = std::chrono::high_resolution_clock::now();
+
 		int type = 5;
+		glm::vec3 position = std::get<0>(tuple);
+		glm::vec3 offset = std::get<1>(tuple);
+
+		if (abs(offset.x) > abs(offset.y) && abs(offset.x) > abs(offset.z))
+		{
+			position.x += glm::sign(offset.x);
+		}
+		if (abs(offset.y) > abs(offset.z) && abs(offset.y) > abs(offset.x))
+		{
+			position.y += glm::sign(offset.y);
+		}
+		if (abs(offset.z) > abs(offset.x) && abs(offset.z) > abs(offset.y))
+		{
+			position.z += glm::sign(offset.z);
+		}
 
 		if (position.z >= 0 && position.z < CHUNK_SIZE.z)
 		{
@@ -364,12 +380,15 @@ public:
 			{
 				for (int n = WORLD_SIZE.y / 2 - 1; n < WORLD_SIZE.y / 2 + 2; n++)
 				{
-					if (position.x >= m_chunks[m][n].m_chunk_pos.x && position.x < m_chunks[m][n].m_chunk_pos.x + CHUNK_SIZE.x && position.y >= m_chunks[m][n].m_chunk_pos.y && position.y < m_chunks[m][n].m_chunk_pos.y + CHUNK_SIZE.y)
+					if (m_chunks[m][n].m_blocks[(int)(position.x - m_chunks[m][n].m_chunk_pos.x)][(int)(position.y - m_chunks[m][n].m_chunk_pos.y)][(int)position.z].m_type != 4)
 					{
-						m_chunks[m][n].m_blocks[(int)(position.x - m_chunks[m][n].m_chunk_pos.x)][(int)(position.y - m_chunks[m][n].m_chunk_pos.y)][(int)position.z].m_type = type;
+						if (position.x >= m_chunks[m][n].m_chunk_pos.x && position.x < m_chunks[m][n].m_chunk_pos.x + CHUNK_SIZE.x && position.y >= m_chunks[m][n].m_chunk_pos.y && position.y < m_chunks[m][n].m_chunk_pos.y + CHUNK_SIZE.y)
+						{
+							m_chunks[m][n].m_blocks[(int)(position.x - m_chunks[m][n].m_chunk_pos.x)][(int)(position.y - m_chunks[m][n].m_chunk_pos.y)][(int)position.z].m_type = type;
 
-						generateMesh(m - 1, m + 2, n - 1, n + 2);
-						updateMesh();
+							generateMesh(m - 1, m + 2, n - 1, n + 2);
+							updateMesh();
+						}
 					}
 				}
 			}
@@ -379,9 +398,12 @@ public:
 		std::cout << "placed block: (" << (int)position.x << ", " << (int)position.y << ", " << (int)position.z << "), " << type << ", " << ms_int << "\n";
 	}
 
-	void destroyBlock(glm::vec3 position)
+	void destroyBlock(std::tuple<glm::vec3, glm::vec3> tuple)
 	{
 		auto t1 = std::chrono::high_resolution_clock::now();
+
+		glm::vec3 position = std::get<0>(tuple);
+		glm::vec3 offset = std::get<1>(tuple);
 
 		if (position.z >= 0 && position.z < CHUNK_SIZE.z)
 		{

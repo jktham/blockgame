@@ -19,7 +19,10 @@ public:
 	float m_fov = FOV;
 
 	float m_height = 1.75f;
-	float m_width = 0.5f;
+	float m_width = 0.25f;
+
+	float m_ray_length = 8.0f;
+	float m_ray_step = 0.1f;
 
 	float m_vertical_velocity = 0.0f;
 
@@ -170,26 +173,26 @@ public:
 		return false;
 	}
 
-	glm::vec3 getRayIntersect()
+	std::tuple<glm::vec3, glm::vec3> getRayIntersect()
 	{
-		for (float r = 0; r < 10.0f; r += 0.1f)
+		for (float r = 0; r < m_ray_length; r += m_ray_step)
 		{
-			glm::vec3 ray = m_position + m_front * r;
+			glm::vec3 ray = m_front * r;
 
 			for (int i = 0; i < exposed_blocks.size(); i++)
 			{
 				glm::vec3 block_collision_min = exposed_blocks[i];
 				glm::vec3 block_collision_max = exposed_blocks[i] + glm::vec3(1.0f);
 
-				if ((ray.x <= block_collision_max.x && ray.x >= block_collision_min.x) &&
-					(ray.y <= block_collision_max.y && ray.y >= block_collision_min.y) &&
-					(ray.z <= block_collision_max.z && ray.z >= block_collision_min.z))
+				if ((m_position.x + ray.x <= block_collision_max.x && m_position.x + ray.x >= block_collision_min.x) &&
+					(m_position.y + ray.y <= block_collision_max.y && m_position.y + ray.y >= block_collision_min.y) &&
+					(m_position.z + ray.z <= block_collision_max.z && m_position.z + ray.z >= block_collision_min.z))
 				{
-					return exposed_blocks[i];
+					return std::make_tuple (exposed_blocks[i], m_position + ray - (exposed_blocks[i] + glm::vec3(0.5f)));
 				}
 			}
 		}
-		return glm::vec3(0.0f, 0.0f, -1.0f);
+		return std::make_tuple (glm::vec3(-1.0f), glm::vec3(-1.0f));
 	}
 
 	glm::mat4 getViewMatrix()
