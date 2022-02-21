@@ -150,8 +150,10 @@
     <ClCompile Include="src\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\shader.fs" />
-    <None Include="src\shader.vs" />
+    <None Include="src\ui_shader.fs" />
+    <None Include="src\ui_shader.vs" />
+    <None Include="src\world_shader.fs" />
+    <None Include="src\world_shader.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\camera.h" />
@@ -159,6 +161,7 @@
     <ClInclude Include="src\light.h" />
     <ClInclude Include="src\perlin.h" />
     <ClInclude Include="src\stb_image.h" />
+    <ClInclude Include="src\ui.h" />
     <ClInclude Include="src\world.h" />
   </ItemGroup>
   <ItemGroup>

@@ -22,9 +22,16 @@ glm::vec2 last_chunk = glm::vec2(0.0f, 0.0f);
 
 std::vector<glm::vec3> exposed_blocks;
 
+// ui
+const float CROSSHAIR_WIDTH = 1.0f;
+const float CROSSHAIR_LENGTH = 10.0f;
+
 // rendering
-unsigned int VAO;
-unsigned int VBO;
+unsigned int world_VAO;
+unsigned int world_VBO;
+
+unsigned int ui_VAO;
+unsigned int ui_VBO;
 
 // timing
 float delta_time = 0.0f;

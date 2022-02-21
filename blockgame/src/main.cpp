@@ -19,11 +19,13 @@
 #include "camera.h"
 #include "world.h"
 #include "light.h"
+#include "ui.h"
 
 // classes
 Camera camera;
 World world;
 Light light;
+UI ui;
 
 // callbacks
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -56,8 +58,11 @@ int main()
 	glfwSetKeyCallback(window, key_callback);
 
 	// buffers
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
+	glGenVertexArrays(1, &world_VAO);
+	glGenBuffers(1, &world_VBO);
+
+	glGenVertexArrays(1, &ui_VAO);
+	glGenBuffers(1, &ui_VBO);
 
 	// load textures
 	stbi_set_flip_vertically_on_load(true);
@@ -79,52 +84,98 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	// vertex shader
-	const char* vert_source;
+	// world vertex shader
+	const char* world_vert_source;
 
-	std::ifstream vert_file("src/shader.vs");
-	std::string vert_string((std::istreambuf_iterator<char>(vert_file)), std::istreambuf_iterator<char>());
-	vert_source = vert_string.c_str();
+	std::ifstream world_vert_file("src/world_shader.vs");
+	std::string world_vert_string((std::istreambuf_iterator<char>(world_vert_file)), std::istreambuf_iterator<char>());
+	world_vert_source = world_vert_string.c_str();
 
-	unsigned int vert_shader;
-	vert_shader = glCreateShader(GL_VERTEX_SHADER);
+	unsigned int world_vert_shader;
+	world_vert_shader = glCreateShader(GL_VERTEX_SHADER);
 
-	glShaderSource(vert_shader, 1, &vert_source, NULL);
-	glCompileShader(vert_shader);
+	glShaderSource(world_vert_shader, 1, &world_vert_source, NULL);
+	glCompileShader(world_vert_shader);
 
-	// fragment shader
-	const char* frag_source;
+	// world fragment shader
+	const char* world_frag_source;
 
-	std::ifstream frag_file("src/shader.fs");
-	std::string frag_string((std::istreambuf_iterator<char>(frag_file)), std::istreambuf_iterator<char>());
-	frag_source = frag_string.c_str();
+	std::ifstream world_frag_file("src/world_shader.fs");
+	std::string world_frag_string((std::istreambuf_iterator<char>(world_frag_file)), std::istreambuf_iterator<char>());
+	world_frag_source = world_frag_string.c_str();
 
-	unsigned int frag_shader;
-	frag_shader = glCreateShader(GL_FRAGMENT_SHADER);
+	unsigned int world_frag_shader;
+	world_frag_shader = glCreateShader(GL_FRAGMENT_SHADER);
 
-	glShaderSource(frag_shader, 1, &frag_source, NULL);
-	glCompileShader(frag_shader);
+	glShaderSource(world_frag_shader, 1, &world_frag_source, NULL);
+	glCompileShader(world_frag_shader);
 
-	// shader program
-	unsigned int shader;
-	shader = glCreateProgram();
+	// world shader program
+	unsigned int world_shader;
+	world_shader = glCreateProgram();
 
-	glAttachShader(shader, vert_shader);
-	glAttachShader(shader, frag_shader);
-	glLinkProgram(shader);
+	glAttachShader(world_shader, world_vert_shader);
+	glAttachShader(world_shader, world_frag_shader);
+	glLinkProgram(world_shader);
 
-	glDeleteShader(vert_shader);
-	glDeleteShader(frag_shader);
+	glDeleteShader(world_vert_shader);
+	glDeleteShader(world_frag_shader);
 
-	// texture uniforms
-	glUseProgram(shader);
-	glUniform1i(glGetUniformLocation(shader, "atlas_texture"), 0);
+	// world texture uniforms
+	glUseProgram(world_shader);
+	glUniform1i(glGetUniformLocation(world_shader, "atlas_texture"), 0);
 	glUseProgram(0);
 
-	// matrices
-	glm::mat4 model = glm::mat4(1.0f);
-	glm::mat4 view = camera.getViewMatrix();
-	glm::mat4 projection = glm::perspective(glm::radians(camera.m_fov), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+	// ui vertex shader
+	const char* ui_vert_source;
+
+	std::ifstream ui_vert_file("src/ui_shader.vs");
+	std::string ui_vert_string((std::istreambuf_iterator<char>(ui_vert_file)), std::istreambuf_iterator<char>());
+	ui_vert_source = ui_vert_string.c_str();
+
+	unsigned int ui_vert_shader;
+	ui_vert_shader = glCreateShader(GL_VERTEX_SHADER);
+
+	glShaderSource(ui_vert_shader, 1, &ui_vert_source, NULL);
+	glCompileShader(ui_vert_shader);
+
+	// ui fragment shader
+	const char* ui_frag_source;
+
+	std::ifstream ui_frag_file("src/ui_shader.fs");
+	std::string ui_frag_string((std::istreambuf_iterator<char>(ui_frag_file)), std::istreambuf_iterator<char>());
+	ui_frag_source = ui_frag_string.c_str();
+
+	unsigned int ui_frag_shader;
+	ui_frag_shader = glCreateShader(GL_FRAGMENT_SHADER);
+
+	glShaderSource(ui_frag_shader, 1, &ui_frag_source, NULL);
+	glCompileShader(ui_frag_shader);
+
+	// ui shader program
+	unsigned int ui_shader;
+	ui_shader = glCreateProgram();
+
+	glAttachShader(ui_shader, ui_vert_shader);
+	glAttachShader(ui_shader, ui_frag_shader);
+	glLinkProgram(ui_shader);
+
+	glDeleteShader(ui_vert_shader);
+	glDeleteShader(ui_frag_shader);
+
+	// ui texture uniforms
+	glUseProgram(ui_shader);
+	glUseProgram(0);
+
+	// world matrices
+	glm::mat4 world_model = glm::mat4(1.0f);
+	glm::mat4 world_view = camera.getViewMatrix();
+	glm::mat4 world_projection = glm::perspective(glm::radians(camera.m_fov), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+
+	// ui matrices
+	glm::mat4 ui_model = glm::mat4(1.0f);
+	glm::mat4 ui_view = glm::mat4(1.0f);
+	glm::mat4 ui_projection = glm::ortho(0.0f, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, 0.0f, -1.0f, 1.0f);
 
 	// opengl settings
 	glEnable(GL_DEPTH_TEST);
@@ -138,6 +189,10 @@ int main()
 	world.createChunks();
 	world.generateMesh();
 	world.updateMesh();
+
+	// ui setup
+	ui.generateMesh();
+	ui.updateMesh();
 
 	// render loop
 	while (!glfwWindowShouldClose(window))
@@ -173,37 +228,55 @@ int main()
 			glm::vec3 selected_block = std::get<0>(camera.getRayIntersect());
 
 			// update matrices
-			model = glm::mat4(1.0f);
-			view = camera.getViewMatrix();
-			projection = camera.getProjectionMatrix();
+			world_view = camera.getViewMatrix();
+			world_projection = camera.getProjectionMatrix();
 
 			// set uniforms
-			glUseProgram(shader);
-			glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, glm::value_ptr(model));
-			glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, glm::value_ptr(view));
-			glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-			glUniform3f(glGetUniformLocation(shader, "light.direction"), light.m_direction.x, light.m_direction.y, light.m_direction.z);
-			glUniform3f(glGetUniformLocation(shader, "light.color"), light.m_color.x, light.m_color.y, light.m_color.z);
-			glUniform3f(glGetUniformLocation(shader, "light.ambient"), light.m_ambient.x, light.m_ambient.y, light.m_ambient.z);
-			glUniform3f(glGetUniformLocation(shader, "light.diffuse"), light.m_diffuse.x, light.m_diffuse.y, light.m_diffuse.z);
-			glUniform3f(glGetUniformLocation(shader, "light.specular"), light.m_specular.x, light.m_specular.y, light.m_specular.z);
-			glUniform3f(glGetUniformLocation(shader, "view_pos"), camera.m_position.x, camera.m_position.y, camera.m_position.z);
-			glUniform3f(glGetUniformLocation(shader, "selected_block"), selected_block.x, selected_block.y, selected_block.z);
+			glUseProgram(world_shader);
+			glUniformMatrix4fv(glGetUniformLocation(world_shader, "model"), 1, GL_FALSE, glm::value_ptr(world_model));
+			glUniformMatrix4fv(glGetUniformLocation(world_shader, "view"), 1, GL_FALSE, glm::value_ptr(world_view));
+			glUniformMatrix4fv(glGetUniformLocation(world_shader, "projection"), 1, GL_FALSE, glm::value_ptr(world_projection));
+			glUniform3f(glGetUniformLocation(world_shader, "light.direction"), light.m_direction.x, light.m_direction.y, light.m_direction.z);
+			glUniform3f(glGetUniformLocation(world_shader, "light.color"), light.m_color.x, light.m_color.y, light.m_color.z);
+			glUniform3f(glGetUniformLocation(world_shader, "light.ambient"), light.m_ambient.x, light.m_ambient.y, light.m_ambient.z);
+			glUniform3f(glGetUniformLocation(world_shader, "light.diffuse"), light.m_diffuse.x, light.m_diffuse.y, light.m_diffuse.z);
+			glUniform3f(glGetUniformLocation(world_shader, "light.specular"), light.m_specular.x, light.m_specular.y, light.m_specular.z);
+			glUniform3f(glGetUniformLocation(world_shader, "view_pos"), camera.m_position.x, camera.m_position.y, camera.m_position.z);
+			glUniform3f(glGetUniformLocation(world_shader, "selected_block"), selected_block.x, selected_block.y, selected_block.z);
+			glUseProgram(0);
+
+			glUseProgram(ui_shader);
+			glUniformMatrix4fv(glGetUniformLocation(ui_shader, "model"), 1, GL_FALSE, glm::value_ptr(ui_model));
+			glUniformMatrix4fv(glGetUniformLocation(ui_shader, "view"), 1, GL_FALSE, glm::value_ptr(ui_view));
+			glUniformMatrix4fv(glGetUniformLocation(ui_shader, "projection"), 1, GL_FALSE, glm::value_ptr(ui_projection));
+			glUseProgram(0);
 
 			// draw vertices
-			glBindVertexArray(VAO);
-			glDrawArrays(GL_TRIANGLES, 0, (GLsizei)world.m_mesh.size() / 3);
-
+			glUseProgram(world_shader);
+			glBindVertexArray(world_VAO);
+			glDrawArrays(GL_TRIANGLES, 0, (GLsizei)world.m_mesh.size() / 11);
 			glBindVertexArray(0);
 			glUseProgram(0);
+
+			glDisable(GL_DEPTH_TEST);
+			glDisable(GL_CULL_FACE);
+
+			glUseProgram(ui_shader);
+			glBindVertexArray(ui_VAO);
+			glDrawArrays(GL_TRIANGLES, 0, (GLsizei)ui.m_mesh.size() / 2);
+			glBindVertexArray(0);
+			glUseProgram(0);
+
+			glEnable(GL_DEPTH_TEST);
+			glEnable(GL_CULL_FACE);
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 		}
 	}
 
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
+	glDeleteVertexArrays(1, &world_VAO);
+	glDeleteBuffers(1, &world_VBO);
 	glfwTerminate();
 	return 0;
 }

@@ -26,10 +26,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\shader.fs">
+    <None Include="src\world_shader.fs">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="src\shader.vs">
+    <None Include="src\world_shader.vs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="src\ui_shader.fs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="src\ui_shader.vs">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
@@ -50,6 +56,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\global.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
