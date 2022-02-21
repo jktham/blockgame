@@ -12,16 +12,16 @@ class Chunk
 public:
 	Block m_blocks[CHUNK_SIZE.x][CHUNK_SIZE.y][CHUNK_SIZE.z];
 
-	glm::ivec2 m_chunk_pos = glm::ivec2(0);
+	glm::vec2 m_chunk_pos = glm::vec2(0.0f, 0.0f);
 
 	std::vector<float> m_mesh;
-	std::vector<glm::ivec3> m_exposed_blocks;
+	std::vector<glm::vec3> m_exposed_blocks;
 	int m_min_z = CHUNK_SIZE.z - 1;
 
 	// generate terrain for a chunk
 	void generateTerrain()
 	{
-		const siv::PerlinNoise::seed_type seed = 123456u;
+		const siv::PerlinNoise::seed_type seed = TERRAIN_SEED;
 		const siv::PerlinNoise perlin{ seed };
 
 		for (int x = 0; x < CHUNK_SIZE.x; x++)
@@ -93,7 +93,7 @@ public:
 		{
 			auto t1 = std::chrono::high_resolution_clock::now();
 
-			glm::ivec2 shift_dir = current_chunk - last_chunk;
+			glm::vec2 shift_dir = current_chunk - last_chunk;
 
 			if (shift_dir.x == 1)
 			{
@@ -228,9 +228,9 @@ public:
 
 							if (m_chunks[m][n].m_blocks[x][y][z].m_type > 0)
 							{
-								int chunk_x = m_chunks[m][n].m_chunk_pos.x;
-								int chunk_y = m_chunks[m][n].m_chunk_pos.y;
-								int atlas_y = 6 - m_chunks[m][n].m_blocks[x][y][z].m_type;
+								float chunk_x = m_chunks[m][n].m_chunk_pos.x;
+								float chunk_y = m_chunks[m][n].m_chunk_pos.y;
+								float atlas_y = 6.0f - m_chunks[m][n].m_blocks[x][y][z].m_type;
 								float atlas_size_x = 6.0f;
 								float atlas_size_y = 6.0f;
 								float block_x = (float)(chunk_x + x);
@@ -360,12 +360,12 @@ public:
 		std::cout << "generated mesh: " << (m_end - m_start) * (n_end - n_start) << " chunks, " << ms_int << "\n";
 	}
 
-	void placeBlock(std::tuple<glm::ivec3, glm::vec3> tuple)
+	void placeBlock(std::tuple<glm::vec3, glm::vec3> tuple)
 	{
 		auto t1 = std::chrono::high_resolution_clock::now();
 
 		int type = 5;
-		glm::ivec3 position = std::get<0>(tuple);
+		glm::vec3 position = std::get<0>(tuple);
 		glm::vec3 offset = std::get<1>(tuple);
 
 		if (abs(offset.x) > abs(offset.y) && abs(offset.x) > abs(offset.z))
@@ -405,11 +405,11 @@ public:
 		std::cout << "placed block: (" << (int)position.x << ", " << (int)position.y << ", " << (int)position.z << "), " << type << ", " << ms_int << "\n";
 	}
 
-	void destroyBlock(std::tuple<glm::ivec3, glm::vec3> tuple)
+	void destroyBlock(std::tuple<glm::vec3, glm::vec3> tuple)
 	{
 		auto t1 = std::chrono::high_resolution_clock::now();
 
-		glm::ivec3 position = std::get<0>(tuple);
+		glm::vec3 position = std::get<0>(tuple);
 		glm::vec3 offset = std::get<1>(tuple);
 
 		if (position.z >= 0 && position.z < CHUNK_SIZE.z)
@@ -442,7 +442,7 @@ public:
 		std::cout << "destroyed block: (" << (int)position.x << ", " << (int)position.y << ", " << (int)position.z << "), " << ms_int << "\n";
 	}
 
-	// stitch together chunk meshes and update VAO and VBO
+	// combine chunk meshes and update VAO and VBO
 	void updateMesh()
 	{
 		auto t1 = std::chrono::high_resolution_clock::now();

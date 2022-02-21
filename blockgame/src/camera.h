@@ -110,7 +110,7 @@ public:
 		for (int i = 0; i < exposed_blocks.size(); i += 1)
 		{
 			glm::vec3 block_collision_min = exposed_blocks[i];
-			glm::vec3 block_collision_max = exposed_blocks[i] + glm::ivec3(1);
+			glm::vec3 block_collision_max = exposed_blocks[i] + glm::vec3(1.0f);
 
 			glm::vec3 camera_collision_min = m_position + glm::vec3(-m_width, -m_width, -m_height);
 			glm::vec3 camera_collision_max = m_position + glm::vec3(m_width, m_width, 0.0);
@@ -142,7 +142,7 @@ public:
 		for (int i = 0; i < exposed_blocks.size(); i += 1)
 		{
 			glm::vec3 block_collision_min = exposed_blocks[i];
-			glm::vec3 block_collision_max = exposed_blocks[i] + glm::ivec3(1);
+			glm::vec3 block_collision_max = exposed_blocks[i] + glm::vec3(1.0f);
 
 			glm::vec3 camera_collision_min = m_position + glm::vec3(-m_width, -m_width, -m_height);
 			glm::vec3 camera_collision_max = m_position + glm::vec3(m_width, m_width, 0.0f);
@@ -173,7 +173,7 @@ public:
 		return false;
 	}
 
-	std::tuple<glm::ivec3, glm::vec3> getRayIntersect()
+	std::tuple<glm::vec3, glm::vec3> getRayIntersect()
 	{
 		for (float r = 0; r < m_ray_length; r += m_ray_step)
 		{
@@ -182,7 +182,7 @@ public:
 			for (int i = 0; i < exposed_blocks.size(); i++)
 			{
 				glm::vec3 block_collision_min = exposed_blocks[i];
-				glm::vec3 block_collision_max = exposed_blocks[i] + glm::ivec3(1);
+				glm::vec3 block_collision_max = exposed_blocks[i] + glm::vec3(1.0f);
 
 				if ((m_position.x + ray.x <= block_collision_max.x && m_position.x + ray.x >= block_collision_min.x) &&
 					(m_position.y + ray.y <= block_collision_max.y && m_position.y + ray.y >= block_collision_min.y) &&
@@ -192,7 +192,7 @@ public:
 				}
 			}
 		}
-		return std::make_tuple(glm::ivec3(-1), glm::vec3(-1.0f));
+		return std::make_tuple(glm::vec3(-1.0f), glm::vec3(-1.0f));
 	}
 
 	glm::mat4 getViewMatrix()
