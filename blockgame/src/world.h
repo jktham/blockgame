@@ -172,7 +172,7 @@ public:
 				generateMesh(0, WORLD_SIZE.x, 0, 2);
 			}
 
-			updateMesh();
+			updateVAO();
 
 			auto t2 = std::chrono::high_resolution_clock::now();
 			auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
@@ -230,9 +230,7 @@ public:
 							{
 								float chunk_x = m_chunks[m][n].m_chunk_pos.x;
 								float chunk_y = m_chunks[m][n].m_chunk_pos.y;
-								float atlas_y = 6.0f - m_chunks[m][n].m_blocks[x][y][z].m_type;
-								float atlas_size_x = 6.0f;
-								float atlas_size_y = 6.0f;
+								float atlas_y = ATLAS_SIZE_Y - m_chunks[m][n].m_blocks[x][y][z].m_type;
 								float block_x = (float)(chunk_x + x);
 								float block_y = (float)(chunk_y + y);
 								float block_z = (float)z;
@@ -241,57 +239,57 @@ public:
 									// pos.x, pos.y, pos.z, tex.x, tex.y, norm.x, norm.y, norm.z, block.x, block.y, block.z
 									// left
 									{
-									0.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, (1.0f + 0.0f) / atlas_size_x, (1.0f + atlas_y) / atlas_size_y, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
-									0.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, (1.0f + 0.0f) / atlas_size_x, (0.0f + atlas_y) / atlas_size_y, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
-									0.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, (0.0f + 0.0f) / atlas_size_x, (0.0f + atlas_y) / atlas_size_y, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
-									0.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, (0.0f + 0.0f) / atlas_size_x, (0.0f + atlas_y) / atlas_size_y, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
-									0.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, (0.0f + 0.0f) / atlas_size_x, (1.0f + atlas_y) / atlas_size_y, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
-									0.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, (1.0f + 0.0f) / atlas_size_x, (1.0f + atlas_y) / atlas_size_y, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+									0.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, (1.0f + 0.0f) / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+									0.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, (1.0f + 0.0f) / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+									0.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, (0.0f + 0.0f) / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+									0.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, (0.0f + 0.0f) / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+									0.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, (0.0f + 0.0f) / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+									0.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, (1.0f + 0.0f) / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
 									},
 									// right
 									{
-									1.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, (1.0f + 1.0f) / atlas_size_x, (1.0f + atlas_y) / atlas_size_y, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
-									1.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, (0.0f + 1.0f) / atlas_size_x, (0.0f + atlas_y) / atlas_size_y, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
-									1.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, (1.0f + 1.0f) / atlas_size_x, (0.0f + atlas_y) / atlas_size_y, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
-									1.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, (0.0f + 1.0f) / atlas_size_x, (0.0f + atlas_y) / atlas_size_y, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
-									1.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, (1.0f + 1.0f) / atlas_size_x, (1.0f + atlas_y) / atlas_size_y, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
-									1.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, (0.0f + 1.0f) / atlas_size_x, (1.0f + atlas_y) / atlas_size_y, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+									1.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, (1.0f + 1.0f) / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+									1.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, (0.0f + 1.0f) / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+									1.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, (1.0f + 1.0f) / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+									1.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, (0.0f + 1.0f) / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+									1.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, (1.0f + 1.0f) / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+									1.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, (0.0f + 1.0f) / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
 									},
 									// front
 									{
-									0.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, (0.0f + 2.0f) / atlas_size_x, (0.0f + atlas_y) / atlas_size_y, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
-									1.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, (1.0f + 2.0f) / atlas_size_x, (0.0f + atlas_y) / atlas_size_y, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
-									1.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, (1.0f + 2.0f) / atlas_size_x, (1.0f + atlas_y) / atlas_size_y, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
-									1.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, (1.0f + 2.0f) / atlas_size_x, (1.0f + atlas_y) / atlas_size_y, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
-									0.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, (0.0f + 2.0f) / atlas_size_x, (1.0f + atlas_y) / atlas_size_y, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
-									0.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, (0.0f + 2.0f) / atlas_size_x, (0.0f + atlas_y) / atlas_size_y, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
+									0.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, (0.0f + 2.0f) / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
+									1.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, (1.0f + 2.0f) / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
+									1.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, (1.0f + 2.0f) / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
+									1.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, (1.0f + 2.0f) / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
+									0.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, (0.0f + 2.0f) / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
+									0.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, (0.0f + 2.0f) / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
 									},
 									// back
 									{
-									0.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, (0.0f + 3.0f) / atlas_size_x, (0.0f + atlas_y) / atlas_size_y, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
-									1.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, (1.0f + 3.0f) / atlas_size_x, (1.0f + atlas_y) / atlas_size_y, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
-									1.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, (1.0f + 3.0f) / atlas_size_x, (0.0f + atlas_y) / atlas_size_y, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
-									1.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, (1.0f + 3.0f) / atlas_size_x, (1.0f + atlas_y) / atlas_size_y, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
-									0.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, (0.0f + 3.0f) / atlas_size_x, (0.0f + atlas_y) / atlas_size_y, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
-									0.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, (0.0f + 3.0f) / atlas_size_x, (1.0f + atlas_y) / atlas_size_y, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
+									0.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, (0.0f + 3.0f) / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
+									1.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, (1.0f + 3.0f) / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
+									1.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, (1.0f + 3.0f) / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
+									1.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, (1.0f + 3.0f) / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
+									0.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, (0.0f + 3.0f) / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
+									0.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, (0.0f + 3.0f) / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
 									},
 									// bottom
 									{
-									0.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, (0.0f + 4.0f) / atlas_size_x, (0.0f + atlas_y) / atlas_size_y, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
-									1.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, (1.0f + 4.0f) / atlas_size_x, (1.0f + atlas_y) / atlas_size_y, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
-									1.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, (1.0f + 4.0f) / atlas_size_x, (0.0f + atlas_y) / atlas_size_y, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
-									1.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, (1.0f + 4.0f) / atlas_size_x, (1.0f + atlas_y) / atlas_size_y, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
-									0.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, (0.0f + 4.0f) / atlas_size_x, (0.0f + atlas_y) / atlas_size_y, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
-									0.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, (0.0f + 4.0f) / atlas_size_x, (1.0f + atlas_y) / atlas_size_y, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
+									0.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, (0.0f + 4.0f) / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
+									1.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, (1.0f + 4.0f) / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
+									1.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, (1.0f + 4.0f) / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
+									1.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, (1.0f + 4.0f) / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
+									0.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, (0.0f + 4.0f) / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
+									0.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, (0.0f + 4.0f) / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
 									},
 									// top
 									{
-									0.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, (0.0f + 5.0f) / atlas_size_x, (0.0f + atlas_y) / atlas_size_y, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
-									1.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, (1.0f + 5.0f) / atlas_size_x, (0.0f + atlas_y) / atlas_size_y, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
-									1.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, (1.0f + 5.0f) / atlas_size_x, (1.0f + atlas_y) / atlas_size_y, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
-									1.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, (1.0f + 5.0f) / atlas_size_x, (1.0f + atlas_y) / atlas_size_y, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
-									0.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, (0.0f + 5.0f) / atlas_size_x, (1.0f + atlas_y) / atlas_size_y, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
-									0.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, (0.0f + 5.0f) / atlas_size_x, (0.0f + atlas_y) / atlas_size_y, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
+									0.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, (0.0f + 5.0f) / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
+									1.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, (1.0f + 5.0f) / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
+									1.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, (1.0f + 5.0f) / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
+									1.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, (1.0f + 5.0f) / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
+									0.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, (0.0f + 5.0f) / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
+									0.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, (0.0f + 5.0f) / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
 									},
 								};
 
@@ -364,7 +362,6 @@ public:
 	{
 		auto t1 = std::chrono::high_resolution_clock::now();
 
-		int type = 5;
 		glm::vec3 position = std::get<0>(tuple);
 		glm::vec3 offset = std::get<1>(tuple);
 
@@ -391,10 +388,10 @@ public:
 					{
 						if (position.x >= m_chunks[m][n].m_chunk_pos.x && position.x < m_chunks[m][n].m_chunk_pos.x + CHUNK_SIZE.x && position.y >= m_chunks[m][n].m_chunk_pos.y && position.y < m_chunks[m][n].m_chunk_pos.y + CHUNK_SIZE.y)
 						{
-							m_chunks[m][n].m_blocks[(int)(position.x - m_chunks[m][n].m_chunk_pos.x)][(int)(position.y - m_chunks[m][n].m_chunk_pos.y)][(int)position.z].m_type = type;
+							m_chunks[m][n].m_blocks[(int)(position.x - m_chunks[m][n].m_chunk_pos.x)][(int)(position.y - m_chunks[m][n].m_chunk_pos.y)][(int)position.z].m_type = current_type;
 
 							generateMesh(m - 1, m + 2, n - 1, n + 2);
-							updateMesh();
+							updateVAO();
 						}
 					}
 				}
@@ -402,7 +399,7 @@ public:
 		}
 		auto t2 = std::chrono::high_resolution_clock::now();
 		auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
-		std::cout << "placed block: (" << (int)position.x << ", " << (int)position.y << ", " << (int)position.z << "), " << type << ", " << ms_int << "\n";
+		std::cout << "placed block: (" << (int)position.x << ", " << (int)position.y << ", " << (int)position.z << "), " << current_type << ", " << ms_int << "\n";
 	}
 
 	void destroyBlock(std::tuple<glm::vec3, glm::vec3> tuple)
@@ -430,7 +427,7 @@ public:
 							}
 
 							generateMesh(m - 1, m + 2, n - 1, n + 2);
-							updateMesh();
+							updateVAO();
 						}
 					}
 				}
@@ -443,7 +440,7 @@ public:
 	}
 
 	// combine chunk meshes and update VAO and VBO
-	void updateMesh()
+	void updateVAO()
 	{
 		auto t1 = std::chrono::high_resolution_clock::now();
 
@@ -493,6 +490,6 @@ public:
 
 		auto t2 = std::chrono::high_resolution_clock::now();
 		auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
-		std::cout << "updated mesh: " << m_mesh.size() << " verts, " << ms_int << "\n";
+		std::cout << "updated VAO: " << m_mesh.size() << " verts, " << ms_int << "\n";
 	}
 };

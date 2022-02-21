@@ -1,10 +1,20 @@
 #version 460 core
 
-in vec2 frag_pos;
+in vec3 color;
+in vec2 tex_coord;
 
 out vec4 frag_color;
 
+uniform sampler2D atlas_texture;
+
 void main()
 {
-    frag_color = vec4(1.0f);
+    if (color == vec3(-1.0f, -1.0f, -1.0f))
+    {
+        frag_color = texture(atlas_texture, tex_coord);
+    }
+    else
+    {
+        frag_color = vec4(color, 1.0f);
+    }
 }

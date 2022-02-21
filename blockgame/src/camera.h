@@ -15,7 +15,7 @@ public:
 
 	float m_speed = 7.5f;
 	float m_sensitivity = 0.1f;
-	float m_fov = 70.0f;
+	float m_fov = 80.0f;
 
 	float m_height = 1.75f;
 	float m_width = 0.25f;
@@ -24,7 +24,7 @@ public:
 	float m_vertical_velocity = 0.0f;
 
 	float m_ray_length = 8.0f;
-	float m_ray_step = 0.25f;
+	float m_ray_step = 0.2f;
 
 	bool m_noclip = false;
 
@@ -243,16 +243,6 @@ public:
 			m_pitch = -89.99f;
 
 		updateCameraVectors();
-	}
-
-	void processMouseScroll(float offset_y)
-	{
-		m_fov -= (float)offset_y * 3.0f;
-
-		if (m_fov < 10.0f)
-			m_fov = 10.0f;
-		if (m_fov > 90.0f)
-			m_fov = 90.0f;
 	}
 
 private:

@@ -121,11 +121,6 @@ int main()
 	glDeleteShader(world_vert_shader);
 	glDeleteShader(world_frag_shader);
 
-	// world texture uniforms
-	glUseProgram(world_shader);
-	glUniform1i(glGetUniformLocation(world_shader, "atlas_texture"), 0);
-	glUseProgram(0);
-
 	// ui vertex shader
 	const char* ui_vert_source;
 
@@ -163,8 +158,14 @@ int main()
 	glDeleteShader(ui_vert_shader);
 	glDeleteShader(ui_frag_shader);
 
+	// world texture uniforms
+	glUseProgram(world_shader);
+	glUniform1i(glGetUniformLocation(world_shader, "atlas_texture"), 0);
+	glUseProgram(0);
+
 	// ui texture uniforms
 	glUseProgram(ui_shader);
+	glUniform1i(glGetUniformLocation(ui_shader, "atlas_texture"), 0);
 	glUseProgram(0);
 
 	// world matrices
@@ -188,11 +189,11 @@ int main()
 	// world setup
 	world.createChunks();
 	world.generateMesh();
-	world.updateMesh();
+	world.updateVAO();
 
 	// ui setup
 	ui.generateMesh();
-	ui.updateMesh();
+	ui.updateVAO();
 
 	// render loop
 	while (!glfwWindowShouldClose(window))
@@ -225,9 +226,11 @@ int main()
 			camera.applyGravity();
 			light.update();
 			world.shiftChunks();
+			ui.generateMesh();
+			ui.updateVAO();
+
 			glm::vec3 selected_block = std::get<0>(camera.getRayIntersect());
 
-			// update matrices
 			world_view = camera.getViewMatrix();
 			world_projection = camera.getProjectionMatrix();
 
@@ -263,7 +266,7 @@ int main()
 
 			glUseProgram(ui_shader);
 			glBindVertexArray(ui_VAO);
-			glDrawArrays(GL_TRIANGLES, 0, (GLsizei)ui.m_mesh.size() / 2);
+			glDrawArrays(GL_TRIANGLES, 0, (GLsizei)ui.m_mesh.size() / 7);
 			glBindVertexArray(0);
 			glUseProgram(0);
 
@@ -346,7 +349,12 @@ void mouse_cursor_callback(GLFWwindow* window, double pos_x, double pos_y)
 
 void scroll_callback(GLFWwindow* window, double offset_x, double offset_y)
 {
-	camera.processMouseScroll(static_cast<float>(offset_y));
+	current_type += (int)offset_y;
+
+	if (current_type > MAX_TYPE)
+		current_type = 1;
+	if (current_type < 1)
+		current_type = MAX_TYPE;
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
