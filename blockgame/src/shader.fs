@@ -13,14 +13,21 @@ out vec4 frag_color;
 in vec3 frag_pos;
 in vec2 tex_coord;
 in vec3 normal;
+in vec3 block;
 
 uniform Light light;
 uniform vec3 view_pos;
+uniform vec3 selected_block;
 uniform sampler2D atlas_texture;
 
 void main()
 {
     frag_color = texture(atlas_texture, tex_coord);
+
+    if (round(block) == round(selected_block))
+    {
+        frag_color += vec4(vec3(0.1f), 1.0f);
+    }
 
     //vec3 light_dir = normalize(light.position - frag_pos);
     vec3 light_dir = normalize(light.direction);

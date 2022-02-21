@@ -170,11 +170,12 @@ int main()
 			camera.applyGravity();
 			light.update();
 			world.shiftChunks();
+			glm::ivec3 selected_block = std::get<0>(camera.getRayIntersect());
 
 			// update matrices
 			model = glm::mat4(1.0f);
 			view = camera.getViewMatrix();
-			projection = glm::perspective(glm::radians(camera.m_fov), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 200.0f);
+			projection = camera.getProjectionMatrix();
 
 			// set uniforms
 			glUseProgram(shader);
@@ -187,6 +188,7 @@ int main()
 			glUniform3f(glGetUniformLocation(shader, "light.diffuse"), light.m_diffuse.x, light.m_diffuse.y, light.m_diffuse.z);
 			glUniform3f(glGetUniformLocation(shader, "light.specular"), light.m_specular.x, light.m_specular.y, light.m_specular.z);
 			glUniform3f(glGetUniformLocation(shader, "view_pos"), camera.m_position.x, camera.m_position.y, camera.m_position.z);
+			glUniform3f(glGetUniformLocation(shader, "selected_block"), (float)selected_block.x, (float)selected_block.y, (float)selected_block.z);
 
 			// draw vertices
 			glBindVertexArray(VAO);

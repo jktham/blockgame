@@ -15,7 +15,7 @@ public:
 
 	float m_speed = 7.5f;
 	float m_sensitivity = 0.1f;
-	float m_fov = 60.0f;
+	float m_fov = 70.0f;
 
 	float m_height = 1.75f;
 	float m_width = 0.25f;
@@ -24,7 +24,7 @@ public:
 	float m_vertical_velocity = 0.0f;
 
 	float m_ray_length = 8.0f;
-	float m_ray_step = 0.1f;
+	float m_ray_step = 0.25f;
 
 	bool m_noclip = false;
 
@@ -198,6 +198,11 @@ public:
 	glm::mat4 getViewMatrix()
 	{
 		return glm::lookAt(m_position, m_position + m_front, m_up);
+	}
+
+	glm::mat4 getProjectionMatrix()
+	{
+		return glm::perspective(glm::radians(m_fov), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 200.0f);
 	}
 
 	void processKeyboard(int key)
