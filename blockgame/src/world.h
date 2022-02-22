@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include <chrono>
 
 class Block
 {
@@ -475,6 +474,7 @@ public:
 				}
 			}
 		}
+
 		auto t2 = std::chrono::high_resolution_clock::now();
 		auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
 		std::cout << "placed block: (" << (int)position.x << ", " << (int)position.y << ", " << (int)position.z << "), " << current_type << ", total " << ms_int << "\n";

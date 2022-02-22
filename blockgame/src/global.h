@@ -21,6 +21,7 @@ glm::vec2 current_chunk = glm::vec2(0.0f, 0.0f);
 glm::vec2 last_chunk = glm::vec2(0.0f, 0.0f);
 
 std::vector<glm::vec3> exposed_blocks;
+std::vector<glm::vec3> reachable_blocks;
 
 const int MAX_TYPE = 5;
 int current_type = 5;

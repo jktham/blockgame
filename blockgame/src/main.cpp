@@ -12,6 +12,7 @@
 #include <iostream>
 #include <iomanip>
 #include <vector>
+#include <chrono>
 
 #include "global.h"
 #include "stb_image.h"

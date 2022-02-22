@@ -24,7 +24,7 @@ public:
 	float m_vertical_velocity = 0.0f;
 
 	float m_ray_length = 8.0f;
-	float m_ray_step = 0.2f;
+	float m_ray_step = 0.1f;
 
 	bool m_noclip = false;
 
@@ -58,7 +58,7 @@ public:
 		if (m_vertical_velocity <= -50.0f)
 			m_vertical_velocity = -50.0f;
 		if (m_position.z < -32.0f)
-			m_position.z = 256.0f;
+			m_position.z = CHUNK_SIZE.z + 64.0f;
 	}
 
 	void applyMovement(glm::vec3 direction)
@@ -175,20 +175,29 @@ public:
 
 	std::tuple<glm::vec3, glm::vec3> getRayIntersect()
 	{
+		reachable_blocks = {};
+		for (int i = 0; i < exposed_blocks.size(); i += 1)
+		{
+			if (glm::length(m_position - exposed_blocks[i]) < m_ray_length + 1.0f)
+			{
+				reachable_blocks.push_back(exposed_blocks[i]);
+			}
+		}
+
 		for (float r = 0; r < m_ray_length; r += m_ray_step)
 		{
 			glm::vec3 ray = m_front * r;
 
-			for (int i = 0; i < exposed_blocks.size(); i++)
+			for (int i = 0; i < reachable_blocks.size(); i++)
 			{
-				glm::vec3 block_collision_min = exposed_blocks[i];
-				glm::vec3 block_collision_max = exposed_blocks[i] + glm::vec3(1.0f);
+				glm::vec3 block_collision_min = reachable_blocks[i];
+				glm::vec3 block_collision_max = reachable_blocks[i] + glm::vec3(1.0f);
 
 				if ((m_position.x + ray.x <= block_collision_max.x && m_position.x + ray.x >= block_collision_min.x) &&
 					(m_position.y + ray.y <= block_collision_max.y && m_position.y + ray.y >= block_collision_min.y) &&
 					(m_position.z + ray.z <= block_collision_max.z && m_position.z + ray.z >= block_collision_min.z))
 				{
-					return std::make_tuple(exposed_blocks[i], m_position + ray - (glm::vec3(exposed_blocks[i]) + glm::vec3(0.5f)));
+					return std::make_tuple(reachable_blocks[i], m_position + ray - (glm::vec3(reachable_blocks[i]) + glm::vec3(0.5f)));
 				}
 			}
 		}
@@ -237,10 +246,10 @@ public:
 		m_yaw += offset_x;
 		m_pitch += offset_y;
 
-		if (m_pitch > 89.99f)
-			m_pitch = 89.99f;
-		if (m_pitch < -89.99f)
-			m_pitch = -89.99f;
+		if (m_pitch > 89.9999f)
+			m_pitch = 89.9999f;
+		if (m_pitch < -89.9999f)
+			m_pitch = -89.9999f;
 
 		updateCameraVectors();
 	}
