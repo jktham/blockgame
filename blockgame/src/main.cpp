@@ -188,7 +188,8 @@ int main()
 
 	// world setup
 	world.createChunks();
-	world.generateMesh();
+	world.generateChunkMesh();
+	world.generateWorldMesh();
 	world.updateVAO();
 
 	// ui setup
@@ -225,9 +226,8 @@ int main()
 			// update
 			camera.applyGravity();
 			light.update();
-			world.shiftChunks();
-			ui.generateMesh();
-			ui.updateVAO();
+			world.updateChunks();
+			ui.update();
 
 			glm::vec3 selected_block = std::get<0>(camera.getRayIntersect());
 

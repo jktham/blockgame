@@ -5,6 +5,12 @@ class UI
 public:
 	std::vector<float> m_mesh;
 
+	void update()
+	{
+		generateMesh();
+		updateVAO();
+	}
+
 	void generateMesh()
 	{
 		m_mesh = {};
