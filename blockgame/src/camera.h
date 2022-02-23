@@ -268,7 +268,8 @@ private:
 		m_front_plane = glm::normalize(glm::cross(glm::vec3(0.0f, 0.0f, 1.0f), m_right));
 	}
 
-	int divideInt(float a, float b) {
+	int divideInt(float a, float b)
+	{
 		if (a < 0) a -= 1;
 		return (int)(a / b - ((int)a % (int)b < 0 ? 1 : 0));
 	}

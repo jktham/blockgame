@@ -23,8 +23,9 @@ glm::vec2 last_chunk = glm::vec2(0.0f, 0.0f);
 std::vector<glm::vec3> exposed_blocks;
 std::vector<glm::vec3> reachable_blocks;
 
-const int MAX_TYPE = 5;
 int current_type = 5;
+int last_type = 5;
+const int MAX_TYPE = 5;
 
 const float ATLAS_SIZE_X = 6.0f;
 const float ATLAS_SIZE_Y = 6.0f;

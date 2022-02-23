@@ -9,7 +9,7 @@ uniform sampler2D atlas_texture;
 
 void main()
 {
-    if (color == vec3(-1.0f, -1.0f, -1.0f))
+    if (color.r == -1.0f)
     {
         frag_color = texture(atlas_texture, tex_coord);
     }

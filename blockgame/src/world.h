@@ -517,4 +517,28 @@ public:
 		auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
 		std::cout << "destroyed block: (" << (int)position.x << ", " << (int)position.y << ", " << (int)position.z << "), total " << ms_int << "\n";
 	}
+
+	// get block type at given position
+	int getBlockType(std::tuple<glm::vec3, glm::vec3> ray_intersect)
+	{
+		glm::vec3 position = std::get<0>(ray_intersect);
+
+		if (position.z >= 0 && position.z < CHUNK_SIZE.z)
+		{
+			for (int m = WORLD_SIZE.x / 2 - 1; m < WORLD_SIZE.x / 2 + 2; m++)
+			{
+				for (int n = WORLD_SIZE.y / 2 - 1; n < WORLD_SIZE.y / 2 + 2; n++)
+				{
+					if (position.x >= m_chunks[m][n].m_chunk_pos.x && position.x < m_chunks[m][n].m_chunk_pos.x + CHUNK_SIZE.x && position.y >= m_chunks[m][n].m_chunk_pos.y && position.y < m_chunks[m][n].m_chunk_pos.y + CHUNK_SIZE.y)
+					{
+						if (m_chunks[m][n].m_blocks[(int)(position.x - m_chunks[m][n].m_chunk_pos.x)][(int)(position.y - m_chunks[m][n].m_chunk_pos.y)][(int)position.z].m_type != 0)
+						{
+							return m_chunks[m][n].m_blocks[(int)(position.x - m_chunks[m][n].m_chunk_pos.x)][(int)(position.y - m_chunks[m][n].m_chunk_pos.y)][(int)position.z].m_type;
+						}
+					}
+				}
+			}
+		}
+		return current_type;
+	}
 };
