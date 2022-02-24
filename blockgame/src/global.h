@@ -11,6 +11,10 @@ float last_y = WINDOW_HEIGHT / 2.0f;
 bool first_mouse = true;
 bool wireframe_mode = false;
 
+int left_delay = 0;
+int right_delay = 0;
+const int CLICK_DELAY = 20;
+
 // world
 const unsigned int TERRAIN_SEED = 123456;
 

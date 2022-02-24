@@ -29,7 +29,7 @@ Light light;
 UI ui;
 
 // callbacks
-void processInput(GLFWwindow* window);
+void processInputState(GLFWwindow* window);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void mouse_cursor_callback(GLFWwindow* window, double xpos, double ypos);
@@ -222,7 +222,7 @@ int main()
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			// process current input state
-			processInput(window);
+			processInputState(window);
 
 			// update
 			camera.applyGravity();
@@ -288,7 +288,7 @@ int main()
 }
 
 // continuous inputs
-void processInput(GLFWwindow* window)
+void processInputState(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
@@ -306,6 +306,30 @@ void processInput(GLFWwindow* window)
 		camera.m_speed = 7.5f * 5.0f;
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
 		camera.m_speed = 7.5f;
+
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	{
+		if (left_delay <= 0)
+		{
+			world.destroyBlock(camera.getRayIntersect());
+			left_delay = CLICK_DELAY;
+		}
+		left_delay -= 1;
+	}
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
+		left_delay = 0;
+
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+	{
+		if (right_delay <= 0)
+		{
+			world.placeBlock(camera.getRayIntersect());
+			right_delay = CLICK_DELAY;
+		}
+		right_delay -= 1;
+	}
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)
+		right_delay = 0;
 }
 
 // discrete inputs
@@ -330,10 +354,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-		world.destroyBlock(camera.getRayIntersect());
-	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-		world.placeBlock(camera.getRayIntersect());
 	if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS)
 		current_type = world.getBlockType(camera.getRayIntersect());
 }
