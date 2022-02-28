@@ -63,10 +63,10 @@ public:
 
 	void applyMovement(glm::vec3 direction)
 	{
-		glm::vec3 collision_position = glm::vec3(0.0f);
+		glm::vec3 collision_offset = glm::vec3(0.0f);
 		glm::vec3 collision_normal = glm::vec3(0.0f);
 
-		if (!checkCollisionHorizontal(collision_position, collision_normal))
+		if (!checkCollisionHorizontal(collision_offset, collision_normal))
 		{
 			float velocity = m_speed * delta_time;
 			m_position += direction * velocity;
@@ -119,9 +119,9 @@ public:
 				(camera_collision_min.y < block_collision_max.y && camera_collision_max.y > block_collision_min.y) &&
 				(camera_collision_min.z <= block_collision_max.z && camera_collision_max.z >= block_collision_min.z))
 			{
-				glm::vec3 collision_position = camera_collision_min - block_collision_min;
+				glm::vec3 collision_offset = camera_collision_min - block_collision_min;
 
-				if (collision_position.z > abs(collision_position.x) && collision_position.z > abs(collision_position.y))
+				if (collision_offset.z > abs(collision_offset.x) && collision_offset.z > abs(collision_offset.y))
 				{
 					floor_height = block_collision_max.z;
 
@@ -134,7 +134,7 @@ public:
 		return false;
 	}
 
-	bool checkCollisionHorizontal(glm::vec3& collision_position, glm::vec3& collision_normal)
+	bool checkCollisionHorizontal(glm::vec3& collision_offset, glm::vec3& collision_normal)
 	{
 		if (m_noclip)
 			return false;
@@ -151,17 +151,17 @@ public:
 				(camera_collision_min.y <= block_collision_max.y && camera_collision_max.y >= block_collision_min.y) &&
 				(camera_collision_min.z <= block_collision_max.z && camera_collision_max.z >= block_collision_min.z))
 			{
-				collision_position = camera_collision_min - block_collision_min;
+				collision_offset = camera_collision_min - block_collision_min;
 
-				if (collision_position.z < abs(collision_position.x) || collision_position.z < abs(collision_position.y))
+				if (collision_offset.z < abs(collision_offset.x) || collision_offset.z < abs(collision_offset.y))
 				{
-					if (glm::abs(collision_position.x) > glm::abs(collision_position.y))
+					if (glm::abs(collision_offset.x) > glm::abs(collision_offset.y))
 					{
-						collision_normal = glm::normalize(glm::vec3(collision_position.x, 0.0f, 0.0f));
+						collision_normal = glm::normalize(glm::vec3(collision_offset.x, 0.0f, 0.0f));
 					}
 					else
 					{
-						collision_normal = glm::normalize(glm::vec3(0.0f, collision_position.y, 0.0f));
+						collision_normal = glm::normalize(glm::vec3(0.0f, collision_offset.y, 0.0f));
 					}
 
 					std::cout << "horizontal collision: (" << i << "/" << exposed_blocks.size() << ")\n";

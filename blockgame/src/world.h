@@ -17,9 +17,45 @@ public:
 	std::vector<glm::vec3> m_exposed_blocks;
 	int m_min_z = CHUNK_SIZE.z - 1;
 
+	void loadChunk()
+	{
+		generateTerrain();
+	}
+
+	void saveChunk()
+	{
+		/*std::ofstream file("dat/chunks.txt", std::ios_base::app | std::ios_base::out);
+		std::string output;
+		file << m_chunk_pos.x << "," << m_chunk_pos.y << "\n";
+		for (int i = 0; i < CHUNK_SIZE.x; i++)
+		{
+			for (int j = 0; j < CHUNK_SIZE.y; j++)
+			{
+				for (int k = 0; k < CHUNK_SIZE.z; k++)
+				{
+					file << m_blocks[i][j][k].m_type << ",";
+				}
+			}
+		}
+		file << "\n";
+		file.close();*/
+	}
+
+	void generateChunk()
+	{
+		if (std::find(generated_chunks.begin(), generated_chunks.end(), m_chunk_pos) != generated_chunks.end()) {
+			loadChunk();
+		}
+		else {
+			generateTerrain();
+		}
+	}
+
 	// generate terrain for a chunk
 	void generateTerrain()
 	{
+		auto t1 = std::chrono::high_resolution_clock::now();
+
 		const siv::PerlinNoise::seed_type seed = TERRAIN_SEED;
 		const siv::PerlinNoise perlin{ seed };
 
@@ -62,6 +98,12 @@ public:
 				}
 			}
 		}
+		generated_chunks.push_back(m_chunk_pos);
+		saveChunk();
+
+		auto t2 = std::chrono::high_resolution_clock::now();
+		auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
+		std::cout << "generated terrain: (" << m_chunk_pos.x << ", " << m_chunk_pos.y << "), " << ms_int << "\n";
 	}
 };
 
@@ -80,7 +122,7 @@ public:
 			for (int n = 0; n < WORLD_SIZE.y; n++)
 			{
 				m_chunks[m][n].m_chunk_pos = glm::vec2((m - WORLD_SIZE.x / 2) * CHUNK_SIZE.x, (n - WORLD_SIZE.y / 2) * CHUNK_SIZE.y);
-				m_chunks[m][n].generateTerrain();
+				m_chunks[m][n].generateChunk();
 			}
 		}
 	}
@@ -120,7 +162,7 @@ public:
 					if (m == WORLD_SIZE.x - 1)
 					{
 						m_chunks[m][n].m_chunk_pos += glm::vec2(CHUNK_SIZE.x, 0);
-						m_chunks[m][n].generateTerrain();
+						m_chunks[m][n].generateChunk();
 					}
 					else
 					{
@@ -139,7 +181,7 @@ public:
 					if (n == WORLD_SIZE.y - 1)
 					{
 						m_chunks[m][n].m_chunk_pos += glm::vec2(0, CHUNK_SIZE.y);
-						m_chunks[m][n].generateTerrain();
+						m_chunks[m][n].generateChunk();
 					}
 					else
 					{
@@ -158,7 +200,7 @@ public:
 					if (m == 0)
 					{
 						m_chunks[m][n].m_chunk_pos -= glm::vec2(CHUNK_SIZE.x, 0);
-						m_chunks[m][n].generateTerrain();
+						m_chunks[m][n].generateChunk();
 					}
 					else
 					{
@@ -177,7 +219,7 @@ public:
 					if (n == 0)
 					{
 						m_chunks[m][n].m_chunk_pos -= glm::vec2(0, CHUNK_SIZE.y);
-						m_chunks[m][n].generateTerrain();
+						m_chunks[m][n].generateChunk();
 					}
 					else
 					{

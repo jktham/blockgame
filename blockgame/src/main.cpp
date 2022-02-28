@@ -185,17 +185,13 @@ int main()
 	glEnable(GL_DEBUG_OUTPUT);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glfwSwapInterval(0);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 	// world setup
 	world.createChunks();
 	world.generateChunkMesh();
 	world.generateWorldMesh();
 	world.updateVAO();
-
-	// ui setup
-	ui.generateHudMesh();
-	ui.updateVAO();
 
 	// render loop
 	while (!glfwWindowShouldClose(window))
@@ -224,55 +220,84 @@ int main()
 			// process current input state
 			processInputState(window);
 
-			// update
-			camera.applyGravity();
-			light.update();
-			world.updateChunks();
-			ui.updateHud();
+			if (game_state == 0)
+			{
+				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
-			glm::vec3 selected_block = std::get<0>(camera.getRayIntersect());
+				ui.updateMenu();
 
-			world_view = camera.getViewMatrix();
-			world_projection = camera.getProjectionMatrix();
+				glUseProgram(ui_shader);
+				glUniformMatrix4fv(glGetUniformLocation(ui_shader, "model"), 1, GL_FALSE, glm::value_ptr(ui_model));
+				glUniformMatrix4fv(glGetUniformLocation(ui_shader, "view"), 1, GL_FALSE, glm::value_ptr(ui_view));
+				glUniformMatrix4fv(glGetUniformLocation(ui_shader, "projection"), 1, GL_FALSE, glm::value_ptr(ui_projection));
+				glUseProgram(0);
 
-			// set uniforms
-			glUseProgram(world_shader);
-			glUniformMatrix4fv(glGetUniformLocation(world_shader, "model"), 1, GL_FALSE, glm::value_ptr(world_model));
-			glUniformMatrix4fv(glGetUniformLocation(world_shader, "view"), 1, GL_FALSE, glm::value_ptr(world_view));
-			glUniformMatrix4fv(glGetUniformLocation(world_shader, "projection"), 1, GL_FALSE, glm::value_ptr(world_projection));
-			glUniform3f(glGetUniformLocation(world_shader, "light.direction"), light.m_direction.x, light.m_direction.y, light.m_direction.z);
-			glUniform3f(glGetUniformLocation(world_shader, "light.color"), light.m_color.x, light.m_color.y, light.m_color.z);
-			glUniform3f(glGetUniformLocation(world_shader, "light.ambient"), light.m_ambient.x, light.m_ambient.y, light.m_ambient.z);
-			glUniform3f(glGetUniformLocation(world_shader, "light.diffuse"), light.m_diffuse.x, light.m_diffuse.y, light.m_diffuse.z);
-			glUniform3f(glGetUniformLocation(world_shader, "light.specular"), light.m_specular.x, light.m_specular.y, light.m_specular.z);
-			glUniform3f(glGetUniformLocation(world_shader, "view_pos"), camera.m_position.x, camera.m_position.y, camera.m_position.z);
-			glUniform3f(glGetUniformLocation(world_shader, "selected_block"), selected_block.x, selected_block.y, selected_block.z);
-			glUseProgram(0);
+				glDisable(GL_DEPTH_TEST);
+				glDisable(GL_CULL_FACE);
 
-			glUseProgram(ui_shader);
-			glUniformMatrix4fv(glGetUniformLocation(ui_shader, "model"), 1, GL_FALSE, glm::value_ptr(ui_model));
-			glUniformMatrix4fv(glGetUniformLocation(ui_shader, "view"), 1, GL_FALSE, glm::value_ptr(ui_view));
-			glUniformMatrix4fv(glGetUniformLocation(ui_shader, "projection"), 1, GL_FALSE, glm::value_ptr(ui_projection));
-			glUseProgram(0);
+				glUseProgram(ui_shader);
+				glBindVertexArray(ui_VAO);
+				glDrawArrays(GL_TRIANGLES, 0, (GLsizei)ui.m_mesh.size() / 7);
+				glBindVertexArray(0);
+				glUseProgram(0);
 
-			// draw vertices
-			glUseProgram(world_shader);
-			glBindVertexArray(world_VAO);
-			glDrawArrays(GL_TRIANGLES, 0, (GLsizei)world.m_mesh.size() / 11);
-			glBindVertexArray(0);
-			glUseProgram(0);
+				glEnable(GL_DEPTH_TEST);
+				glEnable(GL_CULL_FACE);
+			}
+			else if (game_state == 1)
+			{
+				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-			glDisable(GL_DEPTH_TEST);
-			glDisable(GL_CULL_FACE);
+				// update
+				camera.applyGravity();
+				light.update();
+				world.updateChunks();
+				ui.updateHud();
 
-			glUseProgram(ui_shader);
-			glBindVertexArray(ui_VAO);
-			glDrawArrays(GL_TRIANGLES, 0, (GLsizei)ui.m_mesh.size() / 7);
-			glBindVertexArray(0);
-			glUseProgram(0);
+				glm::vec3 selected_block = std::get<0>(camera.getRayIntersect());
 
-			glEnable(GL_DEPTH_TEST);
-			glEnable(GL_CULL_FACE);
+				world_view = camera.getViewMatrix();
+				world_projection = camera.getProjectionMatrix();
+
+				// set uniforms
+				glUseProgram(world_shader);
+				glUniformMatrix4fv(glGetUniformLocation(world_shader, "model"), 1, GL_FALSE, glm::value_ptr(world_model));
+				glUniformMatrix4fv(glGetUniformLocation(world_shader, "view"), 1, GL_FALSE, glm::value_ptr(world_view));
+				glUniformMatrix4fv(glGetUniformLocation(world_shader, "projection"), 1, GL_FALSE, glm::value_ptr(world_projection));
+				glUniform3f(glGetUniformLocation(world_shader, "light.direction"), light.m_direction.x, light.m_direction.y, light.m_direction.z);
+				glUniform3f(glGetUniformLocation(world_shader, "light.color"), light.m_color.x, light.m_color.y, light.m_color.z);
+				glUniform3f(glGetUniformLocation(world_shader, "light.ambient"), light.m_ambient.x, light.m_ambient.y, light.m_ambient.z);
+				glUniform3f(glGetUniformLocation(world_shader, "light.diffuse"), light.m_diffuse.x, light.m_diffuse.y, light.m_diffuse.z);
+				glUniform3f(glGetUniformLocation(world_shader, "light.specular"), light.m_specular.x, light.m_specular.y, light.m_specular.z);
+				glUniform3f(glGetUniformLocation(world_shader, "view_pos"), camera.m_position.x, camera.m_position.y, camera.m_position.z);
+				glUniform3f(glGetUniformLocation(world_shader, "selected_block"), selected_block.x, selected_block.y, selected_block.z);
+				glUseProgram(0);
+
+				glUseProgram(ui_shader);
+				glUniformMatrix4fv(glGetUniformLocation(ui_shader, "model"), 1, GL_FALSE, glm::value_ptr(ui_model));
+				glUniformMatrix4fv(glGetUniformLocation(ui_shader, "view"), 1, GL_FALSE, glm::value_ptr(ui_view));
+				glUniformMatrix4fv(glGetUniformLocation(ui_shader, "projection"), 1, GL_FALSE, glm::value_ptr(ui_projection));
+				glUseProgram(0);
+
+				// draw vertices
+				glUseProgram(world_shader);
+				glBindVertexArray(world_VAO);
+				glDrawArrays(GL_TRIANGLES, 0, (GLsizei)world.m_mesh.size() / 11);
+				glBindVertexArray(0);
+				glUseProgram(0);
+
+				glDisable(GL_DEPTH_TEST);
+				glDisable(GL_CULL_FACE);
+
+				glUseProgram(ui_shader);
+				glBindVertexArray(ui_VAO);
+				glDrawArrays(GL_TRIANGLES, 0, (GLsizei)ui.m_mesh.size() / 7);
+				glBindVertexArray(0);
+				glUseProgram(0);
+
+				glEnable(GL_DEPTH_TEST);
+				glEnable(GL_CULL_FACE);
+			}
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
@@ -293,96 +318,128 @@ void processInputState(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.processKeyboard(GLFW_KEY_W);
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.processKeyboard(GLFW_KEY_S);
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.processKeyboard(GLFW_KEY_A);
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.processKeyboard(GLFW_KEY_D);
-
-	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		camera.m_speed = 7.5f * 5.0f;
-	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
-		camera.m_speed = 7.5f;
-
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	if (game_state == 0)
 	{
-		if (left_delay <= 0)
-		{
-			world.destroyBlock(camera.getRayIntersect());
-			left_delay = CLICK_DELAY;
-		}
-		left_delay -= 1;
+		if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
+			game_state = 1;
 	}
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
-		left_delay = 0;
-
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+	else if (game_state == 1)
 	{
-		if (right_delay <= 0)
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+			camera.processKeyboard(GLFW_KEY_W);
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+			camera.processKeyboard(GLFW_KEY_S);
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+			camera.processKeyboard(GLFW_KEY_A);
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+			camera.processKeyboard(GLFW_KEY_D);
+
+		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+			camera.m_speed = 7.5f * 5.0f;
+		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
+			camera.m_speed = 7.5f;
+
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 		{
-			world.placeBlock(camera.getRayIntersect());
-			right_delay = CLICK_DELAY;
+			if (left_delay <= 0)
+			{
+				world.destroyBlock(camera.getRayIntersect());
+				left_delay = CLICK_DELAY;
+			}
+			left_delay -= 1;
 		}
-		right_delay -= 1;
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
+			left_delay = 0;
+
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+		{
+			if (right_delay <= 0)
+			{
+				world.placeBlock(camera.getRayIntersect());
+				right_delay = CLICK_DELAY;
+			}
+			right_delay -= 1;
+		}
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)
+			right_delay = 0;
 	}
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)
-		right_delay = 0;
 }
 
 // discrete inputs
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
-		camera.processKeyboard(GLFW_KEY_SPACE);
-
-	if (key == GLFW_KEY_TAB && action == GLFW_PRESS)
+	if (game_state == 0)
 	{
-		wireframe_mode = !wireframe_mode;
-
-		if (wireframe_mode)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		else
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
+	else if (game_state == 1)
+	{
+		if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+			camera.processKeyboard(GLFW_KEY_SPACE);
 
-	if (key == GLFW_KEY_Q && action == GLFW_PRESS)
-		camera.m_noclip = !camera.m_noclip;
+		if (key == GLFW_KEY_TAB && action == GLFW_PRESS)
+		{
+			wireframe_mode = !wireframe_mode;
+
+			if (wireframe_mode)
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			else
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+
+		if (key == GLFW_KEY_Q && action == GLFW_PRESS)
+			camera.m_noclip = !camera.m_noclip;
+	}
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-	if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS)
-		current_type = world.getBlockType(camera.getRayIntersect());
+	if (game_state == 0)
+	{
+	}
+	else if (game_state == 1)
+	{
+		if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS)
+			current_type = world.getBlockType(camera.getRayIntersect());
+	}
 }
 
 void mouse_cursor_callback(GLFWwindow* window, double pos_x, double pos_y)
 {
-	if (first_mouse)
+	if (game_state == 0)
 	{
+	}
+	else if (game_state == 1)
+	{
+		if (first_mouse)
+		{
+			last_x = (float)pos_x;
+			last_y = (float)pos_y;
+			first_mouse = false;
+		}
+
+		float offset_x = (float)pos_x - last_x;
+		float offset_y = last_y - (float)pos_y;
 		last_x = (float)pos_x;
 		last_y = (float)pos_y;
-		first_mouse = false;
+
+		camera.processMouseMovement(offset_x, offset_y);
 	}
-
-	float offset_x = (float)pos_x - last_x;
-	float offset_y = last_y - (float)pos_y;
-	last_x = (float)pos_x;
-	last_y = (float)pos_y;
-
-	camera.processMouseMovement(offset_x, offset_y);
 }
 
 void mouse_scroll_callback(GLFWwindow* window, double offset_x, double offset_y)
 {
-	current_type -= (int)offset_y;
+	if (game_state == 0)
+	{
+	}
+	else if (game_state == 1)
+	{
+		current_type -= (int)offset_y;
 
-	if (current_type > MAX_TYPE)
-		current_type = 1;
-	if (current_type < 1)
-		current_type = MAX_TYPE;
+		if (current_type > MAX_TYPE)
+			current_type = 1;
+		if (current_type < 1)
+			current_type = MAX_TYPE;
+	}
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)

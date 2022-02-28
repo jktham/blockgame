@@ -5,6 +5,38 @@ class UI
 public:
 	std::vector<float> m_mesh;
 
+	void updateMenu()
+	{
+		generateMenuMesh();
+		updateVAO();
+	}
+
+	void generateMenuMesh()
+	{
+		m_mesh = {};
+
+		std::vector<float> menu = {
+			// pos.x, pos.y, color.r, color.g, color.b, tex.x, tex.y
+			WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f - 100 - 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+			WINDOW_WIDTH / 2.0f + 400, WINDOW_HEIGHT / 2.0f - 100 - 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+			WINDOW_WIDTH / 2.0f + 400, WINDOW_HEIGHT / 2.0f + 100 - 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+
+			WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f - 100 - 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+			WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f + 100 - 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+			WINDOW_WIDTH / 2.0f + 400, WINDOW_HEIGHT / 2.0f + 100 - 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+
+			WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f - 100 + 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+			WINDOW_WIDTH / 2.0f + 400, WINDOW_HEIGHT / 2.0f - 100 + 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+			WINDOW_WIDTH / 2.0f + 400, WINDOW_HEIGHT / 2.0f + 100 + 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+
+			WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f - 100 + 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+			WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f + 100 + 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+			WINDOW_WIDTH / 2.0f + 400, WINDOW_HEIGHT / 2.0f + 100 + 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+		};
+
+		m_mesh.insert(m_mesh.end(), menu.begin(), menu.end());
+	}
+
 	void updateHud()
 	{
 		if (current_type != last_type)
