@@ -24,20 +24,28 @@ public:
 
 	void saveChunk()
 	{
-		/*std::ofstream file("dat/chunks.txt", std::ios_base::app | std::ios_base::out);
-		std::string output;
-		file << m_chunk_pos.x << "," << m_chunk_pos.y << "\n";
+		/*std::string output;
+
+		output.append(std::to_string(m_chunk_pos.x));
+		output.append(",");
+		output.append(std::to_string(m_chunk_pos.y));
+		output.append("\n");
+
 		for (int i = 0; i < CHUNK_SIZE.x; i++)
 		{
 			for (int j = 0; j < CHUNK_SIZE.y; j++)
 			{
 				for (int k = 0; k < CHUNK_SIZE.z; k++)
 				{
-					file << m_blocks[i][j][k].m_type << ",";
+					output.append(std::to_string(m_blocks[i][j][k].m_type));
+					output.append(",");
 				}
 			}
 		}
-		file << "\n";
+		output.append("\n");
+
+		std::ofstream file("dat/chunks.txt", std::ios_base::app | std::ios_base::out);
+		file << output;
 		file.close();*/
 	}
 

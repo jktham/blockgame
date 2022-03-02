@@ -41,16 +41,14 @@ public:
 			return;
 		}
 
-		float floor_height = 0.0f;
-
-		if (!checkCollisionVertical(floor_height))
+		if (!detectCollisionV())
 		{
 			m_vertical_velocity -= m_gravity * delta_time;
 		}
 		else
 		{
 			m_vertical_velocity = 0.0f;
-			m_position.z = floor_height + m_height;
+			m_position.z = collision_blocks_v[0].z + 1.0f + m_height;
 		}
 
 		m_position += glm::vec3(0.0f, 0.0f, 1.0f) * m_vertical_velocity * delta_time;
@@ -63,28 +61,40 @@ public:
 
 	void applyMovement(glm::vec3 direction)
 	{
-		glm::vec3 collision_offset = glm::vec3(0.0f);
-		glm::vec3 collision_normal = glm::vec3(0.0f);
-
-		if (!checkCollisionHorizontal(collision_offset, collision_normal))
+		if (!detectCollisionH())
 		{
 			float velocity = m_speed * delta_time;
 			m_position += direction * velocity;
 		}
 		else
 		{
-			glm::vec3 collision_cross = glm::cross(glm::normalize(collision_normal), glm::normalize(direction));
-			glm::vec3 collision_direction = glm::vec3(glm::vec4(collision_cross, 1.0f) * glm::rotate(glm::mat4(1.0f), 3.1415f / 2.0f, collision_normal));
-			float collision_velocity = glm::length(collision_cross) * m_speed * delta_time;
+			for (int i = 0; i < collision_blocks_h.size(); i++) // TODO: consider multiblock collisions
+			{
+				glm::vec3 collision_offset = m_position + glm::vec3(-m_width, -m_width, -m_height) - collision_blocks_h[i];
+				glm::vec3 collision_normal = glm::vec3(0.0f);
 
-			if (glm::dot(glm::normalize(collision_normal), glm::normalize(direction)) <= 0.0f)
-			{
-				m_position += collision_direction * collision_velocity;
-			}
-			else
-			{
-				float velocity = m_speed * delta_time;
-				m_position += direction * velocity;
+				if (glm::abs(collision_offset.x) > glm::abs(collision_offset.y))
+				{
+					collision_normal = glm::normalize(glm::vec3(collision_offset.x, 0.0f, 0.0f));
+				}
+				else
+				{
+					collision_normal = glm::normalize(glm::vec3(0.0f, collision_offset.y, 0.0f));
+				}
+
+				glm::vec3 collision_cross = glm::cross(glm::normalize(collision_normal), glm::normalize(direction));
+				glm::vec3 collision_direction = glm::vec3(glm::vec4(collision_cross, 1.0f) * glm::rotate(glm::mat4(1.0f), 3.1415f / 2.0f, collision_normal));
+				float collision_velocity = glm::length(collision_cross) * m_speed * delta_time;
+
+				if (glm::dot(glm::normalize(collision_normal), glm::normalize(direction)) <= 0.0f)
+				{
+					m_position += collision_direction * collision_velocity;
+				}
+				else
+				{
+					float velocity = m_speed * delta_time;
+					m_position += direction * velocity;
+				}
 			}
 		}
 
@@ -93,17 +103,17 @@ public:
 
 	void applyJump()
 	{
-		float floor_height = 0.0f;
-
-		if (checkCollisionVertical(floor_height))
+		if (detectCollisionV())
 		{
 			m_vertical_velocity = 7.5f;
 			m_position.z += 0.01f;
 		}
 	}
 
-	bool checkCollisionVertical(float& floor_height)
+	bool detectCollisionV()
 	{
+		collision_blocks_v = {};
+
 		if (m_noclip)
 			return false;
 
@@ -123,19 +133,23 @@ public:
 
 				if (collision_offset.z > abs(collision_offset.x) && collision_offset.z > abs(collision_offset.y))
 				{
-					floor_height = block_collision_max.z;
-
+					collision_blocks_v.push_back(exposed_blocks[i]);
 					std::cout << "vertical collision: (" << i << "/" << exposed_blocks.size() << ")\n";
-					return true;
 				}
 			}
 		}
 
+		if (!collision_blocks_v.empty())
+		{
+			return true;
+		}
 		return false;
 	}
 
-	bool checkCollisionHorizontal(glm::vec3& collision_offset, glm::vec3& collision_normal)
+	bool detectCollisionH()
 	{
+		collision_blocks_h = {};
+
 		if (m_noclip)
 			return false;
 
@@ -151,25 +165,20 @@ public:
 				(camera_collision_min.y <= block_collision_max.y && camera_collision_max.y >= block_collision_min.y) &&
 				(camera_collision_min.z <= block_collision_max.z && camera_collision_max.z >= block_collision_min.z))
 			{
-				collision_offset = camera_collision_min - block_collision_min;
+				glm::vec3 collision_offset = camera_collision_min - block_collision_min;
 
 				if (collision_offset.z < abs(collision_offset.x) || collision_offset.z < abs(collision_offset.y))
 				{
-					if (glm::abs(collision_offset.x) > glm::abs(collision_offset.y))
-					{
-						collision_normal = glm::normalize(glm::vec3(collision_offset.x, 0.0f, 0.0f));
-					}
-					else
-					{
-						collision_normal = glm::normalize(glm::vec3(0.0f, collision_offset.y, 0.0f));
-					}
-
+					collision_blocks_h.push_back(exposed_blocks[i]);
 					std::cout << "horizontal collision: (" << i << "/" << exposed_blocks.size() << ")\n";
-					return true;
 				}
 			}
 		}
 
+		if (!collision_blocks_h.empty())
+		{
+			return true;
+		}
 		return false;
 	}
 

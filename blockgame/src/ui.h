@@ -1,40 +1,129 @@
 #pragma once
 
+class Button
+{
+public:
+	glm::vec2 m_pos = glm::vec3(0.0f);
+	glm::vec2 m_width = glm::vec3(0.0f);
+	glm::vec3 m_color = glm::vec3(0.0f);
+	bool m_clicked = false;
+	std::vector<float> m_mesh;
+	std::function<void()> action = []() { std::cout << "click\n"; };
+
+	void generateMesh()
+	{
+		m_mesh = {
+			m_pos.x,	 	     m_pos.y,			  m_color.r, m_color.g, m_color.b, 0.0f, 0.0f,
+			m_pos.x + m_width.x, m_pos.y,			  m_color.r, m_color.g, m_color.b, 0.0f, 0.0f,
+			m_pos.x + m_width.x, m_pos.y + m_width.y, m_color.r, m_color.g, m_color.b, 0.0f, 0.0f,
+
+			m_pos.x,             m_pos.y,			  m_color.r, m_color.g, m_color.b, 0.0f, 0.0f,
+			m_pos.x,			 m_pos.y + m_width.y, m_color.r, m_color.g, m_color.b, 0.0f, 0.0f,
+			m_pos.x + m_width.x, m_pos.y + m_width.y, m_color.r, m_color.g, m_color.b, 0.0f, 0.0f,
+		};
+	}
+
+	void hover()
+	{
+		m_color = glm::vec3(0.6f);
+	}
+
+	void click()
+	{
+		m_color = glm::vec3(0.4f);
+	}
+
+	virtual void release()
+	{
+		m_color = glm::vec3(0.2f);
+		action();
+	}
+
+	void reset()
+	{
+		m_color = glm::vec3(1.0f);
+	}
+};
+
 class UI
 {
 public:
 	std::vector<float> m_mesh;
+	std::vector<Button> m_buttons;
+
+	void createMenu()
+	{
+		Button start_button{};
+		start_button.m_pos = glm::vec2(WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f - 300);
+		start_button.m_width = glm::vec2(800, 200);
+		start_button.m_color = glm::vec3(1.0f);
+		start_button.action = []() {
+			game_state = 1;
+		};
+		m_buttons.push_back(start_button);
+
+		Button quit_button{};
+		quit_button.m_pos = glm::vec2(WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f + 100);
+		quit_button.m_width = glm::vec2(800, 200);
+		quit_button.m_color = glm::vec3(1.0f);
+		quit_button.action = []() {
+			glfwSetWindowShouldClose(window, true);
+		};
+		m_buttons.push_back(quit_button);
+	}
 
 	void updateMenu()
 	{
+		updateCursor();
 		generateMenuMesh();
 		updateVAO();
+	}
+
+	void updateCursor()
+	{
+		double xpos, ypos;
+		glfwGetCursorPos(window, &xpos, &ypos);
+
+		for (int i = 0; i < m_buttons.size(); i++)
+		{
+			if ((xpos >= m_buttons[i].m_pos.x) && (xpos <= m_buttons[i].m_pos.x + m_buttons[i].m_width.x) &&
+				(ypos >= m_buttons[i].m_pos.y) && (ypos <= m_buttons[i].m_pos.y + m_buttons[i].m_width.y))
+			{
+				if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+				{
+					m_buttons[i].click();
+					m_buttons[i].m_clicked = true;
+				}
+				else
+				{
+					if (m_buttons[i].m_clicked)
+					{
+						m_buttons[i].release();
+						m_buttons[i].m_clicked = false;
+					}
+					else
+					{
+						m_buttons[i].hover();
+					}
+				}
+			}
+			else
+			{
+				m_buttons[i].reset();
+				m_buttons[i].m_clicked = false;
+			}
+		}
 	}
 
 	void generateMenuMesh()
 	{
 		m_mesh = {};
 
-		std::vector<float> menu = {
-			// pos.x, pos.y, color.r, color.g, color.b, tex.x, tex.y
-			WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f - 100 - 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-			WINDOW_WIDTH / 2.0f + 400, WINDOW_HEIGHT / 2.0f - 100 - 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-			WINDOW_WIDTH / 2.0f + 400, WINDOW_HEIGHT / 2.0f + 100 - 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-
-			WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f - 100 - 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-			WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f + 100 - 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-			WINDOW_WIDTH / 2.0f + 400, WINDOW_HEIGHT / 2.0f + 100 - 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-
-			WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f - 100 + 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-			WINDOW_WIDTH / 2.0f + 400, WINDOW_HEIGHT / 2.0f - 100 + 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-			WINDOW_WIDTH / 2.0f + 400, WINDOW_HEIGHT / 2.0f + 100 + 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-
-			WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f - 100 + 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-			WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f + 100 + 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-			WINDOW_WIDTH / 2.0f + 400, WINDOW_HEIGHT / 2.0f + 100 + 200, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-		};
-
-		m_mesh.insert(m_mesh.end(), menu.begin(), menu.end());
+		for (int i = 0; i < m_buttons.size(); i++)
+		{
+			m_buttons[i].generateMesh();
+			m_mesh.insert(m_mesh.end(), m_buttons[i].m_mesh.begin(), m_buttons[i].m_mesh.end());
+		}
 	}
 
 	void updateHud()

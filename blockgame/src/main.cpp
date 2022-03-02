@@ -13,6 +13,7 @@
 #include <iomanip>
 #include <vector>
 #include <chrono>
+#include <functional>
 
 #include "global.h"
 #include "stb_image.h"
@@ -44,7 +45,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "test window", NULL, NULL);
+	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "test window", NULL, NULL);
 	glfwSetWindowPos(window, 100, 100);
 	glfwMakeContextCurrent(window);
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
@@ -187,11 +188,8 @@ int main()
 	glfwSwapInterval(0);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
-	// world setup
-	world.createChunks();
-	world.generateChunkMesh();
-	world.generateWorldMesh();
-	world.updateVAO();
+	// setup
+	ui.createMenu();
 
 	// render loop
 	while (!glfwWindowShouldClose(window))
@@ -246,6 +244,14 @@ int main()
 			}
 			else if (game_state == 1)
 			{
+				if (first_world_render)
+				{
+					first_world_render = false;
+					world.createChunks();
+					world.generateChunkMesh();
+					world.generateWorldMesh();
+					world.updateVAO();
+				}
 				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 				// update

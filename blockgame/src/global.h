@@ -1,5 +1,7 @@
 #pragma once
 
+GLFWwindow* window;
+
 const unsigned int WINDOW_WIDTH = 1920;
 const unsigned int WINDOW_HEIGHT = 1080;
 
@@ -11,7 +13,7 @@ bool wireframe_mode = false;
 
 int left_delay = 0;
 int right_delay = 0;
-const int CLICK_DELAY = 20;
+const int CLICK_DELAY = 30;
 
 int current_type = 5;
 int last_type = -1;
@@ -28,6 +30,7 @@ const float BLOCK_ICON_POS_Y = WINDOW_HEIGHT - 200.0f;
 const float BLOCK_ICON_WIDTH = 180.0f;
 
 int game_state = 0;
+bool first_world_render = true;
 
 float delta_time = 0.0f;
 float current_frame = 0.0f;
@@ -44,6 +47,8 @@ glm::vec2 last_chunk = glm::vec2(0.0f, 0.0f);
 
 std::vector<glm::vec3> exposed_blocks;
 std::vector<glm::vec3> reachable_blocks;
+std::vector<glm::vec3> collision_blocks_v;
+std::vector<glm::vec3> collision_blocks_h;
 std::vector<glm::vec2> generated_chunks;
 
 unsigned int world_VAO;
