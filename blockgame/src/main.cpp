@@ -14,6 +14,7 @@
 #include <vector>
 #include <chrono>
 #include <functional>
+#include <map>
 
 #include "global.h"
 #include "stb_image.h"
@@ -80,11 +81,26 @@ int main()
 	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(data);
 
-	// texture attributes
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glActiveTexture(0);
+
+	unsigned int font_texture;
+	glGenTextures(1, &font_texture);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, font_texture);
+	data = stbi_load("res/Arial.png", &width, &height, &channels, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	stbi_image_free(data);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glActiveTexture(0);
 
 	// world vertex shader
 	const char* world_vert_source;
@@ -168,6 +184,7 @@ int main()
 	// ui texture uniforms
 	glUseProgram(ui_shader);
 	glUniform1i(glGetUniformLocation(ui_shader, "atlas_texture"), 0);
+	glUniform1i(glGetUniformLocation(ui_shader, "font_texture"), 1);
 	glUseProgram(0);
 
 	// world matrices
@@ -187,8 +204,11 @@ int main()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glfwSwapInterval(0);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// setup
+	ui.generateFont();
 	ui.createMenu();
 
 	// render loop
@@ -235,7 +255,7 @@ int main()
 
 				glUseProgram(ui_shader);
 				glBindVertexArray(ui_VAO);
-				glDrawArrays(GL_TRIANGLES, 0, (GLsizei)ui.m_mesh.size() / 7);
+				glDrawArrays(GL_TRIANGLES, 0, (GLsizei)ui.m_mesh.size() / 8);
 				glBindVertexArray(0);
 				glUseProgram(0);
 
@@ -297,7 +317,7 @@ int main()
 
 				glUseProgram(ui_shader);
 				glBindVertexArray(ui_VAO);
-				glDrawArrays(GL_TRIANGLES, 0, (GLsizei)ui.m_mesh.size() / 7);
+				glDrawArrays(GL_TRIANGLES, 0, (GLsizei)ui.m_mesh.size() / 8);
 				glBindVertexArray(0);
 				glUseProgram(0);
 
