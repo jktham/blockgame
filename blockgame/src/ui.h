@@ -2,8 +2,8 @@
 
 struct Glyph {
 	glm::vec2 m_tex_coord;
-	glm::vec2 m_size;
-	float m_space;
+	glm::vec2 m_tex_size;
+	float m_width;
 };
 
 std::map<int, Glyph> Glyphs;
@@ -33,16 +33,16 @@ public:
 			float h = 1.0f * m_scale;
 
 			std::vector<float> character_vertices = {
-				x,     y + h, m_color.r, m_color.g, m_color.b, ch.m_tex_coord.x,			   ch.m_tex_coord.y,			   2.0f,
-				x,     y,     m_color.r, m_color.g, m_color.b, ch.m_tex_coord.x,			   ch.m_tex_coord.y + ch.m_size.y, 2.0f,
-				x + w, y,     m_color.r, m_color.g, m_color.b, ch.m_tex_coord.x + ch.m_size.x, ch.m_tex_coord.y + ch.m_size.y, 2.0f,
+				x,     y + h, m_color.r, m_color.g, m_color.b, ch.m_tex_coord.x,				   ch.m_tex_coord.y,				   2.0f,
+				x,     y,     m_color.r, m_color.g, m_color.b, ch.m_tex_coord.x,				   ch.m_tex_coord.y + ch.m_tex_size.y, 2.0f,
+				x + w, y,     m_color.r, m_color.g, m_color.b, ch.m_tex_coord.x + ch.m_tex_size.x, ch.m_tex_coord.y + ch.m_tex_size.y, 2.0f,
 
-				x,     y + h, m_color.r, m_color.g, m_color.b, ch.m_tex_coord.x,			   ch.m_tex_coord.y,			   2.0f,
-				x + w, y,     m_color.r, m_color.g, m_color.b, ch.m_tex_coord.x + ch.m_size.x, ch.m_tex_coord.y + ch.m_size.y, 2.0f,
-				x + w, y + h, m_color.r, m_color.g, m_color.b, ch.m_tex_coord.x + ch.m_size.x, ch.m_tex_coord.y,			   2.0f,
+				x,     y + h, m_color.r, m_color.g, m_color.b, ch.m_tex_coord.x,				   ch.m_tex_coord.y,				   2.0f,
+				x + w, y,     m_color.r, m_color.g, m_color.b, ch.m_tex_coord.x + ch.m_tex_size.x, ch.m_tex_coord.y + ch.m_tex_size.y, 2.0f,
+				x + w, y + h, m_color.r, m_color.g, m_color.b, ch.m_tex_coord.x + ch.m_tex_size.x, ch.m_tex_coord.y,				   2.0f,
 			};
 
-			x += ch.m_space * m_scale;
+			x += ch.m_width * m_scale;
 
 			m_mesh.insert(m_mesh.end(), character_vertices.begin(), character_vertices.end());
 		}
@@ -107,16 +107,39 @@ public:
 
 	void generateFont()
 	{
+		std::fstream file("res/Arial.csv", std::fstream::in);
+		std::string line;
+		std::vector<std::string> lines;
+		std::vector<std::string> values;
+		std::vector<float> widths;
+
+		while (std::getline(file, line, '\n'))
+		{
+			lines.push_back(line);
+		}
+
+		for (int i = 0; i < lines.size(); i++)
+		{
+			values.push_back(lines[i].substr(lines[i].find(",") + 1));
+
+			if (i > 7 && i < 264)
+			{
+				widths.push_back(std::stof(values[i]) / std::stof(values[2]));
+			}
+		}
+
+		file.close();
+
 		for (unsigned int c = 0; c < 256; c++)
 		{
-			float d = 1.0f / 16.0f;
-			float x = (c % 16) * d;
-			float y = (16 - c / 16) * d + d;
+			float w = 1.0f / 16.0f;
+			float x = (c % 16) * w;
+			float y = (16 - c / 16) * w + w;
 
 			Glyph glyph = {
 				glm::vec2(x, y),
-				glm::vec2(d, d),
-				1.0f, // TODO: Read width from csv
+				glm::vec2(w),
+				widths[c],
 			};
 
 			Glyphs.insert(std::pair<int, Glyph>(c, glyph));
@@ -144,16 +167,16 @@ public:
 		m_buttons.push_back(quit_button);
 
 		Label start_label{};
-		start_label.m_pos = glm::vec2(WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f - 300);
+		start_label.m_pos = glm::vec2(start_button.m_pos.x, start_button.m_pos.y);
 		start_label.m_color = glm::vec3(0.0f);
-		start_label.m_scale = 100.0f;
+		start_label.m_scale = 80.0f;
 		start_label.m_text = "Start";
 		m_labels.push_back(start_label);
 
 		Label quit_label{};
-		quit_label.m_pos = glm::vec2(WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f + 100);
+		quit_label.m_pos = glm::vec2(quit_button.m_pos.x, quit_button.m_pos.y);
 		quit_label.m_color = glm::vec3(0.0f);
-		quit_label.m_scale = 100.0f;
+		quit_label.m_scale = 80.0f;
 		quit_label.m_text = "Quit";
 		m_labels.push_back(quit_label);
 	}
