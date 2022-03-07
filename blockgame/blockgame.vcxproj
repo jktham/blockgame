@@ -169,10 +169,11 @@
     <ClInclude Include="src\world.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\atlas.png" />
+    <Text Include="dat\chunks.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="dat\chunks.txt" />
+    <Image Include="res\fonts\arial.png" />
+    <Image Include="res\textures\atlas.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -57,7 +57,7 @@ public:
 	glm::vec3 m_color = glm::vec3(0.0f);
 	bool m_clicked = false;
 	std::vector<float> m_mesh;
-	std::function<void()> action = []() { std::cout << "click\n"; };
+	std::function<void()> action = []() {};
 
 	void generateMesh()
 	{
@@ -107,7 +107,7 @@ public:
 
 	void generateFont()
 	{
-		std::fstream file("res/Arial.csv", std::fstream::in);
+		std::fstream file("res/fonts/arial.csv", std::fstream::in);
 		std::string line;
 		std::vector<std::string> lines;
 		std::vector<std::string> values;
@@ -118,6 +118,8 @@ public:
 			lines.push_back(line);
 		}
 
+		file.close();
+
 		for (int i = 0; i < lines.size(); i++)
 		{
 			values.push_back(lines[i].substr(lines[i].find(",") + 1));
@@ -127,8 +129,6 @@ public:
 				widths.push_back(std::stof(values[i]) / std::stof(values[2]));
 			}
 		}
-
-		file.close();
 
 		for (unsigned int c = 0; c < 256; c++)
 		{

@@ -76,7 +76,7 @@ int main()
 	glGenTextures(1, &atlas_texture);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, atlas_texture);
-	data = stbi_load("res/atlas.png", &width, &height, &channels, 0);
+	data = stbi_load("res/textures/atlas.png", &width, &height, &channels, 0);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(data);
@@ -91,7 +91,7 @@ int main()
 	glGenTextures(1, &font_texture);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, font_texture);
-	data = stbi_load("res/Arial.png", &width, &height, &channels, 0);
+	data = stbi_load("res/fonts/arial.png", &width, &height, &channels, 0);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(data);

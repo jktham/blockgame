@@ -66,13 +66,16 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\atlas.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
     <Text Include="dat\chunks.txt">
       <Filter>Data Files</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\textures\atlas.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\fonts\arial.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
