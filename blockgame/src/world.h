@@ -354,31 +354,31 @@ public:
 									},
 								};
 
-								if (x != 0 && m_chunks[m][n].m_blocks[x - 1][y][z].m_type == 0 || x == 0 && m != 0 && m_chunks[m - 1][n].m_blocks[CHUNK_SIZE.x - 1][y][z].m_type == 0)
+								if (x > 0 && m_chunks[m][n].m_blocks[x - 1][y][z].m_type == 0 || x == 0 && m > 0 && m_chunks[m - 1][n].m_blocks[CHUNK_SIZE.x - 1][y][z].m_type == 0)
 								{
 									m_chunks[m][n].m_mesh.insert(m_chunks[m][n].m_mesh.end(), &vertices[0][0], &vertices[0][66]);
 									exposed = true;
 								}
 
-								if (x != CHUNK_SIZE.x - 1 && m_chunks[m][n].m_blocks[x + 1][y][z].m_type == 0 || x == CHUNK_SIZE.x - 1 && m != CHUNK_SIZE.x - 1 && m_chunks[m + 1][n].m_blocks[0][y][z].m_type == 0)
+								if (x < CHUNK_SIZE.x - 1 && m_chunks[m][n].m_blocks[x + 1][y][z].m_type == 0 || x == CHUNK_SIZE.x - 1 && m < WORLD_SIZE.x - 1 && m_chunks[m + 1][n].m_blocks[0][y][z].m_type == 0)
 								{
 									m_chunks[m][n].m_mesh.insert(m_chunks[m][n].m_mesh.end(), &vertices[1][0], &vertices[1][66]);
 									exposed = true;
 								}
 
-								if (y != 0 && m_chunks[m][n].m_blocks[x][y - 1][z].m_type == 0 || y == 0 && n != 0 && m_chunks[m][n - 1].m_blocks[x][CHUNK_SIZE.y - 1][z].m_type == 0)
+								if (y > 0 && m_chunks[m][n].m_blocks[x][y - 1][z].m_type == 0 || y == 0 && n > 0 && m_chunks[m][n - 1].m_blocks[x][CHUNK_SIZE.y - 1][z].m_type == 0)
 								{
 									m_chunks[m][n].m_mesh.insert(m_chunks[m][n].m_mesh.end(), &vertices[2][0], &vertices[2][66]);
 									exposed = true;
 								}
 
-								if (y != CHUNK_SIZE.y - 1 && m_chunks[m][n].m_blocks[x][y + 1][z].m_type == 0 || y == CHUNK_SIZE.y - 1 && n != CHUNK_SIZE.y - 1 && m_chunks[m][n + 1].m_blocks[x][0][z].m_type == 0)
+								if (y < CHUNK_SIZE.y - 1 && m_chunks[m][n].m_blocks[x][y + 1][z].m_type == 0 || y == CHUNK_SIZE.y - 1 && n < WORLD_SIZE.y - 1 && m_chunks[m][n + 1].m_blocks[x][0][z].m_type == 0)
 								{
 									m_chunks[m][n].m_mesh.insert(m_chunks[m][n].m_mesh.end(), &vertices[3][0], &vertices[3][66]);
 									exposed = true;
 								}
 
-								if (z != 0 && m_chunks[m][n].m_blocks[x][y][z - 1].m_type == 0)
+								if (z > 0 && m_chunks[m][n].m_blocks[x][y][z - 1].m_type == 0)
 								{
 									m_chunks[m][n].m_mesh.insert(m_chunks[m][n].m_mesh.end(), &vertices[4][0], &vertices[4][66]);
 									exposed = true;

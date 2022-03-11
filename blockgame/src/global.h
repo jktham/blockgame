@@ -39,8 +39,8 @@ const float FRAME_RATE_LIMIT = 120.0f;
 
 const unsigned int TERRAIN_SEED = 123456;
 
-constexpr glm::ivec2 WORLD_SIZE = glm::ivec2(9, 9); // should be odd, larger than 1
-constexpr glm::ivec3 CHUNK_SIZE = glm::ivec3(16, 16, 64); // weird behavior <= 8, investigate
+constexpr glm::ivec2 WORLD_SIZE = glm::ivec2(9, 9); // must be odd, larger than 1
+constexpr glm::ivec3 CHUNK_SIZE = glm::ivec3(16, 16, 64);
 
 glm::vec2 current_chunk = glm::vec2(0.0f, 0.0f);
 glm::vec2 last_chunk = glm::vec2(0.0f, 0.0f);
