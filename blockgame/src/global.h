@@ -1,5 +1,19 @@
 #pragma once
 
+class Game;
+class Terrain;
+class World;
+class Camera;
+class Light;
+class UI;
+
+Game* game;
+Terrain* terrain;
+World* world;
+Camera* camera;
+Light* light;
+UI* ui;
+
 GLFWwindow* window;
 
 const unsigned int WINDOW_WIDTH = 1920;
@@ -11,13 +25,13 @@ float last_y = WINDOW_HEIGHT / 2.0f;
 bool first_mouse = true;
 bool wireframe_mode = false;
 
+const int CLICK_DELAY = 30;
 int left_delay = 0;
 int right_delay = 0;
-const int CLICK_DELAY = 30;
 
-int current_type = 5;
-int last_type = -1;
 const int MAX_TYPE = 5;
+int current_type = MAX_TYPE;
+int last_type = -1;
 
 const float ATLAS_SIZE_X = 6.0f;
 const float ATLAS_SIZE_Y = 6.0f;
@@ -28,9 +42,6 @@ const float CROSSHAIR_LENGTH = 10.0f;
 const float BLOCK_ICON_POS_X = WINDOW_WIDTH - 200.0f;
 const float BLOCK_ICON_POS_Y = WINDOW_HEIGHT - 200.0f;
 const float BLOCK_ICON_WIDTH = 180.0f;
-
-int game_state = 0;
-bool first_world_render = true;
 
 float delta_time = 0.0f;
 float current_frame = 0.0f;

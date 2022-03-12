@@ -3,19 +3,19 @@
 class Block
 {
 public:
-	int m_type = 0;
+	int type = 0;
 };
 
 class Chunk
 {
 public:
-	Block m_blocks[CHUNK_SIZE.x][CHUNK_SIZE.y][CHUNK_SIZE.z];
+	Block blocks[CHUNK_SIZE.x][CHUNK_SIZE.y][CHUNK_SIZE.z];
 
-	glm::vec2 m_chunk_pos = glm::vec2(0.0f, 0.0f);
+	glm::vec2 chunk_pos = glm::vec2(0.0f, 0.0f);
 
-	std::vector<float> m_mesh;
-	std::vector<glm::vec3> m_exposed_blocks;
-	int m_min_z = CHUNK_SIZE.z - 1;
+	std::vector<float> mesh;
+	std::vector<glm::vec3> exposed_blocks;
+	int min_z = CHUNK_SIZE.z - 1;
 
 	void loadChunk()
 	{
@@ -26,9 +26,9 @@ public:
 	{
 		/*std::string output;
 
-		output.append(std::to_string(m_chunk_pos.x));
+		output.append(std::to_string(chunk_pos.x));
 		output.append(",");
-		output.append(std::to_string(m_chunk_pos.y));
+		output.append(std::to_string(chunk_pos.y));
 		output.append("\n");
 
 		for (int i = 0; i < CHUNK_SIZE.x; i++)
@@ -37,7 +37,7 @@ public:
 			{
 				for (int k = 0; k < CHUNK_SIZE.z; k++)
 				{
-					output.append(std::to_string(m_blocks[i][j][k].m_type));
+					output.append(std::to_string(blocks[i][j][k].type));
 					output.append(",");
 				}
 			}
@@ -51,7 +51,7 @@ public:
 
 	void generateChunk()
 	{
-		if (std::find(generated_chunks.begin(), generated_chunks.end(), m_chunk_pos) != generated_chunks.end()) {
+		if (std::find(generated_chunks.begin(), generated_chunks.end(), chunk_pos) != generated_chunks.end()) {
 			loadChunk();
 		}
 		else {
@@ -71,56 +71,60 @@ public:
 		{
 			for (int y = 0; y < CHUNK_SIZE.y; y++)
 			{
-				double ground_height = perlin.octave2D_01((x + m_chunk_pos.x) * 0.05f, (y + m_chunk_pos.y) * 0.05f, 4) * 10.0f + (float)CHUNK_SIZE.z / 2.0f;
+				double ground_height = perlin.octave2D_01((x + chunk_pos.x) * 0.05f, (y + chunk_pos.y) * 0.05f, 4) * 10.0f + (float)CHUNK_SIZE.z / 2.0f;
 
 				for (int z = 0; z < CHUNK_SIZE.z; z++)
 				{
 					if (z == 0)
 					{
-						m_blocks[x][y][z].m_type = 4;
+						blocks[x][y][z].type = 4;
 					}
 					else if (z < ground_height - 5)
 					{
-						m_blocks[x][y][z].m_type = 3;
+						blocks[x][y][z].type = 3;
 					}
 					else if (z < ground_height - 1)
 					{
-						m_blocks[x][y][z].m_type = 2;
+						blocks[x][y][z].type = 2;
 					}
 					else if (z < ground_height - 0)
 					{
-						m_blocks[x][y][z].m_type = 1;
+						blocks[x][y][z].type = 1;
 					}
 					else
 					{
-						m_blocks[x][y][z].m_type = 0;
+						blocks[x][y][z].type = 0;
 					}
 
-					if (m_blocks[x][y][z].m_type == 0)
+					if (blocks[x][y][z].type == 0)
 					{
-						if (z - 1 < m_min_z)
+						if (z - 1 < min_z)
 						{
-							m_min_z = z - 1;
+							min_z = z - 1;
 						}
 					}
 				}
 			}
 		}
-		generated_chunks.push_back(m_chunk_pos);
+		generated_chunks.push_back(chunk_pos);
 		saveChunk();
 
 		auto t2 = std::chrono::high_resolution_clock::now();
 		auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
-		std::cout << "generated terrain: (" << m_chunk_pos.x << ", " << m_chunk_pos.y << "), " << ms_int << "\n";
+		std::cout << "generated terrain: (" << chunk_pos.x << ", " << chunk_pos.y << "), " << ms_int << "\n";
 	}
 };
 
 class World
 {
 public:
-	Chunk m_chunks[WORLD_SIZE.x][WORLD_SIZE.y];
+	Chunk chunks[WORLD_SIZE.x][WORLD_SIZE.y];
 
-	std::vector<float> m_mesh;
+	std::vector<float> mesh;
+
+	void reset()
+	{
+	}
 
 	// set up initial grid of chunks
 	void createChunks()
@@ -129,8 +133,8 @@ public:
 		{
 			for (int n = 0; n < WORLD_SIZE.y; n++)
 			{
-				m_chunks[m][n].m_chunk_pos = glm::vec2((m - WORLD_SIZE.x / 2) * CHUNK_SIZE.x, (n - WORLD_SIZE.y / 2) * CHUNK_SIZE.y);
-				m_chunks[m][n].generateChunk();
+				chunks[m][n].chunk_pos = glm::vec2((m - WORLD_SIZE.x / 2) * CHUNK_SIZE.x, (n - WORLD_SIZE.y / 2) * CHUNK_SIZE.y);
+				chunks[m][n].generateChunk();
 			}
 		}
 	}
@@ -169,12 +173,12 @@ public:
 				{
 					if (m == WORLD_SIZE.x - 1)
 					{
-						m_chunks[m][n].m_chunk_pos += glm::vec2(CHUNK_SIZE.x, 0);
-						m_chunks[m][n].generateChunk();
+						chunks[m][n].chunk_pos += glm::vec2(CHUNK_SIZE.x, 0);
+						chunks[m][n].generateChunk();
 					}
 					else
 					{
-						m_chunks[m][n] = m_chunks[m + 1][n];
+						chunks[m][n] = chunks[m + 1][n];
 					}
 				}
 			}
@@ -188,12 +192,12 @@ public:
 				{
 					if (n == WORLD_SIZE.y - 1)
 					{
-						m_chunks[m][n].m_chunk_pos += glm::vec2(0, CHUNK_SIZE.y);
-						m_chunks[m][n].generateChunk();
+						chunks[m][n].chunk_pos += glm::vec2(0, CHUNK_SIZE.y);
+						chunks[m][n].generateChunk();
 					}
 					else
 					{
-						m_chunks[m][n] = m_chunks[m][n + 1];
+						chunks[m][n] = chunks[m][n + 1];
 					}
 				}
 			}
@@ -207,12 +211,12 @@ public:
 				{
 					if (m == 0)
 					{
-						m_chunks[m][n].m_chunk_pos -= glm::vec2(CHUNK_SIZE.x, 0);
-						m_chunks[m][n].generateChunk();
+						chunks[m][n].chunk_pos -= glm::vec2(CHUNK_SIZE.x, 0);
+						chunks[m][n].generateChunk();
 					}
 					else
 					{
-						m_chunks[m][n] = m_chunks[m - 1][n];
+						chunks[m][n] = chunks[m - 1][n];
 					}
 				}
 			}
@@ -226,12 +230,12 @@ public:
 				{
 					if (n == 0)
 					{
-						m_chunks[m][n].m_chunk_pos -= glm::vec2(0, CHUNK_SIZE.y);
-						m_chunks[m][n].generateChunk();
+						chunks[m][n].chunk_pos -= glm::vec2(0, CHUNK_SIZE.y);
+						chunks[m][n].generateChunk();
 					}
 					else
 					{
-						m_chunks[m][n] = m_chunks[m][n - 1];
+						chunks[m][n] = chunks[m][n - 1];
 					}
 				}
 			}
@@ -252,26 +256,26 @@ public:
 		{
 			for (int n = n_start; n < n_end; n++)
 			{
-				m_chunks[m][n].m_mesh = {};
-				m_chunks[m][n].m_exposed_blocks = {};
+				chunks[m][n].mesh = {};
+				chunks[m][n].exposed_blocks = {};
 
-				int min_z = m_chunks[m][n].m_min_z;
+				int min_z = chunks[m][n].min_z;
 
-				if (m != 0 && m_chunks[m - 1][n].m_min_z < m_chunks[m][n].m_min_z && m_chunks[m - 1][n].m_min_z < min_z)
+				if (m > 0 && chunks[m - 1][n].min_z < chunks[m][n].min_z && chunks[m - 1][n].min_z < min_z)
 				{
-					min_z = m_chunks[m - 1][n].m_min_z;
+					min_z = chunks[m - 1][n].min_z;
 				}
-				if (m != WORLD_SIZE.x - 1 && m_chunks[m + 1][n].m_min_z < m_chunks[m][n].m_min_z && m_chunks[m + 1][n].m_min_z < min_z)
+				if (m < WORLD_SIZE.x - 1 && chunks[m + 1][n].min_z < chunks[m][n].min_z && chunks[m + 1][n].min_z < min_z)
 				{
-					min_z = m_chunks[m + 1][n].m_min_z;
+					min_z = chunks[m + 1][n].min_z;
 				}
-				if (n != 0 && m_chunks[m][n - 1].m_min_z < m_chunks[m][n].m_min_z && m_chunks[m][n - 1].m_min_z < min_z)
+				if (n > 0 && chunks[m][n - 1].min_z < chunks[m][n].min_z && chunks[m][n - 1].min_z < min_z)
 				{
-					min_z = m_chunks[m][n - 1].m_min_z;
+					min_z = chunks[m][n - 1].min_z;
 				}
-				if (n != WORLD_SIZE.y && m_chunks[m][n + 1].m_min_z < m_chunks[m][n].m_min_z && m_chunks[m][n + 1].m_min_z < min_z)
+				if (n < WORLD_SIZE.y - 1 && chunks[m][n + 1].min_z < chunks[m][n].min_z && chunks[m][n + 1].min_z < min_z)
 				{
-					min_z = m_chunks[m][n + 1].m_min_z;
+					min_z = chunks[m][n + 1].min_z;
 				}
 
 				if (min_z < 0)
@@ -287,11 +291,11 @@ public:
 						{
 							bool exposed = false;
 
-							if (m_chunks[m][n].m_blocks[x][y][z].m_type > 0)
+							if (chunks[m][n].blocks[x][y][z].type > 0)
 							{
-								float chunk_x = m_chunks[m][n].m_chunk_pos.x;
-								float chunk_y = m_chunks[m][n].m_chunk_pos.y;
-								float atlas_y = ATLAS_SIZE_Y - m_chunks[m][n].m_blocks[x][y][z].m_type;
+								float chunk_x = chunks[m][n].chunk_pos.x;
+								float chunk_y = chunks[m][n].chunk_pos.y;
+								float atlas_y = ATLAS_SIZE_Y - chunks[m][n].blocks[x][y][z].type;
 								float block_x = (float)(chunk_x + x);
 								float block_y = (float)(chunk_y + y);
 								float block_z = (float)z;
@@ -354,45 +358,45 @@ public:
 									},
 								};
 
-								if (x > 0 && m_chunks[m][n].m_blocks[x - 1][y][z].m_type == 0 || x == 0 && m > 0 && m_chunks[m - 1][n].m_blocks[CHUNK_SIZE.x - 1][y][z].m_type == 0)
+								if (x > 0 && chunks[m][n].blocks[x - 1][y][z].type == 0 || x == 0 && m > 0 && chunks[m - 1][n].blocks[CHUNK_SIZE.x - 1][y][z].type == 0)
 								{
-									m_chunks[m][n].m_mesh.insert(m_chunks[m][n].m_mesh.end(), &vertices[0][0], &vertices[0][66]);
+									chunks[m][n].mesh.insert(chunks[m][n].mesh.end(), &vertices[0][0], &vertices[0][66]);
 									exposed = true;
 								}
 
-								if (x < CHUNK_SIZE.x - 1 && m_chunks[m][n].m_blocks[x + 1][y][z].m_type == 0 || x == CHUNK_SIZE.x - 1 && m < WORLD_SIZE.x - 1 && m_chunks[m + 1][n].m_blocks[0][y][z].m_type == 0)
+								if (x < CHUNK_SIZE.x - 1 && chunks[m][n].blocks[x + 1][y][z].type == 0 || x == CHUNK_SIZE.x - 1 && m < WORLD_SIZE.x - 1 && chunks[m + 1][n].blocks[0][y][z].type == 0)
 								{
-									m_chunks[m][n].m_mesh.insert(m_chunks[m][n].m_mesh.end(), &vertices[1][0], &vertices[1][66]);
+									chunks[m][n].mesh.insert(chunks[m][n].mesh.end(), &vertices[1][0], &vertices[1][66]);
 									exposed = true;
 								}
 
-								if (y > 0 && m_chunks[m][n].m_blocks[x][y - 1][z].m_type == 0 || y == 0 && n > 0 && m_chunks[m][n - 1].m_blocks[x][CHUNK_SIZE.y - 1][z].m_type == 0)
+								if (y > 0 && chunks[m][n].blocks[x][y - 1][z].type == 0 || y == 0 && n > 0 && chunks[m][n - 1].blocks[x][CHUNK_SIZE.y - 1][z].type == 0)
 								{
-									m_chunks[m][n].m_mesh.insert(m_chunks[m][n].m_mesh.end(), &vertices[2][0], &vertices[2][66]);
+									chunks[m][n].mesh.insert(chunks[m][n].mesh.end(), &vertices[2][0], &vertices[2][66]);
 									exposed = true;
 								}
 
-								if (y < CHUNK_SIZE.y - 1 && m_chunks[m][n].m_blocks[x][y + 1][z].m_type == 0 || y == CHUNK_SIZE.y - 1 && n < WORLD_SIZE.y - 1 && m_chunks[m][n + 1].m_blocks[x][0][z].m_type == 0)
+								if (y < CHUNK_SIZE.y - 1 && chunks[m][n].blocks[x][y + 1][z].type == 0 || y == CHUNK_SIZE.y - 1 && n < WORLD_SIZE.y - 1 && chunks[m][n + 1].blocks[x][0][z].type == 0)
 								{
-									m_chunks[m][n].m_mesh.insert(m_chunks[m][n].m_mesh.end(), &vertices[3][0], &vertices[3][66]);
+									chunks[m][n].mesh.insert(chunks[m][n].mesh.end(), &vertices[3][0], &vertices[3][66]);
 									exposed = true;
 								}
 
-								if (z > 0 && m_chunks[m][n].m_blocks[x][y][z - 1].m_type == 0)
+								if (z > 0 && chunks[m][n].blocks[x][y][z - 1].type == 0)
 								{
-									m_chunks[m][n].m_mesh.insert(m_chunks[m][n].m_mesh.end(), &vertices[4][0], &vertices[4][66]);
+									chunks[m][n].mesh.insert(chunks[m][n].mesh.end(), &vertices[4][0], &vertices[4][66]);
 									exposed = true;
 								}
 
-								if (z == CHUNK_SIZE.z - 1 || m_chunks[m][n].m_blocks[x][y][z + 1].m_type == 0)
+								if (z == CHUNK_SIZE.z - 1 || chunks[m][n].blocks[x][y][z + 1].type == 0)
 								{
-									m_chunks[m][n].m_mesh.insert(m_chunks[m][n].m_mesh.end(), &vertices[5][0], &vertices[5][66]);
+									chunks[m][n].mesh.insert(chunks[m][n].mesh.end(), &vertices[5][0], &vertices[5][66]);
 									exposed = true;
 								}
 
 								if (exposed)
 								{
-									m_chunks[m][n].m_exposed_blocks.push_back(glm::ivec3(m_chunks[m][n].m_chunk_pos.x + x, m_chunks[m][n].m_chunk_pos.y + y, z));
+									chunks[m][n].exposed_blocks.push_back(glm::ivec3(chunks[m][n].chunk_pos.x + x, chunks[m][n].chunk_pos.y + y, z));
 								}
 							}
 						}
@@ -409,7 +413,7 @@ public:
 			{
 				if (m >= 0 && m < WORLD_SIZE.x && n >= 0 && n < WORLD_SIZE.y)
 				{
-					exposed_blocks.insert(exposed_blocks.end(), m_chunks[m][n].m_exposed_blocks.begin(), m_chunks[m][n].m_exposed_blocks.end());
+					exposed_blocks.insert(exposed_blocks.end(), chunks[m][n].exposed_blocks.begin(), chunks[m][n].exposed_blocks.end());
 				}
 			}
 		}
@@ -424,13 +428,13 @@ public:
 	{
 		auto t1 = std::chrono::high_resolution_clock::now();
 
-		m_mesh = {};
+		mesh = {};
 
 		for (int m = 0; m < WORLD_SIZE.x; m++)
 		{
 			for (int n = 0; n < WORLD_SIZE.y; n++)
 			{
-				m_mesh.insert(m_mesh.end(), m_chunks[m][n].m_mesh.begin(), m_chunks[m][n].m_mesh.end());
+				mesh.insert(mesh.end(), chunks[m][n].mesh.begin(), chunks[m][n].mesh.end());
 			}
 		}
 
@@ -449,7 +453,7 @@ public:
 
 		// vertex buffer object
 		glBindBuffer(GL_ARRAY_BUFFER, world_VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m_mesh.size(), m_mesh.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh.size(), mesh.data(), GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		// vertex attribute (position)
@@ -480,7 +484,7 @@ public:
 
 		auto t2 = std::chrono::high_resolution_clock::now();
 		auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
-		std::cout << "updated VAO: " << m_mesh.size() << " verts, " << ms_int << "\n";
+		std::cout << "updated VAO: " << mesh.size() << " verts, " << ms_int << "\n";
 	}
 
 	// place block of global current type at given position with offset
@@ -510,11 +514,11 @@ public:
 			{
 				for (int n = WORLD_SIZE.y / 2 - 1; n < WORLD_SIZE.y / 2 + 2; n++)
 				{
-					if (m_chunks[m][n].m_blocks[(int)(position.x - m_chunks[m][n].m_chunk_pos.x)][(int)(position.y - m_chunks[m][n].m_chunk_pos.y)][(int)position.z].m_type != 4)
+					if (chunks[m][n].blocks[(int)(position.x - chunks[m][n].chunk_pos.x)][(int)(position.y - chunks[m][n].chunk_pos.y)][(int)position.z].type != 4)
 					{
-						if (position.x >= m_chunks[m][n].m_chunk_pos.x && position.x < m_chunks[m][n].m_chunk_pos.x + CHUNK_SIZE.x && position.y >= m_chunks[m][n].m_chunk_pos.y && position.y < m_chunks[m][n].m_chunk_pos.y + CHUNK_SIZE.y)
+						if (position.x >= chunks[m][n].chunk_pos.x && position.x < chunks[m][n].chunk_pos.x + CHUNK_SIZE.x && position.y >= chunks[m][n].chunk_pos.y && position.y < chunks[m][n].chunk_pos.y + CHUNK_SIZE.y)
 						{
-							m_chunks[m][n].m_blocks[(int)(position.x - m_chunks[m][n].m_chunk_pos.x)][(int)(position.y - m_chunks[m][n].m_chunk_pos.y)][(int)position.z].m_type = current_type;
+							chunks[m][n].blocks[(int)(position.x - chunks[m][n].chunk_pos.x)][(int)(position.y - chunks[m][n].chunk_pos.y)][(int)position.z].type = current_type;
 
 							generateChunkMesh(m - 1, m + 2, n - 1, n + 2);
 							generateWorldMesh();
@@ -543,15 +547,15 @@ public:
 			{
 				for (int n = WORLD_SIZE.y / 2 - 1; n < WORLD_SIZE.y / 2 + 2; n++)
 				{
-					if (position.x >= m_chunks[m][n].m_chunk_pos.x && position.x < m_chunks[m][n].m_chunk_pos.x + CHUNK_SIZE.x && position.y >= m_chunks[m][n].m_chunk_pos.y && position.y < m_chunks[m][n].m_chunk_pos.y + CHUNK_SIZE.y)
+					if (position.x >= chunks[m][n].chunk_pos.x && position.x < chunks[m][n].chunk_pos.x + CHUNK_SIZE.x && position.y >= chunks[m][n].chunk_pos.y && position.y < chunks[m][n].chunk_pos.y + CHUNK_SIZE.y)
 					{
-						if (m_chunks[m][n].m_blocks[(int)(position.x - m_chunks[m][n].m_chunk_pos.x)][(int)(position.y - m_chunks[m][n].m_chunk_pos.y)][(int)position.z].m_type != 4)
+						if (chunks[m][n].blocks[(int)(position.x - chunks[m][n].chunk_pos.x)][(int)(position.y - chunks[m][n].chunk_pos.y)][(int)position.z].type != 4)
 						{
-							m_chunks[m][n].m_blocks[(int)(position.x - m_chunks[m][n].m_chunk_pos.x)][(int)(position.y - m_chunks[m][n].m_chunk_pos.y)][(int)position.z].m_type = 0;
+							chunks[m][n].blocks[(int)(position.x - chunks[m][n].chunk_pos.x)][(int)(position.y - chunks[m][n].chunk_pos.y)][(int)position.z].type = 0;
 
-							if (position.z - 1 < m_chunks[m][n].m_min_z)
+							if (position.z - 1 < chunks[m][n].min_z)
 							{
-								m_chunks[m][n].m_min_z = (int)position.z - 1;
+								chunks[m][n].min_z = (int)position.z - 1;
 							}
 
 							generateChunkMesh(m - 1, m + 2, n - 1, n + 2);
@@ -579,11 +583,11 @@ public:
 			{
 				for (int n = WORLD_SIZE.y / 2 - 1; n < WORLD_SIZE.y / 2 + 2; n++)
 				{
-					if (position.x >= m_chunks[m][n].m_chunk_pos.x && position.x < m_chunks[m][n].m_chunk_pos.x + CHUNK_SIZE.x && position.y >= m_chunks[m][n].m_chunk_pos.y && position.y < m_chunks[m][n].m_chunk_pos.y + CHUNK_SIZE.y)
+					if (position.x >= chunks[m][n].chunk_pos.x && position.x < chunks[m][n].chunk_pos.x + CHUNK_SIZE.x && position.y >= chunks[m][n].chunk_pos.y && position.y < chunks[m][n].chunk_pos.y + CHUNK_SIZE.y)
 					{
-						if (m_chunks[m][n].m_blocks[(int)(position.x - m_chunks[m][n].m_chunk_pos.x)][(int)(position.y - m_chunks[m][n].m_chunk_pos.y)][(int)position.z].m_type != 0)
+						if (chunks[m][n].blocks[(int)(position.x - chunks[m][n].chunk_pos.x)][(int)(position.y - chunks[m][n].chunk_pos.y)][(int)position.z].type != 0)
 						{
-							return m_chunks[m][n].m_blocks[(int)(position.x - m_chunks[m][n].m_chunk_pos.x)][(int)(position.y - m_chunks[m][n].m_chunk_pos.y)][(int)position.z].m_type;
+							return chunks[m][n].blocks[(int)(position.x - chunks[m][n].chunk_pos.x)][(int)(position.y - chunks[m][n].chunk_pos.y)][(int)position.z].type;
 						}
 					}
 				}

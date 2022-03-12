@@ -19,16 +19,12 @@
 #include "global.h"
 #include "stb_image.h"
 #include "perlin.h"
+#include "terrain.h"
 #include "camera.h"
 #include "world.h"
 #include "light.h"
+#include "game.h"
 #include "ui.h"
-
-// classes
-Camera camera;
-World world;
-Light light;
-UI ui;
 
 // callbacks
 void processInputState(GLFWwindow* window);
@@ -40,6 +36,13 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 int main()
 {
+	game = new Game;
+	terrain = new Terrain;
+	//world = new World;
+	//camera = new Camera;
+	light = new Light;
+	ui = new UI;
+
 	// window setup
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -189,8 +192,8 @@ int main()
 
 	// world matrices
 	glm::mat4 world_model = glm::mat4(1.0f);
-	glm::mat4 world_view = camera.getViewMatrix();
-	glm::mat4 world_projection = glm::perspective(glm::radians(camera.m_fov), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+	glm::mat4 world_view = glm::mat4(1.0f);
+	glm::mat4 world_projection = glm::perspective(glm::radians(80.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 
 	// ui matrices
 	glm::mat4 ui_model = glm::mat4(1.0f);
@@ -208,8 +211,8 @@ int main()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// setup
-	ui.generateFont();
-	ui.createMenu();
+	ui->generateFont();
+	ui->createMenu();
 
 	// render loop
 	while (!glfwWindowShouldClose(window))
@@ -222,10 +225,17 @@ int main()
 			last_frame = current_frame;
 
 			std::cout << std::fixed;
-			std::cout << std::setprecision(2);
-			std::cout << "pos: (" << camera.m_position.x << ", " << camera.m_position.y << ", " << camera.m_position.z << "),  ";
-			std::cout << "chunk: (" << current_chunk.x << ", " << current_chunk.y << "),  ";
-			std::cout << "vert: " << camera.m_vertical_velocity << ",  ";
+			if (game->state == 0)
+			{
+				std::cout << "pos: (" << last_x << ", " << last_y << "),  ";
+			}
+			else if (game->state == 1)
+			{
+				std::cout << std::setprecision(2);
+				std::cout << "pos: (" << camera->position.x << ", " << camera->position.y << ", " << camera->position.z << "),  ";
+				std::cout << "chunk: (" << current_chunk.x << ", " << current_chunk.y << "),  ";
+				std::cout << "vert: " << camera->vertical_velocity << ",  ";
+			}
 			std::cout << std::setprecision(4);
 			std::cout << "delta: " << delta_time << ",  ";
 			std::cout << std::setprecision(2);
@@ -238,11 +248,11 @@ int main()
 			// process current input state
 			processInputState(window);
 
-			if (game_state == 0)
+			if (game->state == 0)
 			{
 				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
-				ui.updateMenu();
+				ui->updateMenu();
 
 				glUseProgram(ui_shader);
 				glUniformMatrix4fv(glGetUniformLocation(ui_shader, "model"), 1, GL_FALSE, glm::value_ptr(ui_model));
@@ -255,47 +265,39 @@ int main()
 
 				glUseProgram(ui_shader);
 				glBindVertexArray(ui_VAO);
-				glDrawArrays(GL_TRIANGLES, 0, (GLsizei)ui.m_mesh.size() / 8);
+				glDrawArrays(GL_TRIANGLES, 0, (GLsizei)ui->mesh.size() / 8);
 				glBindVertexArray(0);
 				glUseProgram(0);
 
 				glEnable(GL_DEPTH_TEST);
 				glEnable(GL_CULL_FACE);
 			}
-			else if (game_state == 1)
+			else if (game->state == 1)
 			{
-				if (first_world_render)
-				{
-					first_world_render = false;
-					world.createChunks();
-					world.generateChunkMesh();
-					world.generateWorldMesh();
-					world.updateVAO();
-				}
 				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 				// update
-				camera.applyGravity();
-				light.update();
-				world.updateChunks();
-				ui.updateHud();
+				camera->applyGravity();
+				light->update();
+				world->updateChunks();
+				ui->updateHud();
 
-				glm::vec3 selected_block = std::get<0>(camera.getRayIntersect());
+				glm::vec3 selected_block = std::get<0>(camera->getRayIntersect());
 
-				world_view = camera.getViewMatrix();
-				world_projection = camera.getProjectionMatrix();
+				world_view = camera->getViewMatrix();
+				world_projection = camera->getProjectionMatrix();
 
 				// set uniforms
 				glUseProgram(world_shader);
 				glUniformMatrix4fv(glGetUniformLocation(world_shader, "model"), 1, GL_FALSE, glm::value_ptr(world_model));
 				glUniformMatrix4fv(glGetUniformLocation(world_shader, "view"), 1, GL_FALSE, glm::value_ptr(world_view));
 				glUniformMatrix4fv(glGetUniformLocation(world_shader, "projection"), 1, GL_FALSE, glm::value_ptr(world_projection));
-				glUniform3f(glGetUniformLocation(world_shader, "light.direction"), light.m_direction.x, light.m_direction.y, light.m_direction.z);
-				glUniform3f(glGetUniformLocation(world_shader, "light.color"), light.m_color.x, light.m_color.y, light.m_color.z);
-				glUniform3f(glGetUniformLocation(world_shader, "light.ambient"), light.m_ambient.x, light.m_ambient.y, light.m_ambient.z);
-				glUniform3f(glGetUniformLocation(world_shader, "light.diffuse"), light.m_diffuse.x, light.m_diffuse.y, light.m_diffuse.z);
-				glUniform3f(glGetUniformLocation(world_shader, "light.specular"), light.m_specular.x, light.m_specular.y, light.m_specular.z);
-				glUniform3f(glGetUniformLocation(world_shader, "view_pos"), camera.m_position.x, camera.m_position.y, camera.m_position.z);
+				glUniform3f(glGetUniformLocation(world_shader, "light.direction"), light->direction.x, light->direction.y, light->direction.z);
+				glUniform3f(glGetUniformLocation(world_shader, "light.color"), light->color.x, light->color.y, light->color.z);
+				glUniform3f(glGetUniformLocation(world_shader, "light.ambient"), light->ambient.x, light->ambient.y, light->ambient.z);
+				glUniform3f(glGetUniformLocation(world_shader, "light.diffuse"), light->diffuse.x, light->diffuse.y, light->diffuse.z);
+				glUniform3f(glGetUniformLocation(world_shader, "light.specular"), light->specular.x, light->specular.y, light->specular.z);
+				glUniform3f(glGetUniformLocation(world_shader, "view_pos"), camera->position.x, camera->position.y, camera->position.z);
 				glUniform3f(glGetUniformLocation(world_shader, "selected_block"), selected_block.x, selected_block.y, selected_block.z);
 				glUseProgram(0);
 
@@ -308,7 +310,7 @@ int main()
 				// draw vertices
 				glUseProgram(world_shader);
 				glBindVertexArray(world_VAO);
-				glDrawArrays(GL_TRIANGLES, 0, (GLsizei)world.m_mesh.size() / 11);
+				glDrawArrays(GL_TRIANGLES, 0, (GLsizei)world->mesh.size() / 11);
 				glBindVertexArray(0);
 				glUseProgram(0);
 
@@ -317,7 +319,7 @@ int main()
 
 				glUseProgram(ui_shader);
 				glBindVertexArray(ui_VAO);
-				glDrawArrays(GL_TRIANGLES, 0, (GLsizei)ui.m_mesh.size() / 8);
+				glDrawArrays(GL_TRIANGLES, 0, (GLsizei)ui->mesh.size() / 8);
 				glBindVertexArray(0);
 				glUseProgram(0);
 
@@ -341,35 +343,30 @@ int main()
 // continuous inputs
 void processInputState(GLFWwindow* window)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
-
-	if (game_state == 0)
+	if (game->state == 0)
 	{
-		if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
-			game_state = 1;
 	}
-	else if (game_state == 1)
+	else if (game->state == 1)
 	{
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-			camera.processKeyboard(GLFW_KEY_W);
+			camera->processKeyboard(GLFW_KEY_W);
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-			camera.processKeyboard(GLFW_KEY_S);
+			camera->processKeyboard(GLFW_KEY_S);
 		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-			camera.processKeyboard(GLFW_KEY_A);
+			camera->processKeyboard(GLFW_KEY_A);
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-			camera.processKeyboard(GLFW_KEY_D);
+			camera->processKeyboard(GLFW_KEY_D);
 
 		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-			camera.m_speed = 7.5f * 5.0f;
+			camera->speed = 7.5f * 5.0f;
 		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
-			camera.m_speed = 7.5f;
+			camera->speed = 7.5f;
 
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 		{
 			if (left_delay <= 0)
 			{
-				world.destroyBlock(camera.getRayIntersect());
+				world->destroyBlock(camera->getRayIntersect());
 				left_delay = CLICK_DELAY;
 			}
 			left_delay -= 1;
@@ -381,7 +378,7 @@ void processInputState(GLFWwindow* window)
 		{
 			if (right_delay <= 0)
 			{
-				world.placeBlock(camera.getRayIntersect());
+				world->placeBlock(camera->getRayIntersect());
 				right_delay = CLICK_DELAY;
 			}
 			right_delay -= 1;
@@ -394,47 +391,56 @@ void processInputState(GLFWwindow* window)
 // discrete inputs
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	if (game_state == 0)
+	if (key == GLFW_KEY_TAB && action == GLFW_PRESS)
 	{
+		wireframe_mode = !wireframe_mode;
+
+		if (wireframe_mode)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		else
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
-	else if (game_state == 1)
+
+	if (game->state == 0)
 	{
+		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+			glfwSetWindowShouldClose(window, true);
+		if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
+			game->start();
+	}
+	else if (game->state == 1)
+	{
+		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+			game->quit();
+
 		if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
-			camera.processKeyboard(GLFW_KEY_SPACE);
-
-		if (key == GLFW_KEY_TAB && action == GLFW_PRESS)
-		{
-			wireframe_mode = !wireframe_mode;
-
-			if (wireframe_mode)
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			else
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		}
+			camera->processKeyboard(GLFW_KEY_SPACE);
 
 		if (key == GLFW_KEY_Q && action == GLFW_PRESS)
-			camera.m_noclip = !camera.m_noclip;
+			camera->noclip = !camera->noclip;
 	}
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-	if (game_state == 0)
+	if (game->state == 0)
 	{
 	}
-	else if (game_state == 1)
+	else if (game->state == 1)
 	{
 		if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS)
-			current_type = world.getBlockType(camera.getRayIntersect());
+			current_type = world->getBlockType(camera->getRayIntersect());
 	}
 }
 
 void mouse_cursor_callback(GLFWwindow* window, double pos_x, double pos_y)
 {
-	if (game_state == 0)
+	if (game->state == 0)
 	{
+		last_x = (float)pos_x;
+		last_y = (float)pos_y;
 	}
-	else if (game_state == 1)
+	else if (game->state == 1)
 	{
 		if (first_mouse)
 		{
@@ -448,16 +454,16 @@ void mouse_cursor_callback(GLFWwindow* window, double pos_x, double pos_y)
 		last_x = (float)pos_x;
 		last_y = (float)pos_y;
 
-		camera.processMouseMovement(offset_x, offset_y);
+		camera->processMouseMovement(offset_x, offset_y);
 	}
 }
 
 void mouse_scroll_callback(GLFWwindow* window, double offset_x, double offset_y)
 {
-	if (game_state == 0)
+	if (game->state == 0)
 	{
 	}
-	else if (game_state == 1)
+	else if (game->state == 1)
 	{
 		current_type -= (int)offset_y;
 

@@ -1,9 +1,9 @@
 #pragma once
 
 struct Glyph {
-	glm::vec2 m_tex_coord;
-	glm::vec2 m_tex_size;
-	float m_width;
+	glm::vec2 tex_coord;
+	glm::vec2 tex_size;
+	float width;
 };
 
 std::map<int, Glyph> Glyphs;
@@ -11,40 +11,40 @@ std::map<int, Glyph> Glyphs;
 class Label
 {
 public:
-	glm::vec2 m_pos = glm::vec3(0.0f);
-	glm::vec3 m_color = glm::vec3(0.0f);
-	std::vector<float> m_mesh;
-	std::string m_text = "";
-	float m_scale = 1.0f;
+	glm::vec2 pos = glm::vec3(0.0f);
+	glm::vec3 color = glm::vec3(0.0f);
+	std::vector<float> mesh;
+	std::string text = "";
+	float scale = 1.0f;
 
 	void generateMesh()
 	{
-		m_mesh = {};
+		mesh = {};
 
-		float x = m_pos.x;
-		float y = m_pos.y;
+		float x = pos.x;
+		float y = pos.y;
 
 		std::string::const_iterator c;
-		for (c = m_text.begin(); c != m_text.end(); c++)
+		for (c = text.begin(); c != text.end(); c++)
 		{
 			Glyph ch = Glyphs[*c];
 
-			float w = 1.0f * m_scale;
-			float h = 1.0f * m_scale;
+			float w = 1.0f * scale;
+			float h = 1.0f * scale;
 
 			std::vector<float> character_vertices = {
-				x,     y + h, m_color.r, m_color.g, m_color.b, ch.m_tex_coord.x,				   ch.m_tex_coord.y,				   2.0f,
-				x,     y,     m_color.r, m_color.g, m_color.b, ch.m_tex_coord.x,				   ch.m_tex_coord.y + ch.m_tex_size.y, 2.0f,
-				x + w, y,     m_color.r, m_color.g, m_color.b, ch.m_tex_coord.x + ch.m_tex_size.x, ch.m_tex_coord.y + ch.m_tex_size.y, 2.0f,
+				x,     y + h, color.r, color.g, color.b, ch.tex_coord.x,				   ch.tex_coord.y,				   2.0f,
+				x,     y,     color.r, color.g, color.b, ch.tex_coord.x,				   ch.tex_coord.y + ch.tex_size.y, 2.0f,
+				x + w, y,     color.r, color.g, color.b, ch.tex_coord.x + ch.tex_size.x, ch.tex_coord.y + ch.tex_size.y, 2.0f,
 
-				x,     y + h, m_color.r, m_color.g, m_color.b, ch.m_tex_coord.x,				   ch.m_tex_coord.y,				   2.0f,
-				x + w, y,     m_color.r, m_color.g, m_color.b, ch.m_tex_coord.x + ch.m_tex_size.x, ch.m_tex_coord.y + ch.m_tex_size.y, 2.0f,
-				x + w, y + h, m_color.r, m_color.g, m_color.b, ch.m_tex_coord.x + ch.m_tex_size.x, ch.m_tex_coord.y,				   2.0f,
+				x,     y + h, color.r, color.g, color.b, ch.tex_coord.x,				   ch.tex_coord.y,				   2.0f,
+				x + w, y,     color.r, color.g, color.b, ch.tex_coord.x + ch.tex_size.x, ch.tex_coord.y + ch.tex_size.y, 2.0f,
+				x + w, y + h, color.r, color.g, color.b, ch.tex_coord.x + ch.tex_size.x, ch.tex_coord.y,				   2.0f,
 			};
 
-			x += ch.m_width * m_scale;
+			x += ch.width * scale;
 
-			m_mesh.insert(m_mesh.end(), character_vertices.begin(), character_vertices.end());
+			mesh.insert(mesh.end(), character_vertices.begin(), character_vertices.end());
 		}
 	}
 };
@@ -52,58 +52,58 @@ public:
 class Button
 {
 public:
-	glm::vec2 m_pos = glm::vec3(0.0f);
-	glm::vec2 m_width = glm::vec3(0.0f);
-	glm::vec3 m_color = glm::vec3(0.0f);
-	bool m_clicked = false;
-	std::vector<float> m_mesh;
+	glm::vec2 pos = glm::vec3(0.0f);
+	glm::vec2 width = glm::vec3(0.0f);
+	glm::vec3 color = glm::vec3(0.0f);
+	bool clicked = false;
+	std::vector<float> mesh;
 	std::function<void()> action = []() {};
 
 	void generateMesh()
 	{
-		m_mesh = {};
+		mesh = {};
 
 		std::vector<float> button_vertices = {
-			m_pos.x,	 	     m_pos.y,			  m_color.r, m_color.g, m_color.b, 0.0f, 0.0f, 0.0f,
-			m_pos.x + m_width.x, m_pos.y,			  m_color.r, m_color.g, m_color.b, 0.0f, 0.0f, 0.0f,
-			m_pos.x + m_width.x, m_pos.y + m_width.y, m_color.r, m_color.g, m_color.b, 0.0f, 0.0f, 0.0f,
+			pos.x,	 	     pos.y,			  color.r, color.g, color.b, 0.0f, 0.0f, 0.0f,
+			pos.x + width.x, pos.y,			  color.r, color.g, color.b, 0.0f, 0.0f, 0.0f,
+			pos.x + width.x, pos.y + width.y, color.r, color.g, color.b, 0.0f, 0.0f, 0.0f,
 
-			m_pos.x,             m_pos.y,			  m_color.r, m_color.g, m_color.b, 0.0f, 0.0f, 0.0f,
-			m_pos.x,			 m_pos.y + m_width.y, m_color.r, m_color.g, m_color.b, 0.0f, 0.0f, 0.0f,
-			m_pos.x + m_width.x, m_pos.y + m_width.y, m_color.r, m_color.g, m_color.b, 0.0f, 0.0f, 0.0f,
+			pos.x,             pos.y,			  color.r, color.g, color.b, 0.0f, 0.0f, 0.0f,
+			pos.x,			 pos.y + width.y, color.r, color.g, color.b, 0.0f, 0.0f, 0.0f,
+			pos.x + width.x, pos.y + width.y, color.r, color.g, color.b, 0.0f, 0.0f, 0.0f,
 		};
 
-		m_mesh.insert(m_mesh.end(), button_vertices.begin(), button_vertices.end());
+		mesh.insert(mesh.end(), button_vertices.begin(), button_vertices.end());
 	}
 
 	void hover()
 	{
-		m_color = glm::vec3(0.6f);
+		color = glm::vec3(0.6f);
 	}
 
 	void click()
 	{
-		m_color = glm::vec3(0.4f);
+		color = glm::vec3(0.4f);
 	}
 
 	void release()
 	{
-		m_color = glm::vec3(0.2f);
+		color = glm::vec3(0.2f);
 		action();
 	}
 
 	void reset()
 	{
-		m_color = glm::vec3(1.0f);
+		color = glm::vec3(1.0f);
 	}
 };
 
 class UI
 {
 public:
-	std::vector<float> m_mesh;
-	std::vector<Button> m_buttons;
-	std::vector<Label> m_labels;
+	std::vector<float> mesh;
+	std::vector<Button> buttons;
+	std::vector<Label> labels;
 
 	void generateFont()
 	{
@@ -149,36 +149,36 @@ public:
 	void createMenu()
 	{
 		Button start_button{};
-		start_button.m_pos = glm::vec2(WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f - 300);
-		start_button.m_width = glm::vec2(800, 200);
-		start_button.m_color = glm::vec3(1.0f);
+		start_button.pos = glm::vec2(WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f - 300);
+		start_button.width = glm::vec2(800, 200);
+		start_button.color = glm::vec3(1.0f);
 		start_button.action = []() {
-			game_state = 1;
+			game->start();
 		};
-		m_buttons.push_back(start_button);
+		buttons.push_back(start_button);
 
 		Button quit_button{};
-		quit_button.m_pos = glm::vec2(WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f + 100);
-		quit_button.m_width = glm::vec2(800, 200);
-		quit_button.m_color = glm::vec3(1.0f);
+		quit_button.pos = glm::vec2(WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f + 100);
+		quit_button.width = glm::vec2(800, 200);
+		quit_button.color = glm::vec3(1.0f);
 		quit_button.action = []() {
 			glfwSetWindowShouldClose(window, true);
 		};
-		m_buttons.push_back(quit_button);
+		buttons.push_back(quit_button);
 
 		Label start_label{};
-		start_label.m_pos = glm::vec2(start_button.m_pos.x, start_button.m_pos.y);
-		start_label.m_color = glm::vec3(0.0f);
-		start_label.m_scale = 80.0f;
-		start_label.m_text = "Start";
-		m_labels.push_back(start_label);
+		start_label.pos = glm::vec2(start_button.pos.x, start_button.pos.y);
+		start_label.color = glm::vec3(0.0f);
+		start_label.scale = 80.0f;
+		start_label.text = "Start";
+		labels.push_back(start_label);
 
 		Label quit_label{};
-		quit_label.m_pos = glm::vec2(quit_button.m_pos.x, quit_button.m_pos.y);
-		quit_label.m_color = glm::vec3(0.0f);
-		quit_label.m_scale = 80.0f;
-		quit_label.m_text = "Quit";
-		m_labels.push_back(quit_label);
+		quit_label.pos = glm::vec2(quit_button.pos.x, quit_button.pos.y);
+		quit_label.color = glm::vec3(0.0f);
+		quit_label.scale = 80.0f;
+		quit_label.text = "Quit";
+		labels.push_back(quit_label);
 	}
 
 	void updateMenu()
@@ -193,51 +193,51 @@ public:
 		double xpos, ypos;
 		glfwGetCursorPos(window, &xpos, &ypos);
 
-		for (int i = 0; i < m_buttons.size(); i++)
+		for (int i = 0; i < buttons.size(); i++)
 		{
-			if ((xpos >= m_buttons[i].m_pos.x) && (xpos <= m_buttons[i].m_pos.x + m_buttons[i].m_width.x) &&
-				(ypos >= m_buttons[i].m_pos.y) && (ypos <= m_buttons[i].m_pos.y + m_buttons[i].m_width.y))
+			if ((xpos >= buttons[i].pos.x) && (xpos <= buttons[i].pos.x + buttons[i].width.x) &&
+				(ypos >= buttons[i].pos.y) && (ypos <= buttons[i].pos.y + buttons[i].width.y))
 			{
 				if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 				{
-					m_buttons[i].click();
-					m_buttons[i].m_clicked = true;
+					buttons[i].click();
+					buttons[i].clicked = true;
 				}
 				else
 				{
-					if (m_buttons[i].m_clicked)
+					if (buttons[i].clicked)
 					{
-						m_buttons[i].release();
-						m_buttons[i].m_clicked = false;
+						buttons[i].release();
+						buttons[i].clicked = false;
 					}
 					else
 					{
-						m_buttons[i].hover();
+						buttons[i].hover();
 					}
 				}
 			}
 			else
 			{
-				m_buttons[i].reset();
-				m_buttons[i].m_clicked = false;
+				buttons[i].reset();
+				buttons[i].clicked = false;
 			}
 		}
 	}
 
 	void generateMenuMesh()
 	{
-		m_mesh = {};
+		mesh = {};
 
-		for (int i = 0; i < m_buttons.size(); i++)
+		for (int i = 0; i < buttons.size(); i++)
 		{
-			m_buttons[i].generateMesh();
-			m_mesh.insert(m_mesh.end(), m_buttons[i].m_mesh.begin(), m_buttons[i].m_mesh.end());
+			buttons[i].generateMesh();
+			mesh.insert(mesh.end(), buttons[i].mesh.begin(), buttons[i].mesh.end());
 		}
 
-		for (int i = 0; i < m_labels.size(); i++)
+		for (int i = 0; i < labels.size(); i++)
 		{
-			m_labels[i].generateMesh();
-			m_mesh.insert(m_mesh.end(), m_labels[i].m_mesh.begin(), m_labels[i].m_mesh.end());
+			labels[i].generateMesh();
+			mesh.insert(mesh.end(), labels[i].mesh.begin(), labels[i].mesh.end());
 		}
 	}
 
@@ -253,7 +253,7 @@ public:
 
 	void generateHudMesh()
 	{
-		m_mesh = {};
+		mesh = {};
 
 		std::vector<float> crosshair_vertices = {
 			// pos.x, pos.y, color.r, color.g, color.b, tex.x, tex.y, tex_type
@@ -287,8 +287,8 @@ public:
 			BLOCK_ICON_POS_X + 1.0f * BLOCK_ICON_WIDTH, BLOCK_ICON_POS_Y + 1.0f * BLOCK_ICON_WIDTH, 0.0f, 0.0f, 0.0f, 1.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
 		};
 
-		m_mesh.insert(m_mesh.end(), crosshair_vertices.begin(), crosshair_vertices.end());
-		m_mesh.insert(m_mesh.end(), block_icon_vertices.begin(), block_icon_vertices.end());
+		mesh.insert(mesh.end(), crosshair_vertices.begin(), crosshair_vertices.end());
+		mesh.insert(mesh.end(), block_icon_vertices.begin(), block_icon_vertices.end());
 	}
 
 	void updateVAO()
@@ -298,7 +298,7 @@ public:
 
 		// vertex buffer object
 		glBindBuffer(GL_ARRAY_BUFFER, ui_VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m_mesh.size(), m_mesh.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh.size(), mesh.data(), GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		// vertex attribute (position)

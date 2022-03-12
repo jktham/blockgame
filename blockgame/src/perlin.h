@@ -38,7 +38,6 @@
 #	include <concepts>
 # endif
 
-
 // Library major version
 # define SIVPERLIN_VERSION_MAJOR			3
 
@@ -51,14 +50,12 @@
 // Library version
 # define SIVPERLIN_VERSION			((SIVPERLIN_VERSION_MAJOR * 100 * 100) + (SIVPERLIN_VERSION_MINOR * 100) + (SIVPERLIN_VERSION_REVISION))
 
-
 // [[nodiscard]] for constructors
 # if (201907L <= __has_cpp_attribute(nodiscard))
 #	define SIVPERLIN_NODISCARD_CXX20 [[nodiscard]]
 # else
 #	define SIVPERLIN_NODISCARD_CXX20
 # endif
-
 
 // std::uniform_random_bit_generator concept
 # if __cpp_lib_concepts
@@ -69,7 +66,6 @@
 #	define SIVPERLIN_CONCEPT_URBG_ template <class URBG, std::enable_if_t<std::conjunction_v<std::is_invocable<URBG&>, std::is_unsigned<std::invoke_result_t<URBG&>>>>*>
 # endif
 
-
 // arbitrary value for increasing entropy
 # ifndef SIVPERLIN_DEFAULT_Y
 #	define SIVPERLIN_DEFAULT_Y (0.12345)
@@ -79,7 +75,6 @@
 # ifndef SIVPERLIN_DEFAULT_Z
 #	define SIVPERLIN_DEFAULT_Z (0.34567)
 # endif
-
 
 namespace siv
 {
