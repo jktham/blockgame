@@ -52,6 +52,8 @@ extern const float BLOCK_ICON_WIDTH;
 extern float delta_time;
 extern float current_frame;
 extern float last_frame;
+extern float frame_rate;
+extern std::deque<float> past_frames;
 extern const float FRAME_RATE_LIMIT;
 
 extern const unsigned int TERRAIN_SEED;

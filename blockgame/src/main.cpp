@@ -211,12 +211,19 @@ int main()
 	// render loop
 	while (!glfwWindowShouldClose(window))
 	{
-		if ((float)glfwGetTime() - last_frame > 1.0f / FRAME_RATE_LIMIT)
+		if ((float)glfwGetTime() - last_frame >= 1.0f / FRAME_RATE_LIMIT)
 		{
 			// timing
 			current_frame = (float)glfwGetTime();
 			delta_time = current_frame - last_frame;
 			last_frame = current_frame;
+
+			if (past_frames.size() >= 10)
+			{
+				past_frames.pop_front();
+			}
+			past_frames.push_back(delta_time);
+			frame_rate = 10.0f / std::accumulate(past_frames.begin(), past_frames.end(), 0.0f);
 
 			std::cout << std::fixed;
 			if (game->state == 0)
@@ -233,7 +240,7 @@ int main()
 			std::cout << std::setprecision(4);
 			std::cout << "delta: " << delta_time << ",  ";
 			std::cout << std::setprecision(2);
-			std::cout << "fps: " << 1.0f / delta_time << "\n";
+			std::cout << "fps: " << frame_rate << "\n";
 
 			// clear buffers
 			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

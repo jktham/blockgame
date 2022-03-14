@@ -51,6 +51,8 @@ const float BLOCK_ICON_WIDTH = 180.0f;
 float delta_time = 0.0f;
 float current_frame = 0.0f;
 float last_frame = 0.0f;
+float frame_rate = 0.0f;
+std::deque<float> past_frames = {};
 const float FRAME_RATE_LIMIT = 120.0f;
 
 const unsigned int TERRAIN_SEED = 123456;
