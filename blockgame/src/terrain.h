@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "perlin.h"
+
 class Terrain
 {
 public:
@@ -21,8 +23,8 @@ public:
 		93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180
 	};
 
-	double getPerlin(int x, int y)
-	{
-		return 32.0;
-	}
+	const siv::PerlinNoise::seed_type seed = TERRAIN_SEED;
+	const siv::PerlinNoise perlin{ seed };
+
+	double getGroundHeight(int x, int y);
 };

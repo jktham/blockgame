@@ -1,5 +1,11 @@
 #pragma once
 
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+
+#include <vector>
+#include <deque>
+
 class Game;
 class Terrain;
 class World;
@@ -7,63 +13,63 @@ class Camera;
 class Light;
 class UI;
 
-Game* game;
-Terrain* terrain;
-World* world;
-Camera* camera;
-Light* light;
-UI* ui;
+extern Game* game;
+extern Terrain* terrain;
+extern World* world;
+extern Camera* camera;
+extern Light* light;
+extern UI* ui;
 
-GLFWwindow* window;
+extern GLFWwindow* window;
 
-const unsigned int WINDOW_WIDTH = 1920;
-const unsigned int WINDOW_HEIGHT = 1080;
+extern const unsigned int WINDOW_WIDTH;
+extern const unsigned int WINDOW_HEIGHT;
 
-float last_x = WINDOW_WIDTH / 2.0f;
-float last_y = WINDOW_HEIGHT / 2.0f;
+extern float last_x;
+extern float last_y;
 
-bool first_mouse = true;
-bool wireframe_mode = false;
+extern bool first_mouse;
+extern bool wireframe_mode;
 
-const int CLICK_DELAY = 30;
-int left_delay = 0;
-int right_delay = 0;
+extern const int CLICK_DELAY;
+extern int left_delay;
+extern int right_delay;
 
-const int MAX_TYPE = 5;
-int current_type = MAX_TYPE;
-int last_type = -1;
+extern const int MAX_TYPE;
+extern int current_type;
+extern int last_type;
 
-const float ATLAS_SIZE_X = 6.0f;
-const float ATLAS_SIZE_Y = 6.0f;
+extern const float ATLAS_SIZE_X;
+extern const float ATLAS_SIZE_Y;
 
-const float CROSSHAIR_WIDTH = 1.0f;
-const float CROSSHAIR_LENGTH = 10.0f;
+extern const float CROSSHAIR_WIDTH;
+extern const float CROSSHAIR_LENGTH;
 
-const float BLOCK_ICON_POS_X = WINDOW_WIDTH - 200.0f;
-const float BLOCK_ICON_POS_Y = WINDOW_HEIGHT - 200.0f;
-const float BLOCK_ICON_WIDTH = 180.0f;
+extern const float BLOCK_ICON_POS_X;
+extern const float BLOCK_ICON_POS_Y;
+extern const float BLOCK_ICON_WIDTH;
 
-float delta_time = 0.0f;
-float current_frame = 0.0f;
-float last_frame = 0.0f;
-const float FRAME_RATE_LIMIT = 120.0f;
+extern float delta_time;
+extern float current_frame;
+extern float last_frame;
+extern const float FRAME_RATE_LIMIT;
 
-const unsigned int TERRAIN_SEED = 123456;
+extern const unsigned int TERRAIN_SEED;
 
-constexpr glm::ivec2 WORLD_SIZE = glm::ivec2(9, 9); // must be odd, larger than 1
-constexpr glm::ivec3 CHUNK_SIZE = glm::ivec3(16, 16, 64);
+inline constexpr glm::ivec2 WORLD_SIZE = glm::ivec2(9, 9); // must be odd, larger than 1
+inline constexpr glm::ivec3 CHUNK_SIZE = glm::ivec3(16, 16, 64);
 
-glm::vec2 current_chunk = glm::vec2(0.0f, 0.0f);
-glm::vec2 last_chunk = glm::vec2(0.0f, 0.0f);
+extern glm::vec2 current_chunk;
+extern glm::vec2 last_chunk;
 
-std::vector<glm::vec3> exposed_blocks;
-std::vector<glm::vec3> reachable_blocks;
-std::vector<glm::vec3> collision_blocks_v;
-std::vector<glm::vec3> collision_blocks_h;
-std::vector<glm::vec2> generated_chunks;
+extern std::vector<glm::vec3> exposed_blocks;
+extern std::vector<glm::vec3> reachable_blocks;
+extern std::vector<glm::vec3> collision_blocks_v;
+extern std::vector<glm::vec3> collision_blocks_h;
+extern std::vector<glm::vec2> generated_chunks;
 
-unsigned int world_VAO;
-unsigned int world_VBO;
+extern unsigned int world_VAO;
+extern unsigned int world_VBO;
 
-unsigned int ui_VAO;
-unsigned int ui_VBO;
+extern unsigned int ui_VAO;
+extern unsigned int ui_VBO;

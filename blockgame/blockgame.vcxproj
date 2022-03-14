@@ -149,9 +149,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\camera.cpp" />
+    <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\glad.c" />
+    <ClCompile Include="src\global.cpp" />
+    <ClCompile Include="src\light.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
+    <ClCompile Include="src\terrain.cpp" />
+    <ClCompile Include="src\ui.cpp" />
+    <ClCompile Include="src\world.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\ui_shader.fs" />

@@ -1,29 +1,23 @@
-#pragma once
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <string>
-#include <sstream>
 #include <fstream>
 #include <streambuf>
 #include <iostream>
 #include <iomanip>
-#include <vector>
 #include <chrono>
-#include <functional>
-#include <map>
+#include <algorithm>
 
 #include "global.h"
 #include "stb_image.h"
+#include "game.h"
 #include "perlin.h"
 #include "terrain.h"
-#include "camera.h"
 #include "world.h"
+#include "camera.h"
 #include "light.h"
-#include "game.h"
 #include "ui.h"
 
 // callbacks
