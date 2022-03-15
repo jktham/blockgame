@@ -9,6 +9,7 @@
 class Game;
 class Terrain;
 class World;
+class Player;
 class Camera;
 class Light;
 class UI;
@@ -16,6 +17,7 @@ class UI;
 extern Game* game;
 extern Terrain* terrain;
 extern World* world;
+extern Player* player;
 extern Camera* camera;
 extern Light* light;
 extern UI* ui;
@@ -42,21 +44,12 @@ extern int last_type;
 extern const float ATLAS_SIZE_X;
 extern const float ATLAS_SIZE_Y;
 
-extern const float CROSSHAIR_WIDTH;
-extern const float CROSSHAIR_LENGTH;
-
-extern const float BLOCK_ICON_POS_X;
-extern const float BLOCK_ICON_POS_Y;
-extern const float BLOCK_ICON_WIDTH;
-
 extern float delta_time;
 extern float current_frame;
 extern float last_frame;
 extern float frame_rate;
 extern std::deque<float> past_frames;
 extern const float FRAME_RATE_LIMIT;
-
-extern const unsigned int TERRAIN_SEED;
 
 inline constexpr glm::ivec2 WORLD_SIZE = glm::ivec2(9, 9); // must be odd, larger than 1
 inline constexpr glm::ivec3 CHUNK_SIZE = glm::ivec3(16, 16, 64);

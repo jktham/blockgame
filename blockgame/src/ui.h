@@ -46,6 +46,13 @@ public:
 class UI
 {
 public:
+	const float CROSSHAIR_WIDTH = 1.0f;
+	const float CROSSHAIR_LENGTH = 10.0f;
+
+	const float BLOCK_ICON_POS_X = WINDOW_WIDTH - 200.0f;
+	const float BLOCK_ICON_POS_Y = WINDOW_HEIGHT - 200.0f;
+	const float BLOCK_ICON_WIDTH = 180.0f;
+
 	std::vector<float> mesh;
 	std::vector<Button> buttons;
 	std::vector<Label> labels;

@@ -1,9 +1,15 @@
 ﻿#pragma once
 
+enum class State
+{
+	MENU,
+	ALIVE,
+};
+
 class Game
 {
 public:
-	int state = 0;
+	State state = State::MENU;
 
 	void start();
 	void quit();

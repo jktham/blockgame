@@ -6,11 +6,12 @@
 #include "global.h"
 #include "game.h"
 #include "world.h"
+#include "player.h"
 #include "camera.h"
 
 void Game::start()
 {
-	state = 1;
+	state = State::ALIVE;
 	first_mouse = true;
 
 	world = new World;
@@ -19,6 +20,7 @@ void Game::start()
 	world->generateWorldMesh();
 	world->updateVAO();
 
+	player = new Player;
 	camera = new Camera;
 	current_chunk = glm::vec2(0.0f, 0.0f);
 	last_chunk = glm::vec2(0.0f, 0.0f);
@@ -26,10 +28,11 @@ void Game::start()
 
 void Game::quit()
 {
-	state = 0;
+	state = State::MENU;
 	current_type = MAX_TYPE;
 	last_type = -1;
 
 	delete world;
+	delete player;
 	delete camera;
 }

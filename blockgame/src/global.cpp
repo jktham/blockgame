@@ -8,6 +8,7 @@
 #include "game.h"
 #include "terrain.h"
 #include "world.h"
+#include "player.h"
 #include "camera.h"
 #include "light.h"
 #include "ui.h"
@@ -15,6 +16,7 @@
 Game* game;
 Terrain* terrain;
 World* world;
+Player* player;
 Camera* camera;
 Light* light;
 UI* ui;
@@ -41,24 +43,12 @@ int last_type = -1;
 const float ATLAS_SIZE_X = 6.0f;
 const float ATLAS_SIZE_Y = 6.0f;
 
-const float CROSSHAIR_WIDTH = 1.0f;
-const float CROSSHAIR_LENGTH = 10.0f;
-
-const float BLOCK_ICON_POS_X = WINDOW_WIDTH - 200.0f;
-const float BLOCK_ICON_POS_Y = WINDOW_HEIGHT - 200.0f;
-const float BLOCK_ICON_WIDTH = 180.0f;
-
 float delta_time = 0.0f;
 float current_frame = 0.0f;
 float last_frame = 0.0f;
 float frame_rate = 0.0f;
 std::deque<float> past_frames = {};
 const float FRAME_RATE_LIMIT = 120.0f;
-
-const unsigned int TERRAIN_SEED = 123456;
-
-//constexpr glm::ivec2 WORLD_SIZE = glm::ivec2(9, 9); // must be odd, larger than 1
-//constexpr glm::ivec3 CHUNK_SIZE = glm::ivec3(16, 16, 64);
 
 glm::vec2 current_chunk = glm::vec2(0.0f, 0.0f);
 glm::vec2 last_chunk = glm::vec2(0.0f, 0.0f);
