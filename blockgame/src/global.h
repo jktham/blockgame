@@ -54,15 +54,6 @@ extern const float FRAME_RATE_LIMIT;
 inline constexpr glm::ivec2 WORLD_SIZE = glm::ivec2(9, 9); // must be odd, larger than 1
 inline constexpr glm::ivec3 CHUNK_SIZE = glm::ivec3(16, 16, 64);
 
-extern glm::vec2 current_chunk;
-extern glm::vec2 last_chunk;
-
-extern std::vector<glm::vec3> exposed_blocks;
-extern std::vector<glm::vec3> reachable_blocks;
-extern std::vector<glm::vec3> collision_blocks_v;
-extern std::vector<glm::vec3> collision_blocks_h;
-extern std::vector<glm::vec2> generated_chunks;
-
 extern unsigned int world_VAO;
 extern unsigned int world_VBO;
 

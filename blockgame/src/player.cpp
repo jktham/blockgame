@@ -99,10 +99,10 @@ bool Player::detectCollisionV()
 	if (noclip)
 		return false;
 
-	for (int i = 0; i < exposed_blocks.size(); i += 1)
+	for (int i = 0; i < world->exposed_blocks.size(); i += 1)
 	{
-		glm::vec3 block_collision_min = exposed_blocks[i];
-		glm::vec3 block_collision_max = exposed_blocks[i] + glm::vec3(1.0f);
+		glm::vec3 block_collision_min = world->exposed_blocks[i];
+		glm::vec3 block_collision_max = world->exposed_blocks[i] + glm::vec3(1.0f);
 
 		glm::vec3 camera_collision_min = position + glm::vec3(-width, -width, 0.0f);
 		glm::vec3 camera_collision_max = position + glm::vec3(width, width, 0.0f);
@@ -115,8 +115,8 @@ bool Player::detectCollisionV()
 
 			if (collision_offset.z > abs(collision_offset.x) && collision_offset.z > abs(collision_offset.y))
 			{
-				collision_blocks_v.push_back(exposed_blocks[i]);
-				std::cout << "vertical collision: (" << i << "/" << exposed_blocks.size() << ")\n";
+				collision_blocks_v.push_back(world->exposed_blocks[i]);
+				std::cout << "vertical collision: (" << i << "/" << world->exposed_blocks.size() << ")\n";
 			}
 		}
 	}
@@ -135,10 +135,10 @@ bool Player::detectCollisionH()
 	if (noclip)
 		return false;
 
-	for (int i = 0; i < exposed_blocks.size(); i += 1)
+	for (int i = 0; i < world->exposed_blocks.size(); i += 1)
 	{
-		glm::vec3 block_collision_min = exposed_blocks[i];
-		glm::vec3 block_collision_max = exposed_blocks[i] + glm::vec3(1.0f);
+		glm::vec3 block_collision_min = world->exposed_blocks[i];
+		glm::vec3 block_collision_max = world->exposed_blocks[i] + glm::vec3(1.0f);
 
 		glm::vec3 camera_collision_min = position + glm::vec3(-width, -width, 0.0f);
 		glm::vec3 camera_collision_max = position + glm::vec3(width, width, 0.0f);
@@ -151,8 +151,8 @@ bool Player::detectCollisionH()
 
 			if (collision_offset.z < abs(collision_offset.x) || collision_offset.z < abs(collision_offset.y))
 			{
-				collision_blocks_h.push_back(exposed_blocks[i]);
-				std::cout << "horizontal collision: (" << i << "/" << exposed_blocks.size() << ")\n";
+				collision_blocks_h.push_back(world->exposed_blocks[i]);
+				std::cout << "horizontal collision: (" << i << "/" << world->exposed_blocks.size() << ")\n";
 			}
 		}
 	}

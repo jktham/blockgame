@@ -50,15 +50,6 @@ float frame_rate = 0.0f;
 std::deque<float> past_frames = {};
 const float FRAME_RATE_LIMIT = 120.0f;
 
-glm::vec2 current_chunk = glm::vec2(0.0f, 0.0f);
-glm::vec2 last_chunk = glm::vec2(0.0f, 0.0f);
-
-std::vector<glm::vec3> exposed_blocks;
-std::vector<glm::vec3> reachable_blocks;
-std::vector<glm::vec3> collision_blocks_v;
-std::vector<glm::vec3> collision_blocks_h;
-std::vector<glm::vec2> generated_chunks;
-
 unsigned int world_VAO;
 unsigned int world_VBO;
 

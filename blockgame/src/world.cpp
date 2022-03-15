@@ -8,6 +8,7 @@
 #include <chrono>
 
 #include "global.h"
+#include "player.h"
 #include "terrain.h"
 #include "world.h"
 
@@ -45,7 +46,7 @@ void Chunk::saveChunk()
 
 void Chunk::generateChunk()
 {
-	if (std::find(generated_chunks.begin(), generated_chunks.end(), chunk_pos) != generated_chunks.end()) {
+	if (std::find(world->generated_chunks.begin(), world->generated_chunks.end(), chunk_pos) != world->generated_chunks.end()) {
 		loadChunk();
 	}
 	else {
@@ -96,7 +97,7 @@ void Chunk::generateTerrain()
 			}
 		}
 	}
-	generated_chunks.push_back(chunk_pos);
+	world->generated_chunks.push_back(chunk_pos);
 	saveChunk();
 
 	auto t2 = std::chrono::high_resolution_clock::now();
@@ -118,11 +119,11 @@ void World::createChunks()
 
 void World::updateChunks()
 {
-	if (current_chunk != last_chunk)
+	if (player->current_chunk != player->last_chunk)
 	{
 		auto t1 = std::chrono::high_resolution_clock::now();
 
-		glm::vec2 shift_direction = current_chunk - last_chunk;
+		glm::vec2 shift_direction = player->current_chunk - player->last_chunk;
 
 		shiftChunks(shift_direction);
 		generateWorldMesh();
@@ -130,10 +131,10 @@ void World::updateChunks()
 
 		auto t2 = std::chrono::high_resolution_clock::now();
 		auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
-		std::cout << "updated chunks: total " << ms_int << "\n";
+		std::cout << "updated chunks: " << ms_int << "\n";
 	}
 
-	last_chunk = current_chunk;
+	player->last_chunk = player->current_chunk;
 }
 
 void World::shiftChunks(glm::vec2 shift_direction)
@@ -502,7 +503,7 @@ void World::placeBlock(std::tuple<glm::vec3, glm::vec3> ray_intersect)
 
 	auto t2 = std::chrono::high_resolution_clock::now();
 	auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
-	std::cout << "placed block: (" << (int)position.x << ", " << (int)position.y << ", " << (int)position.z << "), " << current_type << ", total " << ms_int << "\n";
+	std::cout << "placed block: (" << (int)position.x << ", " << (int)position.y << ", " << (int)position.z << "), " << current_type << ", " << ms_int << "\n";
 }
 
 void World::destroyBlock(std::tuple<glm::vec3, glm::vec3> ray_intersect)
@@ -539,7 +540,7 @@ void World::destroyBlock(std::tuple<glm::vec3, glm::vec3> ray_intersect)
 
 	auto t2 = std::chrono::high_resolution_clock::now();
 	auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
-	std::cout << "destroyed block: (" << (int)position.x << ", " << (int)position.y << ", " << (int)position.z << "), total " << ms_int << "\n";
+	std::cout << "destroyed block: (" << (int)position.x << ", " << (int)position.y << ", " << (int)position.z << "), " << ms_int << "\n";
 }
 
 int World::getBlockType(std::tuple<glm::vec3, glm::vec3> ray_intersect)

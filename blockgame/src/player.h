@@ -18,11 +18,17 @@ class Player
 {
 public:
 	glm::vec3 position = glm::vec3(0.0f, 0.0f, CHUNK_SIZE.z / 2.0f + 16.0f);
-	glm::vec3 up;
-	glm::vec3 front;
-	glm::vec3 front_plane;
-	glm::vec3 front_move;
-	glm::vec3 right;
+	glm::vec3 up{};
+	glm::vec3 front{};
+	glm::vec3 front_plane{};
+	glm::vec3 front_move{};
+	glm::vec3 right{};
+
+	glm::vec2 current_chunk{};
+	glm::vec2 last_chunk{};
+
+	std::vector<glm::vec3> collision_blocks_v;
+	std::vector<glm::vec3> collision_blocks_h;
 
 	float yaw = 45.0f;
 	float pitch = 0.0f;

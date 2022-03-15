@@ -5,7 +5,7 @@
 class Camera
 {
 public:
-	glm::vec3 position;
+	glm::vec3 position{};
 
 	float fov = 80.0f;
 

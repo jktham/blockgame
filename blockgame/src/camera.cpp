@@ -8,15 +8,16 @@
 #include "global.h"
 #include "camera.h"
 #include "player.h"
+#include "world.h"
 
 std::tuple<glm::vec3, glm::vec3> Camera::getRayIntersect()
 {
-	reachable_blocks = {};
-	for (int i = 0; i < exposed_blocks.size(); i += 1)
+	world->reachable_blocks = {};
+	for (int i = 0; i < world->exposed_blocks.size(); i += 1)
 	{
-		if (glm::length(position - exposed_blocks[i]) < ray_length + 1.0f)
+		if (glm::length(position - world->exposed_blocks[i]) < ray_length + 1.0f)
 		{
-			reachable_blocks.push_back(exposed_blocks[i]);
+			world->reachable_blocks.push_back(world->exposed_blocks[i]);
 		}
 	}
 
@@ -24,16 +25,16 @@ std::tuple<glm::vec3, glm::vec3> Camera::getRayIntersect()
 	{
 		glm::vec3 ray = player->front * r;
 
-		for (int i = 0; i < reachable_blocks.size(); i++)
+		for (int i = 0; i < world->reachable_blocks.size(); i++)
 		{
-			glm::vec3 block_collision_min = reachable_blocks[i];
-			glm::vec3 block_collision_max = reachable_blocks[i] + glm::vec3(1.0f);
+			glm::vec3 block_collision_min = world->reachable_blocks[i];
+			glm::vec3 block_collision_max = world->reachable_blocks[i] + glm::vec3(1.0f);
 
 			if ((position.x + ray.x <= block_collision_max.x && position.x + ray.x >= block_collision_min.x) &&
 				(position.y + ray.y <= block_collision_max.y && position.y + ray.y >= block_collision_min.y) &&
 				(position.z + ray.z <= block_collision_max.z && position.z + ray.z >= block_collision_min.z))
 			{
-				return std::make_tuple(reachable_blocks[i], position + ray - (glm::vec3(reachable_blocks[i]) + glm::vec3(0.5f)));
+				return std::make_tuple(world->reachable_blocks[i], position + ray - (glm::vec3(world->reachable_blocks[i]) + glm::vec3(0.5f)));
 			}
 		}
 	}

@@ -15,15 +15,13 @@ void Game::start()
 	first_mouse = true;
 
 	world = new World;
+	player = new Player;
+	camera = new Camera;
+
 	world->createChunks();
 	world->generateChunkMesh();
 	world->generateWorldMesh();
 	world->updateVAO();
-
-	player = new Player;
-	camera = new Camera;
-	current_chunk = glm::vec2(0.0f, 0.0f);
-	last_chunk = glm::vec2(0.0f, 0.0f);
 }
 
 void Game::quit()

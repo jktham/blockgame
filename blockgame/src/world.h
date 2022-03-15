@@ -35,6 +35,10 @@ public:
 
 	std::vector<float> mesh;
 
+	std::vector<glm::vec3> exposed_blocks;
+	std::vector<glm::vec3> reachable_blocks;
+	std::vector<glm::vec2> generated_chunks;
+
 	// set up initial grid of chunks
 	void createChunks();
 

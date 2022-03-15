@@ -236,7 +236,7 @@ int main()
 			{
 				std::cout << std::setprecision(2);
 				std::cout << "pos: (" << player->position.x << ", " << player->position.y << ", " << player->position.z << "),  ";
-				std::cout << "chunk: (" << current_chunk.x << ", " << current_chunk.y << "),  ";
+				std::cout << "chunk: (" << player->current_chunk.x << ", " << player->current_chunk.y << "),  ";
 				std::cout << "vert: " << player->vertical_velocity << ",  ";
 			}
 			std::cout << std::setprecision(4);
@@ -301,7 +301,7 @@ int main()
 				glUniform3f(glGetUniformLocation(world_shader, "light.ambient"), light->ambient.x, light->ambient.y, light->ambient.z);
 				glUniform3f(glGetUniformLocation(world_shader, "light.diffuse"), light->diffuse.x, light->diffuse.y, light->diffuse.z);
 				glUniform3f(glGetUniformLocation(world_shader, "light.specular"), light->specular.x, light->specular.y, light->specular.z);
-				glUniform3f(glGetUniformLocation(world_shader, "view_pos"), player->position.x, player->position.y, player->position.z);
+				glUniform3f(glGetUniformLocation(world_shader, "view_pos"), camera->position.x, camera->position.y, camera->position.z);
 				glUniform3f(glGetUniformLocation(world_shader, "selected_block"), selected_block.x, selected_block.y, selected_block.z);
 				glUseProgram(0);
 
@@ -366,7 +366,7 @@ void processInputState(GLFWwindow* window)
 		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
 			player->sprint = false;
 
-		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
 		{
 			if (left_delay <= 0)
 			{
@@ -375,10 +375,12 @@ void processInputState(GLFWwindow* window)
 			}
 			left_delay -= 1;
 		}
-		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
+		else
+		{
 			left_delay = 0;
+		}
 
-		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		{
 			if (right_delay <= 0)
 			{
@@ -387,8 +389,10 @@ void processInputState(GLFWwindow* window)
 			}
 			right_delay -= 1;
 		}
-		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)
+		else
+		{
 			right_delay = 0;
+		}
 	}
 }
 
@@ -421,6 +425,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 		if (key == GLFW_KEY_Q && action == GLFW_PRESS)
 			player->noclip = !player->noclip;
+
+		if (key == GLFW_KEY_K && action == GLFW_PRESS)
+			player->processAction(Action::BLOCK_PICK);
 	}
 }
 
