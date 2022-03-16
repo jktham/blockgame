@@ -45,6 +45,8 @@ public:
 	bool noclip = false;
 	bool sprint = false;
 
+	Player();
+
 	void applyGravity();
 	void applyMovement(glm::vec3 direction);
 	void applyJump();
@@ -54,6 +56,8 @@ public:
 
 	void processAction(Action action);
 	void processMouseMovement(float offset_x, float offset_y);
+
+	void updateVectors();
 
 private:
 	int divideInt(float a, float b);

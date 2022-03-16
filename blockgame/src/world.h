@@ -36,7 +36,6 @@ public:
 	std::vector<float> mesh;
 
 	std::vector<glm::vec3> exposed_blocks;
-	std::vector<glm::vec3> reachable_blocks;
 	std::vector<glm::vec2> generated_chunks;
 
 	// set up initial grid of chunks
@@ -56,9 +55,9 @@ public:
 	void updateVAO();
 
 	// place block of global current type at given position with offset
-	void placeBlock(std::tuple<glm::vec3, glm::vec3> ray_intersect);
+	void placeBlock(glm::vec3 position);
 	// replace block at given position with air
-	void destroyBlock(std::tuple<glm::vec3, glm::vec3> ray_intersect);
+	void destroyBlock(glm::vec3 position);
 	// get block type at given position
-	int getBlockType(std::tuple<glm::vec3, glm::vec3> ray_intersect);
+	int getBlockType(glm::vec3 position);
 };

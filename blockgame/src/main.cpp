@@ -281,12 +281,12 @@ int main()
 
 				// update
 				player->applyGravity();
-				camera->updateCameraVectors();
+				camera->updatePosition();
 				light->update();
 				world->updateChunks();
 				ui->updateHud();
 
-				glm::vec3 selected_block = std::get<0>(camera->getRayIntersect());
+				glm::vec3 selected_block = glm::floor(camera->getRayIntersect());
 
 				world_view = camera->getViewMatrix();
 				world_projection = camera->getProjectionMatrix();

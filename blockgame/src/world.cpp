@@ -460,37 +460,37 @@ void World::updateVAO()
 	std::cout << "updated VAO: " << mesh.size() << " verts, " << ms_int << "\n";
 }
 
-void World::placeBlock(std::tuple<glm::vec3, glm::vec3> ray_intersect)
+void World::placeBlock(glm::vec3 position)
 {
 	auto t1 = std::chrono::high_resolution_clock::now();
 
-	glm::vec3 position = std::get<0>(ray_intersect);
-	glm::vec3 offset = std::get<1>(ray_intersect);
+	glm::vec3 pos = glm::floor(position);
+	glm::vec3 offset = position - glm::floor(position) - glm::vec3(0.5f);
 
 	if (abs(offset.x) > abs(offset.y) && abs(offset.x) > abs(offset.z))
 	{
-		position.x += (int)glm::sign(offset.x);
+		pos.x += (int)glm::sign(offset.x);
 	}
 	if (abs(offset.y) > abs(offset.z) && abs(offset.y) > abs(offset.x))
 	{
-		position.y += (int)glm::sign(offset.y);
+		pos.y += (int)glm::sign(offset.y);
 	}
 	if (abs(offset.z) > abs(offset.x) && abs(offset.z) > abs(offset.y))
 	{
-		position.z += (int)glm::sign(offset.z);
+		pos.z += (int)glm::sign(offset.z);
 	}
 
-	if (position.z >= 0 && position.z < CHUNK_SIZE.z)
+	if (pos.z >= 0 && pos.z < CHUNK_SIZE.z)
 	{
 		for (int m = WORLD_SIZE.x / 2 - 1; m < WORLD_SIZE.x / 2 + 2; m++)
 		{
 			for (int n = WORLD_SIZE.y / 2 - 1; n < WORLD_SIZE.y / 2 + 2; n++)
 			{
-				if (chunks[m][n].blocks[(int)(position.x - chunks[m][n].chunk_pos.x)][(int)(position.y - chunks[m][n].chunk_pos.y)][(int)position.z].type != 4)
+				if (chunks[m][n].blocks[(int)(pos.x - chunks[m][n].chunk_pos.x)][(int)(pos.y - chunks[m][n].chunk_pos.y)][(int)pos.z].type != 4)
 				{
-					if (position.x >= chunks[m][n].chunk_pos.x && position.x < chunks[m][n].chunk_pos.x + CHUNK_SIZE.x && position.y >= chunks[m][n].chunk_pos.y && position.y < chunks[m][n].chunk_pos.y + CHUNK_SIZE.y)
+					if (pos.x >= chunks[m][n].chunk_pos.x && pos.x < chunks[m][n].chunk_pos.x + CHUNK_SIZE.x && pos.y >= chunks[m][n].chunk_pos.y && pos.y < chunks[m][n].chunk_pos.y + CHUNK_SIZE.y)
 					{
-						chunks[m][n].blocks[(int)(position.x - chunks[m][n].chunk_pos.x)][(int)(position.y - chunks[m][n].chunk_pos.y)][(int)position.z].type = current_type;
+						chunks[m][n].blocks[(int)(pos.x - chunks[m][n].chunk_pos.x)][(int)(pos.y - chunks[m][n].chunk_pos.y)][(int)pos.z].type = current_type;
 
 						generateChunkMesh(m - 1, m + 2, n - 1, n + 2);
 						generateWorldMesh();
@@ -503,30 +503,30 @@ void World::placeBlock(std::tuple<glm::vec3, glm::vec3> ray_intersect)
 
 	auto t2 = std::chrono::high_resolution_clock::now();
 	auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
-	std::cout << "placed block: (" << (int)position.x << ", " << (int)position.y << ", " << (int)position.z << "), " << current_type << ", " << ms_int << "\n";
+	std::cout << "placed block: (" << (int)pos.x << ", " << (int)pos.y << ", " << (int)pos.z << "), " << current_type << ", " << ms_int << "\n";
 }
 
-void World::destroyBlock(std::tuple<glm::vec3, glm::vec3> ray_intersect)
+void World::destroyBlock(glm::vec3 position)
 {
 	auto t1 = std::chrono::high_resolution_clock::now();
 
-	glm::vec3 position = std::get<0>(ray_intersect);
+	glm::vec3 pos = glm::floor(position);
 
-	if (position.z >= 0 && position.z < CHUNK_SIZE.z)
+	if (pos.z >= 0 && pos.z < CHUNK_SIZE.z)
 	{
 		for (int m = WORLD_SIZE.x / 2 - 1; m < WORLD_SIZE.x / 2 + 2; m++)
 		{
 			for (int n = WORLD_SIZE.y / 2 - 1; n < WORLD_SIZE.y / 2 + 2; n++)
 			{
-				if (position.x >= chunks[m][n].chunk_pos.x && position.x < chunks[m][n].chunk_pos.x + CHUNK_SIZE.x && position.y >= chunks[m][n].chunk_pos.y && position.y < chunks[m][n].chunk_pos.y + CHUNK_SIZE.y)
+				if (pos.x >= chunks[m][n].chunk_pos.x && pos.x < chunks[m][n].chunk_pos.x + CHUNK_SIZE.x && pos.y >= chunks[m][n].chunk_pos.y && pos.y < chunks[m][n].chunk_pos.y + CHUNK_SIZE.y)
 				{
-					if (chunks[m][n].blocks[(int)(position.x - chunks[m][n].chunk_pos.x)][(int)(position.y - chunks[m][n].chunk_pos.y)][(int)position.z].type != 4)
+					if (chunks[m][n].blocks[(int)(pos.x - chunks[m][n].chunk_pos.x)][(int)(pos.y - chunks[m][n].chunk_pos.y)][(int)pos.z].type != 4)
 					{
-						chunks[m][n].blocks[(int)(position.x - chunks[m][n].chunk_pos.x)][(int)(position.y - chunks[m][n].chunk_pos.y)][(int)position.z].type = 0;
+						chunks[m][n].blocks[(int)(pos.x - chunks[m][n].chunk_pos.x)][(int)(pos.y - chunks[m][n].chunk_pos.y)][(int)pos.z].type = 0;
 
-						if (position.z - 1 < chunks[m][n].min_z)
+						if (pos.z - 1 < chunks[m][n].min_z)
 						{
-							chunks[m][n].min_z = (int)position.z - 1;
+							chunks[m][n].min_z = (int)pos.z - 1;
 						}
 
 						generateChunkMesh(m - 1, m + 2, n - 1, n + 2);
@@ -540,28 +540,25 @@ void World::destroyBlock(std::tuple<glm::vec3, glm::vec3> ray_intersect)
 
 	auto t2 = std::chrono::high_resolution_clock::now();
 	auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
-	std::cout << "destroyed block: (" << (int)position.x << ", " << (int)position.y << ", " << (int)position.z << "), " << ms_int << "\n";
+	std::cout << "destroyed block: (" << (int)pos.x << ", " << (int)pos.y << ", " << (int)pos.z << "), " << ms_int << "\n";
 }
 
-int World::getBlockType(std::tuple<glm::vec3, glm::vec3> ray_intersect)
+int World::getBlockType(glm::vec3 position)
 {
-	glm::vec3 position = std::get<0>(ray_intersect);
+	glm::vec3 pos = glm::floor(position);
 
-	if (position.z >= 0 && position.z < CHUNK_SIZE.z)
+	if (pos.z >= 0 && pos.z < CHUNK_SIZE.z)
 	{
 		for (int m = WORLD_SIZE.x / 2 - 1; m < WORLD_SIZE.x / 2 + 2; m++)
 		{
 			for (int n = WORLD_SIZE.y / 2 - 1; n < WORLD_SIZE.y / 2 + 2; n++)
 			{
-				if (position.x >= chunks[m][n].chunk_pos.x && position.x < chunks[m][n].chunk_pos.x + CHUNK_SIZE.x && position.y >= chunks[m][n].chunk_pos.y && position.y < chunks[m][n].chunk_pos.y + CHUNK_SIZE.y)
+				if (pos.x >= chunks[m][n].chunk_pos.x && pos.x < chunks[m][n].chunk_pos.x + CHUNK_SIZE.x && pos.y >= chunks[m][n].chunk_pos.y && pos.y < chunks[m][n].chunk_pos.y + CHUNK_SIZE.y)
 				{
-					if (chunks[m][n].blocks[(int)(position.x - chunks[m][n].chunk_pos.x)][(int)(position.y - chunks[m][n].chunk_pos.y)][(int)position.z].type != 0)
-					{
-						return chunks[m][n].blocks[(int)(position.x - chunks[m][n].chunk_pos.x)][(int)(position.y - chunks[m][n].chunk_pos.y)][(int)position.z].type;
-					}
+					return chunks[m][n].blocks[(int)(pos.x - chunks[m][n].chunk_pos.x)][(int)(pos.y - chunks[m][n].chunk_pos.y)][(int)pos.z].type;
 				}
 			}
 		}
 	}
-	return current_type;
+	return 0;
 }

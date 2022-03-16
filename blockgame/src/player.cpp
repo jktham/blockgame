@@ -10,6 +10,11 @@
 #include "camera.h"
 #include "world.h"
 
+Player::Player()
+{
+	updateVectors();
+}
+
 void Player::applyGravity()
 {
 	if (noclip)
@@ -192,7 +197,11 @@ void Player::processAction(Action action)
 	if (action == Action::BLOCK_PLACE)
 		world->placeBlock(camera->getRayIntersect());
 	if (action == Action::BLOCK_PICK)
-		current_type = world->getBlockType(camera->getRayIntersect());
+	{
+		int type = world->getBlockType(camera->getRayIntersect());
+		if (type != 0)
+			current_type = type;
+	}
 }
 
 void Player::processMouseMovement(float offset_x, float offset_y)
@@ -208,7 +217,20 @@ void Player::processMouseMovement(float offset_x, float offset_y)
 	if (pitch < -89.9999f)
 		pitch = -89.9999f;
 
-	camera->updateCameraVectors();
+	updateVectors();
+}
+
+void Player::updateVectors()
+{
+	glm::vec3 view{};
+	view.x = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	view.y = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	view.z = sin(glm::radians(pitch));
+	front = glm::normalize(view);
+
+	right = glm::normalize(glm::cross(front, glm::vec3(0.0f, 0.0f, 1.0f)));
+	up = glm::normalize(glm::cross(right, front));
+	front_plane = glm::normalize(glm::cross(glm::vec3(0.0f, 0.0f, 1.0f), right));
 }
 
 int Player::divideInt(float a, float b)

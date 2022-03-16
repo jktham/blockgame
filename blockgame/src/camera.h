@@ -10,12 +10,12 @@ public:
 	float fov = 80.0f;
 
 	float ray_length = 8.0f;
-	float ray_step = 0.1f;
+	float ray_step = 0.001f;
 
-	std::tuple<glm::vec3, glm::vec3> getRayIntersect();
+	glm::vec3 getRayIntersect();
 
 	glm::mat4 getViewMatrix();
 	glm::mat4 getProjectionMatrix();
 
-	void updateCameraVectors();
+	void updatePosition();
 };
