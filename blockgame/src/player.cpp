@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 Player::Player()
 {
@@ -22,14 +23,26 @@ void Player::applyGravity()
 		return;
 	}
 
-	if (!detectCollisionV())
+	vertical_velocity -= gravity * delta_time;
+
+	if (detectCollisionV())
 	{
-		vertical_velocity -= gravity * delta_time;
-	}
-	else
-	{
-		vertical_velocity = 0.0f;
-		position.z = collision_blocks_v[0].z + 1.0f;
+		for (int i = 0; i < collision_blocks_v.size(); i++)
+		{
+			glm::vec3 collision_offset = position - collision_blocks_v[i];
+
+
+			if (collision_offset.z >= 0.0f)
+			{
+				vertical_velocity = 0.0f;
+				position.z = collision_blocks_v[i].z + 1.0f;
+			}
+			else
+			{
+				vertical_velocity = 0.0f;
+				position.z = collision_blocks_v[i].z - height;
+			}
+		}
 	}
 
 	position += glm::vec3(0.0f, 0.0f, 1.0f) * vertical_velocity * delta_time;
@@ -47,39 +60,25 @@ void Player::applyMovement(glm::vec3 direction)
 	else
 		speed = 7.5f;
 
-	if (!detectCollisionH())
+	float velocity = speed * delta_time;
+	position += direction * velocity;
+
+	if (detectCollisionH())
 	{
-		float velocity = speed * delta_time;
-		position += direction * velocity;
-	}
-	else
-	{
-		for (int i = 0; i < collision_blocks_h.size(); i++) // TODO: consider multiblock collisions
+		for (int i = 0; i < collision_blocks_h.size(); i++)
 		{
-			glm::vec3 collision_offset = position + glm::vec3(-width, -width, 0.0f) - collision_blocks_h[i];
+			glm::vec3 collision_offset = position - collision_blocks_h[i];
 			glm::vec3 collision_normal = glm::vec3(0.0f);
 
-			if (glm::abs(collision_offset.x) > glm::abs(collision_offset.y))
-			{
-				collision_normal = glm::normalize(glm::vec3(collision_offset.x, 0.0f, 0.0f));
-			}
-			else
-			{
-				collision_normal = glm::normalize(glm::vec3(0.0f, collision_offset.y, 0.0f));
-			}
+			collision_normal = (glm::abs(collision_offset.x - 0.5f) > glm::abs(collision_offset.y - 0.5f)) ? glm::normalize(glm::vec3(collision_offset.x - width, 0.0f, 0.0f)) : glm::normalize(glm::vec3(0.0f, collision_offset.y - width, 0.0f));
 
-			glm::vec3 collision_cross = glm::cross(glm::normalize(collision_normal), glm::normalize(direction));
-			glm::vec3 collision_direction = glm::vec3(glm::vec4(collision_cross, 1.0f) * glm::rotate(glm::mat4(1.0f), 3.1415f / 2.0f, collision_normal));
-			float collision_velocity = glm::length(collision_cross) * speed * delta_time;
-
-			if (glm::dot(glm::normalize(collision_normal), glm::normalize(direction)) <= 0.0f)
+			if (collision_normal.x > 0.0f || collision_normal.y > 0.0f)
 			{
-				position += collision_direction * collision_velocity;
+				position += (glm::vec3(1.0f) - collision_offset + glm::vec3(width)) * collision_normal;
 			}
-			else
+			else if (collision_normal.x < 0.0f || collision_normal.y < 0.0f)
 			{
-				float velocity = speed * delta_time;
-				position += direction * velocity;
+				position += (collision_offset + glm::vec3(width)) * collision_normal;
 			}
 		}
 	}
@@ -108,16 +107,16 @@ bool Player::detectCollisionV()
 		glm::vec3 block_collision_min = world->exposed_blocks[i];
 		glm::vec3 block_collision_max = world->exposed_blocks[i] + glm::vec3(1.0f);
 
-		glm::vec3 camera_collision_min = position + glm::vec3(-width, -width, 0.0f);
-		glm::vec3 camera_collision_max = position + glm::vec3(width, width, 0.0f);
+		glm::vec3 player_collision_min = position + glm::vec3(-width, -width, 0.0f);
+		glm::vec3 player_collision_max = position + glm::vec3(width, width, height);
 
-		if ((camera_collision_min.x < block_collision_max.x && camera_collision_max.x > block_collision_min.x) &&
-			(camera_collision_min.y < block_collision_max.y && camera_collision_max.y > block_collision_min.y) &&
-			(camera_collision_min.z <= block_collision_max.z && camera_collision_max.z >= block_collision_min.z))
+		if ((player_collision_min.x < block_collision_max.x && player_collision_max.x > block_collision_min.x) &&
+			(player_collision_min.y < block_collision_max.y && player_collision_max.y > block_collision_min.y) &&
+			(player_collision_min.z <= block_collision_max.z && player_collision_max.z > block_collision_min.z))
 		{
-			glm::vec3 collision_offset = camera_collision_min - block_collision_min;
+			glm::vec3 collision_offset = player_collision_min - block_collision_min;
 
-			if (collision_offset.z > abs(collision_offset.x) && collision_offset.z > abs(collision_offset.y))
+			if (abs(collision_offset.z) > abs(collision_offset.x) && abs(collision_offset.z) > abs(collision_offset.y))
 			{
 				collision_blocks_v.push_back(world->exposed_blocks[i]);
 				std::cout << "vertical collision: (" << i << "/" << world->exposed_blocks.size() << ")\n";
@@ -144,14 +143,14 @@ bool Player::detectCollisionH()
 		glm::vec3 block_collision_min = world->exposed_blocks[i];
 		glm::vec3 block_collision_max = world->exposed_blocks[i] + glm::vec3(1.0f);
 
-		glm::vec3 camera_collision_min = position + glm::vec3(-width, -width, 0.0f);
-		glm::vec3 camera_collision_max = position + glm::vec3(width, width, 0.0f);
+		glm::vec3 player_collision_min = position + glm::vec3(-width, -width, 0.0f);
+		glm::vec3 player_collision_max = position + glm::vec3(width, width, height);
 
-		if ((camera_collision_min.x <= block_collision_max.x && camera_collision_max.x >= block_collision_min.x) &&
-			(camera_collision_min.y <= block_collision_max.y && camera_collision_max.y >= block_collision_min.y) &&
-			(camera_collision_min.z <= block_collision_max.z && camera_collision_max.z >= block_collision_min.z))
+		if ((player_collision_min.x <= block_collision_max.x && player_collision_max.x >= block_collision_min.x) &&
+			(player_collision_min.y <= block_collision_max.y && player_collision_max.y >= block_collision_min.y) &&
+			(player_collision_min.z <= block_collision_max.z && player_collision_max.z >= block_collision_min.z))
 		{
-			glm::vec3 collision_offset = camera_collision_min - block_collision_min;
+			glm::vec3 collision_offset = player_collision_min - block_collision_min;
 
 			if (collision_offset.z < abs(collision_offset.x) || collision_offset.z < abs(collision_offset.y))
 			{
