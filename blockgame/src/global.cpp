@@ -1,17 +1,9 @@
-#include <GLFW/glfw3.h>
+#include "global.h"
+
 #include <glm/glm.hpp>
 
 #include <vector>
 #include <deque>
-
-#include "global.h"
-#include "game.h"
-#include "terrain.h"
-#include "world.h"
-#include "player.h"
-#include "camera.h"
-#include "light.h"
-#include "ui.h"
 
 Game* game;
 Terrain* terrain;

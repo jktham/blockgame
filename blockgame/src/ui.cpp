@@ -1,3 +1,7 @@
+#include "ui.h"
+#include "game.h"
+#include "global.h"
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -7,10 +11,6 @@
 #include <vector>
 #include <functional>
 #include <map>
-
-#include "global.h"
-#include "game.h"
-#include "ui.h"
 
 void Label::generateMesh()
 {

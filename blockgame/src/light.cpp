@@ -1,10 +1,7 @@
-﻿#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-
-#include <vector>
-
+﻿#include "light.h"
 #include "global.h"
-#include "light.h"
+
+#include <glm/glm.hpp>
 
 void Light::update()
 {

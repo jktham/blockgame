@@ -1,5 +1,7 @@
 #pragma once
 
+#include "global.h"
+
 #include <glm/glm.hpp>
 
 #include <string>

@@ -1,15 +1,3 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-#include <fstream>
-#include <streambuf>
-#include <iostream>
-#include <iomanip>
-#include <chrono>
-#include <algorithm>
-
 #include "global.h"
 #include "stb_image.h"
 #include "game.h"
@@ -20,6 +8,19 @@
 #include "camera.h"
 #include "light.h"
 #include "ui.h"
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <fstream>
+#include <streambuf>
+#include <iostream>
+#include <iomanip>
+#include <chrono>
+#include <algorithm>
 
 // callbacks
 void processInputState(GLFWwindow* window);

@@ -1,14 +1,13 @@
-﻿#include <GLFW/glfw3.h>
+﻿#include "camera.h"
+#include "world.h"
+#include "player.h"
+#include "global.h"
+
 #include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <iostream>
 #include <vector>
-
-#include "global.h"
-#include "camera.h"
-#include "player.h"
-#include "world.h"
 
 glm::vec3 Camera::getRayIntersect()
 {

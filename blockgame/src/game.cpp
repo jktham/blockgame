@@ -1,13 +1,12 @@
-﻿#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-
-#include <vector>
-
-#include "global.h"
-#include "game.h"
+﻿#include "game.h"
 #include "world.h"
 #include "player.h"
 #include "camera.h"
+#include "global.h"
+
+#include <glm/glm.hpp>
+
+#include <vector>
 
 void Game::start()
 {

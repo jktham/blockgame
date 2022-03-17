@@ -1,16 +1,15 @@
-﻿#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+﻿#include "world.h"
+#include "terrain.h"
+#include "player.h"
+#include "global.h"
+
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 
 #include <fstream>
 #include <iostream>
 #include <vector>
 #include <chrono>
-
-#include "global.h"
-#include "player.h"
-#include "terrain.h"
-#include "world.h"
 
 void Chunk::loadChunk()
 {

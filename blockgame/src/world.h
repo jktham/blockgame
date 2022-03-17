@@ -1,7 +1,10 @@
 ﻿#pragma once
 
-#include <vector>
+#include "global.h"
+
 #include <glm/glm.hpp>
+
+#include <vector>
 
 class Block
 {

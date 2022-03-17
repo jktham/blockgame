@@ -1,6 +1,5 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
 #include <vector>
@@ -13,6 +12,7 @@ class Player;
 class Camera;
 class Light;
 class UI;
+struct GLFWwindow;
 
 extern Game* game;
 extern Terrain* terrain;
@@ -21,7 +21,6 @@ extern Player* player;
 extern Camera* camera;
 extern Light* light;
 extern UI* ui;
-
 extern GLFWwindow* window;
 
 extern const unsigned int WINDOW_WIDTH;

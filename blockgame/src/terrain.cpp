@@ -1,11 +1,10 @@
-﻿#include <GLFW/glfw3.h>
+﻿#include "terrain.h"
+#include "perlin.h"
+#include "global.h"
+
 #include <glm/glm.hpp>
 
 #include <vector>
-
-#include "global.h"
-#include "perlin.h"
-#include "terrain.h"
 
 double Terrain::getGroundHeight(int x, int y)
 {
