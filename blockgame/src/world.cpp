@@ -61,7 +61,7 @@ void Chunk::generateTerrain()
 	{
 		for (int y = 0; y < CHUNK_SIZE.y; y++)
 		{
-			double ground_height = terrain->getGroundHeight(x + (int)chunk_pos.x, y + (int)chunk_pos.y);
+			float ground_height = terrain->getGroundHeight(x + (int)chunk_pos.x, y + (int)chunk_pos.y);
 
 			for (int z = 0; z < CHUNK_SIZE.z; z++)
 			{

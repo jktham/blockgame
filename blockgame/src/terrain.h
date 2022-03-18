@@ -2,6 +2,8 @@
 
 #include "perlin.h"
 
+#include "glm/glm.hpp"
+
 class Terrain
 {
 public:
@@ -27,5 +29,10 @@ public:
 	const siv::PerlinNoise::seed_type seed = TERRAIN_SEED;
 	const siv::PerlinNoise perlin{ seed };
 
-	double getGroundHeight(int x, int y);
+	float getGroundHeight(int x, int y);
+
+	float interpolate(float a, float b, float w);
+	float getDotProduct(int x, int y, float fx, float fy);
+	glm::vec2 getRandomGridVector(int x, int y);
+	float getPerlin(int x, int y, float frequency, float amplitude);
 };
