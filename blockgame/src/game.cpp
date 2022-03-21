@@ -26,8 +26,6 @@ void Game::start()
 void Game::quit()
 {
 	state = State::MENU;
-	current_type = MAX_TYPE;
-	last_type = -1;
 
 	delete world;
 	delete player;

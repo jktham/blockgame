@@ -47,6 +47,12 @@ public:
 	bool noclip = false;
 	bool sprint = false;
 
+	int current_type = 5;
+	int last_type = 0;
+
+	int left_delay = 0;
+	int right_delay = 0;
+
 	Player();
 
 	void applyGravity();

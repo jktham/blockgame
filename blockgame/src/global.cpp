@@ -25,12 +25,8 @@ bool first_mouse = true;
 bool wireframe_mode = false;
 
 const int CLICK_DELAY = 30;
-int left_delay = 0;
-int right_delay = 0;
 
 const int MAX_TYPE = 5;
-int current_type = MAX_TYPE;
-int last_type = -1;
 
 const float ATLAS_SIZE_X = 6.0f;
 const float ATLAS_SIZE_Y = 6.0f;

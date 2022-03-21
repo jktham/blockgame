@@ -193,7 +193,7 @@ void Player::processAction(Action action)
 	if (action == Action::BLOCK_DESTROY)
 		world->destroyBlock(camera->getRayIntersect());
 	if (action == Action::BLOCK_PLACE)
-		world->placeBlock(camera->getRayIntersect());
+		world->placeBlock(camera->getRayIntersect(), current_type);
 	if (action == Action::BLOCK_PICK)
 	{
 		int type = world->getBlockType(camera->getRayIntersect());

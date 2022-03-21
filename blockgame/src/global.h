@@ -33,12 +33,8 @@ extern bool first_mouse;
 extern bool wireframe_mode;
 
 extern const int CLICK_DELAY;
-extern int left_delay;
-extern int right_delay;
 
 extern const int MAX_TYPE;
-extern int current_type;
-extern int last_type;
 
 extern const float ATLAS_SIZE_X;
 extern const float ATLAS_SIZE_Y;

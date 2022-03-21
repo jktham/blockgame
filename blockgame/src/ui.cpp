@@ -1,4 +1,5 @@
 #include "ui.h"
+#include "player.h"
 #include "game.h"
 #include "global.h"
 
@@ -219,12 +220,12 @@ void UI::generateMenuMesh()
 
 void UI::updateHud()
 {
-	if (current_type != last_type)
+	if (player->current_type != player->last_type)
 	{
 		generateHudMesh();
 		updateVAO();
 	}
-	last_type = current_type;
+	player->last_type = player->current_type;
 }
 
 void UI::generateHudMesh()
@@ -250,7 +251,7 @@ void UI::generateHudMesh()
 		WINDOW_WIDTH / 2.0f + CROSSHAIR_WIDTH, WINDOW_HEIGHT / 2.0f + CROSSHAIR_LENGTH, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
 	};
 
-	float atlas_y = ATLAS_SIZE_Y - current_type;
+	float atlas_y = ATLAS_SIZE_Y - player->current_type;
 
 	std::vector<float> block_icon_vertices = {
 		// pos.x, pos.y, color.r, color.g, color.b, tex.x, tex.y, tex_type -> use texture if > 0

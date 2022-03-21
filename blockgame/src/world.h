@@ -10,6 +10,7 @@ class Block
 {
 public:
 	int type = 0;
+	int data = 0;
 };
 
 class Chunk
@@ -31,6 +32,19 @@ public:
 	void generateTerrain();
 };
 
+class Change
+{
+public:
+	glm::vec3 pos = glm::vec3(0.0f);
+	int type = 0;
+
+	Change(glm::vec3 a_pos, int a_type)
+	{
+		pos = a_pos;
+		type = a_type;
+	}
+};
+
 class World
 {
 public:
@@ -39,7 +53,7 @@ public:
 	std::vector<float> mesh;
 
 	std::vector<glm::vec3> exposed_blocks;
-	std::vector<glm::vec2> generated_chunks;
+	std::vector<Change> changes;
 
 	// set up initial grid of chunks
 	void createChunks();
@@ -58,7 +72,7 @@ public:
 	void updateVAO();
 
 	// place block of global current type at given position with offset
-	void placeBlock(glm::vec3 position);
+	void placeBlock(glm::vec3 position, int type);
 	// replace block at given position with air
 	void destroyBlock(glm::vec3 position);
 	// get block type at given position

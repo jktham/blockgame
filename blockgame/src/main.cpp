@@ -369,30 +369,30 @@ void processInputState(GLFWwindow* window)
 
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
 		{
-			if (left_delay <= 0)
+			if (player->left_delay <= 0)
 			{
 				player->processAction(Action::BLOCK_DESTROY);
-				left_delay = CLICK_DELAY;
+				player->left_delay = CLICK_DELAY;
 			}
-			left_delay -= 1;
+			player->left_delay -= 1;
 		}
 		else
 		{
-			left_delay = 0;
+			player->left_delay = 0;
 		}
 
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		{
-			if (right_delay <= 0)
+			if (player->right_delay <= 0)
 			{
 				player->processAction(Action::BLOCK_PLACE);
-				right_delay = CLICK_DELAY;
+				player->right_delay = CLICK_DELAY;
 			}
-			right_delay -= 1;
+			player->right_delay -= 1;
 		}
 		else
 		{
-			right_delay = 0;
+			player->right_delay = 0;
 		}
 	}
 }
@@ -476,12 +476,12 @@ void mouse_scroll_callback(GLFWwindow* window, double offset_x, double offset_y)
 	}
 	else if (game->state == State::ALIVE)
 	{
-		current_type -= (int)offset_y;
+		player->current_type -= (int)offset_y;
 
-		if (current_type > MAX_TYPE)
-			current_type = 1;
-		if (current_type < 1)
-			current_type = MAX_TYPE;
+		if (player->current_type > MAX_TYPE)
+			player->current_type = 1;
+		if (player->current_type < 1)
+			player->current_type = MAX_TYPE;
 	}
 }
 

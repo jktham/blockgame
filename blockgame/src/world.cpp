@@ -45,11 +45,21 @@ void Chunk::saveChunk()
 
 void Chunk::generateChunk()
 {
-	if (std::find(world->generated_chunks.begin(), world->generated_chunks.end(), chunk_pos) != world->generated_chunks.end()) {
-		loadChunk();
-	}
-	else {
-		generateTerrain();
+	generateTerrain();
+
+	for (int i = 0; i < world->changes.size(); i++)
+	{
+		if (world->changes[i].pos.x >= chunk_pos.x && world->changes[i].pos.x < chunk_pos.x + CHUNK_SIZE.x && world->changes[i].pos.y >= chunk_pos.y && world->changes[i].pos.y < chunk_pos.y + CHUNK_SIZE.y)
+		{
+			int x = (int)(world->changes[i].pos.x - chunk_pos.x);
+			int y = (int)(world->changes[i].pos.y - chunk_pos.y);
+			int z = (int)(world->changes[i].pos.z);
+
+			blocks[x][y][z].type = world->changes[i].type;
+
+			if (z - 1 < min_z)
+				min_z = z - 1;
+		}
 	}
 }
 
@@ -96,7 +106,6 @@ void Chunk::generateTerrain()
 			}
 		}
 	}
-	world->generated_chunks.push_back(chunk_pos);
 	saveChunk();
 
 	auto t2 = std::chrono::high_resolution_clock::now();
@@ -459,7 +468,7 @@ void World::updateVAO()
 	std::cout << "updated VAO: " << mesh.size() << " verts, " << ms_int << "\n";
 }
 
-void World::placeBlock(glm::vec3 position)
+void World::placeBlock(glm::vec3 position, int type)
 {
 	auto t1 = std::chrono::high_resolution_clock::now();
 
@@ -489,7 +498,8 @@ void World::placeBlock(glm::vec3 position)
 				{
 					if (pos.x >= chunks[m][n].chunk_pos.x && pos.x < chunks[m][n].chunk_pos.x + CHUNK_SIZE.x && pos.y >= chunks[m][n].chunk_pos.y && pos.y < chunks[m][n].chunk_pos.y + CHUNK_SIZE.y)
 					{
-						chunks[m][n].blocks[(int)(pos.x - chunks[m][n].chunk_pos.x)][(int)(pos.y - chunks[m][n].chunk_pos.y)][(int)pos.z].type = current_type;
+						chunks[m][n].blocks[(int)(pos.x - chunks[m][n].chunk_pos.x)][(int)(pos.y - chunks[m][n].chunk_pos.y)][(int)pos.z].type = type;
+						changes.push_back(Change(pos, type));
 
 						generateChunkMesh(m - 1, m + 2, n - 1, n + 2);
 						generateWorldMesh();
@@ -502,7 +512,7 @@ void World::placeBlock(glm::vec3 position)
 
 	auto t2 = std::chrono::high_resolution_clock::now();
 	auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
-	std::cout << "placed block: (" << (int)pos.x << ", " << (int)pos.y << ", " << (int)pos.z << "), " << current_type << ", " << ms_int << "\n";
+	std::cout << "placed block: (" << (int)pos.x << ", " << (int)pos.y << ", " << (int)pos.z << "), " << type << ", " << ms_int << "\n";
 }
 
 void World::destroyBlock(glm::vec3 position)
@@ -522,6 +532,7 @@ void World::destroyBlock(glm::vec3 position)
 					if (chunks[m][n].blocks[(int)(pos.x - chunks[m][n].chunk_pos.x)][(int)(pos.y - chunks[m][n].chunk_pos.y)][(int)pos.z].type != 4)
 					{
 						chunks[m][n].blocks[(int)(pos.x - chunks[m][n].chunk_pos.x)][(int)(pos.y - chunks[m][n].chunk_pos.y)][(int)pos.z].type = 0;
+						changes.push_back(Change(pos, 0));
 
 						if (pos.z - 1 < chunks[m][n].min_z)
 						{
