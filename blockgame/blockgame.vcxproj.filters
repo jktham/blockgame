@@ -30,7 +30,7 @@
     <ClCompile Include="src\stb_image.cpp">
       <Filter>Library Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\light.cpp">
+    <ClCompile Include="src\effects.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\terrain.cpp">
@@ -88,7 +88,7 @@
     <ClInclude Include="src\global.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\light.h">
+    <ClInclude Include="src\effects.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\terrain.h">

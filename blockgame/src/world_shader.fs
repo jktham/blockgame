@@ -8,6 +8,12 @@ struct Light {
     vec3 specular;
 };
 
+struct Fog {
+    vec3 color;
+    float distance;
+    float dropoff;
+};
+
 out vec4 frag_color;
 
 in vec3 frag_pos;
@@ -16,6 +22,7 @@ in vec3 normal;
 in vec3 block;
 
 uniform Light light;
+uniform Fog fog;
 uniform vec3 view_pos;
 uniform vec3 selected_block;
 uniform sampler2D atlas_texture;
@@ -41,4 +48,6 @@ void main()
     vec3 lighting = ambient + diffuse + specular;
 
     frag_color *= vec4(lighting, 1.0f);
+
+    frag_color *= vec4(vec3(pow(fog.distance, fog.dropoff) - pow(distance(view_pos.xy, frag_pos.xy), fog.dropoff)) / pow(fog.distance, fog.dropoff), 1.0f);
 }

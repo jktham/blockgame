@@ -6,7 +6,7 @@
 #include "world.h"
 #include "player.h"
 #include "camera.h"
-#include "light.h"
+#include "effects.h"
 #include "ui.h"
 #include "threadpool.h"
 
@@ -39,6 +39,7 @@ int main()
 	//player = new Player;
 	//camera = new Camera;
 	light = new Light;
+	fog = new Fog;
 	ui = new UI;
 	threadpool = new Threadpool;
 
@@ -323,6 +324,9 @@ int main()
 				glUniform3f(glGetUniformLocation(world_shader, "light.ambient"), light->ambient.x, light->ambient.y, light->ambient.z);
 				glUniform3f(glGetUniformLocation(world_shader, "light.diffuse"), light->diffuse.x, light->diffuse.y, light->diffuse.z);
 				glUniform3f(glGetUniformLocation(world_shader, "light.specular"), light->specular.x, light->specular.y, light->specular.z);
+				glUniform3f(glGetUniformLocation(world_shader, "fog.color"), fog->color.x, fog->color.x, fog->color.z);
+				glUniform1f(glGetUniformLocation(world_shader, "fog.distance"), fog->distance);
+				glUniform1f(glGetUniformLocation(world_shader, "fog.dropoff"), fog->dropoff);
 				glUniform3f(glGetUniformLocation(world_shader, "view_pos"), camera->position.x, camera->position.y, camera->position.z);
 				glUniform3f(glGetUniformLocation(world_shader, "selected_block"), player->selected_block.x, player->selected_block.y, player->selected_block.z);
 				glUseProgram(0);

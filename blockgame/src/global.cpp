@@ -11,6 +11,7 @@ World* world;
 Player* player;
 Camera* camera;
 Light* light;
+Fog* fog;
 UI* ui;
 GLFWwindow* window;
 Threadpool* threadpool;
