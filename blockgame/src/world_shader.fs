@@ -9,9 +9,10 @@ struct Light {
 };
 
 struct Fog {
-    vec3 color;
-    float distance;
-    float dropoff;
+    float start;
+    float end;
+    float exponent;
+    bool enabled;
 };
 
 out vec4 frag_color;
@@ -49,5 +50,14 @@ void main()
 
     frag_color *= vec4(lighting, 1.0f);
 
-    frag_color *= vec4(vec3(pow(fog.distance, fog.dropoff) - pow(distance(view_pos.xy, frag_pos.xy), fog.dropoff)) / pow(fog.distance, fog.dropoff), 1.0f);
+    if (fog.enabled)
+    {
+        float lum = 1.0f;
+        if (distance(view_pos.xy, frag_pos.xy) >= fog.start)
+        {
+            lum = 1.0f - pow((distance(view_pos.xy, frag_pos.xy) - fog.start) / (fog.end - fog.start), fog.exponent);
+        }
+
+        frag_color *= vec4(vec3(clamp(lum, 0.0f, 1.0f)), 1.0f);
+    }
 }

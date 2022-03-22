@@ -17,7 +17,8 @@ public:
 class Fog
 {
 public:
-	glm::vec3 color = glm::vec3(0.0f, 0.0f, 0.0f);
-	float distance = 60.0f;
-	float dropoff = 20.0f;
+	float start = 30.0f;
+	float end = 60.0f;
+	float exponent = 3.0f;
+	bool enabled = true;
 };

@@ -324,9 +324,10 @@ int main()
 				glUniform3f(glGetUniformLocation(world_shader, "light.ambient"), light->ambient.x, light->ambient.y, light->ambient.z);
 				glUniform3f(glGetUniformLocation(world_shader, "light.diffuse"), light->diffuse.x, light->diffuse.y, light->diffuse.z);
 				glUniform3f(glGetUniformLocation(world_shader, "light.specular"), light->specular.x, light->specular.y, light->specular.z);
-				glUniform3f(glGetUniformLocation(world_shader, "fog.color"), fog->color.x, fog->color.x, fog->color.z);
-				glUniform1f(glGetUniformLocation(world_shader, "fog.distance"), fog->distance);
-				glUniform1f(glGetUniformLocation(world_shader, "fog.dropoff"), fog->dropoff);
+				glUniform1f(glGetUniformLocation(world_shader, "fog.start"), fog->start);
+				glUniform1f(glGetUniformLocation(world_shader, "fog.end"), fog->end);
+				glUniform1f(glGetUniformLocation(world_shader, "fog.exponent"), fog->exponent);
+				glUniform1i(glGetUniformLocation(world_shader, "fog.enabled"), (int)fog->enabled);
 				glUniform3f(glGetUniformLocation(world_shader, "view_pos"), camera->position.x, camera->position.y, camera->position.z);
 				glUniform3f(glGetUniformLocation(world_shader, "selected_block"), player->selected_block.x, player->selected_block.y, player->selected_block.z);
 				glUseProgram(0);
@@ -451,6 +452,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 		if (key == GLFW_KEY_Q && action == GLFW_PRESS)
 			player->noclip = !player->noclip;
+
+		if (key == GLFW_KEY_F && action == GLFW_PRESS)
+			fog->enabled = !fog->enabled;
 
 		if (key == GLFW_KEY_K && action == GLFW_PRESS)
 			player->processAction(Action::BLOCK_PICK);
