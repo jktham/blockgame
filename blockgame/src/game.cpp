@@ -20,7 +20,8 @@ void Game::start()
 	world->createChunks();
 	world->generateChunkMesh();
 	world->generateWorldMesh();
-	world->updateVAO();
+	world->updateExposedBlocks();
+	world->updateVAO(world->complete_mesh);
 }
 
 void Game::quit()

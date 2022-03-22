@@ -12,8 +12,8 @@ Player* player;
 Camera* camera;
 Light* light;
 UI* ui;
-
 GLFWwindow* window;
+Threadpool* threadpool;
 
 const unsigned int WINDOW_WIDTH = 1920;
 const unsigned int WINDOW_HEIGHT = 1080;

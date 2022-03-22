@@ -1,6 +1,5 @@
 ﻿#include "world.h"
 #include "terrain.h"
-#include "player.h"
 #include "global.h"
 
 #include <glad/glad.h>
@@ -125,24 +124,19 @@ void World::createChunks()
 	}
 }
 
-void World::updateChunks()
+void World::updateChunks(glm::vec2 shift_direction)
 {
-	if (player->current_chunk != player->last_chunk)
-	{
-		auto t1 = std::chrono::high_resolution_clock::now();
+	auto t1 = std::chrono::high_resolution_clock::now();
 
-		glm::vec2 shift_direction = player->current_chunk - player->last_chunk;
+	meshgen_done = false;
+	shiftChunks(shift_direction);
+	generateWorldMesh();
+	meshgen_done = true;
+	//updateVAO(front_mesh);
 
-		shiftChunks(shift_direction);
-		generateWorldMesh();
-		updateVAO();
-
-		auto t2 = std::chrono::high_resolution_clock::now();
-		auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
-		std::cout << "updated chunks: " << ms_int << "\n";
-	}
-
-	player->last_chunk = player->current_chunk;
+	auto t2 = std::chrono::high_resolution_clock::now();
+	auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
+	std::cout << "updated chunks: " << ms_int << "\n";
 }
 
 void World::shiftChunks(glm::vec2 shift_direction)
@@ -388,19 +382,6 @@ void World::generateChunkMesh(int m_start, int m_end, int n_start, int n_end)
 		}
 	}
 
-	exposed_blocks = {};
-
-	for (int m = WORLD_SIZE.x / 2 - 1; m < WORLD_SIZE.x / 2 + 2; m++)
-	{
-		for (int n = WORLD_SIZE.y / 2 - 1; n < WORLD_SIZE.y / 2 + 2; n++)
-		{
-			if (m >= 0 && m < WORLD_SIZE.x && n >= 0 && n < WORLD_SIZE.y)
-			{
-				exposed_blocks.insert(exposed_blocks.end(), chunks[m][n].exposed_blocks.begin(), chunks[m][n].exposed_blocks.end());
-			}
-		}
-	}
-
 	auto t2 = std::chrono::high_resolution_clock::now();
 	auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
 	std::cout << "generated chunk mesh: " << (m_end - m_start) * (n_end - n_start) << " chunks, " << ms_int << "\n";
@@ -420,12 +401,30 @@ void World::generateWorldMesh()
 		}
 	}
 
+	complete_mesh = mesh;
+
 	auto t2 = std::chrono::high_resolution_clock::now();
 	auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
 	std::cout << "generated world mesh: " << WORLD_SIZE.x * WORLD_SIZE.y << " chunks, " << ms_int << "\n";
 }
 
-void World::updateVAO()
+void World::updateExposedBlocks()
+{
+	exposed_blocks = {};
+
+	for (int m = WORLD_SIZE.x / 2 - 1; m < WORLD_SIZE.x / 2 + 2; m++)
+	{
+		for (int n = WORLD_SIZE.y / 2 - 1; n < WORLD_SIZE.y / 2 + 2; n++)
+		{
+			if (m >= 0 && m < WORLD_SIZE.x && n >= 0 && n < WORLD_SIZE.y)
+			{
+				exposed_blocks.insert(exposed_blocks.end(), chunks[m][n].exposed_blocks.begin(), chunks[m][n].exposed_blocks.end());
+			}
+		}
+	}
+}
+
+void World::updateVAO(std::vector<float> data)
 {
 	auto t1 = std::chrono::high_resolution_clock::now();
 
@@ -434,7 +433,7 @@ void World::updateVAO()
 
 	// vertex buffer object
 	glBindBuffer(GL_ARRAY_BUFFER, world_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh.size(), mesh.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * data.size(), data.data(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// vertex attribute (position)
@@ -465,7 +464,7 @@ void World::updateVAO()
 
 	auto t2 = std::chrono::high_resolution_clock::now();
 	auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
-	std::cout << "updated VAO: " << mesh.size() << " verts, " << ms_int << "\n";
+	std::cout << "updated VAO: " << data.size() << " verts, " << ms_int << "\n";
 }
 
 void World::placeBlock(glm::vec3 position, int type)
@@ -503,7 +502,8 @@ void World::placeBlock(glm::vec3 position, int type)
 
 						generateChunkMesh(m - 1, m + 2, n - 1, n + 2);
 						generateWorldMesh();
-						updateVAO();
+						updateExposedBlocks();
+						updateVAO(complete_mesh);
 					}
 				}
 			}
@@ -541,7 +541,8 @@ void World::destroyBlock(glm::vec3 position)
 
 						generateChunkMesh(m - 1, m + 2, n - 1, n + 2);
 						generateWorldMesh();
-						updateVAO();
+						updateExposedBlocks();
+						updateVAO(complete_mesh);
 					}
 				}
 			}

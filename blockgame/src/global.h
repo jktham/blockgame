@@ -13,6 +13,7 @@ class Camera;
 class Light;
 class UI;
 struct GLFWwindow;
+class Threadpool;
 
 extern Game* game;
 extern Terrain* terrain;
@@ -22,6 +23,7 @@ extern Camera* camera;
 extern Light* light;
 extern UI* ui;
 extern GLFWwindow* window;
+extern Threadpool* threadpool;
 
 extern const unsigned int WINDOW_WIDTH;
 extern const unsigned int WINDOW_HEIGHT;

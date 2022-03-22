@@ -158,6 +158,7 @@
     <ClCompile Include="src\player.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
     <ClCompile Include="src\terrain.cpp" />
+    <ClCompile Include="src\threadpool.cpp" />
     <ClCompile Include="src\ui.cpp" />
     <ClCompile Include="src\world.cpp" />
   </ItemGroup>
@@ -176,6 +177,7 @@
     <ClInclude Include="src\terrain.h" />
     <ClInclude Include="src\perlin.h" />
     <ClInclude Include="src\stb_image.h" />
+    <ClInclude Include="src\threadpool.h" />
     <ClInclude Include="src\ui.h" />
     <ClInclude Include="src\world.h" />
   </ItemGroup>

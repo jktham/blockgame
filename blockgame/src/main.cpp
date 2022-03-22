@@ -8,6 +8,7 @@
 #include "camera.h"
 #include "light.h"
 #include "ui.h"
+#include "threadpool.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -39,6 +40,7 @@ int main()
 	//camera = new Camera;
 	light = new Light;
 	ui = new UI;
+	threadpool = new Threadpool;
 
 	// window setup
 	glfwInit();
@@ -208,6 +210,7 @@ int main()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// setup
+	threadpool->createThreads(1);
 	ui->generateFont();
 	ui->createMenu();
 
@@ -284,10 +287,28 @@ int main()
 				player->applyGravity();
 				camera->updatePosition();
 				light->update();
-				world->updateChunks();
 				ui->updateHud();
 
-				glm::vec3 selected_block = glm::floor(camera->getRayIntersect());
+				if (player->current_chunk != player->last_chunk)
+				{
+					glm::vec2 shift_direction = player->current_chunk - player->last_chunk;
+					player->last_chunk = player->current_chunk;
+
+					// single threaded
+					/*world->updateChunks(shift_direction);*/
+
+					// multi threaded
+					std::function<void()> job = [shift_direction] { world->updateChunks(shift_direction); };
+					threadpool->queue.push_back(job);
+				}
+				if (world->meshgen_done)
+				{
+					world->meshgen_done = false;
+					world->updateExposedBlocks();
+					world->updateVAO(world->complete_mesh);
+				}
+
+				player->selected_block = glm::floor(camera->getRayIntersect());
 
 				world_view = camera->getViewMatrix();
 				world_projection = camera->getProjectionMatrix();
@@ -303,7 +324,7 @@ int main()
 				glUniform3f(glGetUniformLocation(world_shader, "light.diffuse"), light->diffuse.x, light->diffuse.y, light->diffuse.z);
 				glUniform3f(glGetUniformLocation(world_shader, "light.specular"), light->specular.x, light->specular.y, light->specular.z);
 				glUniform3f(glGetUniformLocation(world_shader, "view_pos"), camera->position.x, camera->position.y, camera->position.z);
-				glUniform3f(glGetUniformLocation(world_shader, "selected_block"), selected_block.x, selected_block.y, selected_block.z);
+				glUniform3f(glGetUniformLocation(world_shader, "selected_block"), player->selected_block.x, player->selected_block.y, player->selected_block.z);
 				glUseProgram(0);
 
 				glUseProgram(ui_shader);
@@ -315,7 +336,7 @@ int main()
 				// draw vertices
 				glUseProgram(world_shader);
 				glBindVertexArray(world_VAO);
-				glDrawArrays(GL_TRIANGLES, 0, (GLsizei)world->mesh.size() / 11);
+				glDrawArrays(GL_TRIANGLES, 0, (GLsizei)world->complete_mesh.size() / 11);
 				glBindVertexArray(0);
 				glUseProgram(0);
 

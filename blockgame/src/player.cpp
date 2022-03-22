@@ -31,7 +31,6 @@ void Player::applyGravity()
 		{
 			glm::vec3 collision_offset = position - collision_blocks_v[i];
 
-
 			if (collision_offset.z >= 0.0f)
 			{
 				vertical_velocity = 0.0f;

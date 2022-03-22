@@ -51,15 +51,18 @@ public:
 	Chunk chunks[WORLD_SIZE.x][WORLD_SIZE.y];
 
 	std::vector<float> mesh;
+	std::vector<float> complete_mesh;
 
 	std::vector<glm::vec3> exposed_blocks;
 	std::vector<Change> changes;
+
+	bool meshgen_done = false;
 
 	// set up initial grid of chunks
 	void createChunks();
 
 	// check for chunk change, shift chunks, generate mesh and update VAO
-	void updateChunks();
+	void updateChunks(glm::vec2 shift_direction);
 	// shift chunks by given direction and generate new chunk terrain and chunk meshes accordingly
 	void shiftChunks(glm::vec2 shift_direction);
 
@@ -68,8 +71,11 @@ public:
 	// combine chunk meshes into world mesh
 	void generateWorldMesh();
 
+	// update blocks exposed to air, relevant for collision and interaction
+	void updateExposedBlocks();
+
 	// Update VAO and VBO
-	void updateVAO();
+	void updateVAO(std::vector<float> data);
 
 	// place block of global current type at given position with offset
 	void placeBlock(glm::vec3 position, int type);

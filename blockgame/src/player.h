@@ -53,6 +53,8 @@ public:
 	int left_delay = 0;
 	int right_delay = 0;
 
+	glm::vec3 selected_block{};
+
 	Player();
 
 	void applyGravity();
