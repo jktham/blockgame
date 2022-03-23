@@ -1,5 +1,4 @@
 ﻿#include "terrain.h"
-#include "perlin.h"
 #include "global.h"
 
 #include <glm/glm.hpp>
@@ -23,7 +22,6 @@ float Terrain::getGroundHeight(int x, int y)
 		amplitude *= 2.0f;
 	}
 
-	//h = (float)perlin.octave2D_01(x * 0.05f, y * 0.05f, 4) * 10.0f + (float)CHUNK_SIZE.z / 2.0f;
 	//h = sin(x * 0.1f) * 10.0f + 32.0f;
 	//h = (x * x + y * y) * 0.1f;
 	//h = abs(x - y);

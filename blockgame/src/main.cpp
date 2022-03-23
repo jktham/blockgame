@@ -1,7 +1,6 @@
 #include "global.h"
 #include "stb_image.h"
 #include "game.h"
-#include "perlin.h"
 #include "terrain.h"
 #include "world.h"
 #include "player.h"
@@ -22,6 +21,7 @@
 #include <iomanip>
 #include <chrono>
 #include <algorithm>
+#include <numeric>
 
 // callbacks
 void processInputState(GLFWwindow* window);
@@ -458,6 +458,11 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 		if (key == GLFW_KEY_K && action == GLFW_PRESS)
 			player->processAction(Action::BLOCK_PICK);
+
+		if (key == GLFW_KEY_N && action == GLFW_PRESS)
+			world->save("data/save.txt");
+		if (key == GLFW_KEY_M && action == GLFW_PRESS)
+			world->load("data/save.txt");
 	}
 }
 

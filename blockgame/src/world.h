@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 
 #include <vector>
+#include <string>
 
 class Block
 {
@@ -24,8 +25,7 @@ public:
 	std::vector<glm::vec3> exposed_blocks;
 	int min_z = CHUNK_SIZE.z - 1;
 
-	void loadChunk();
-	void saveChunk();
+	// generate chunk and apply stored changes
 	void generateChunk();
 
 	// generate terrain for a chunk
@@ -83,4 +83,9 @@ public:
 	void destroyBlock(glm::vec3 position);
 	// get block type at given position
 	int getBlockType(glm::vec3 position);
+
+	// save changes to file
+	void save(std::string path);
+	// load changes from file and generate chunks
+	void load(std::string path);
 };

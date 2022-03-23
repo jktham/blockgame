@@ -9,38 +9,7 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
-
-void Chunk::loadChunk()
-{
-	generateTerrain();
-}
-
-void Chunk::saveChunk()
-{
-	/*std::string output;
-
-	output.append(std::to_string(chunk_pos.x));
-	output.append(",");
-	output.append(std::to_string(chunk_pos.y));
-	output.append("\n");
-
-	for (int i = 0; i < CHUNK_SIZE.x; i++)
-	{
-		for (int j = 0; j < CHUNK_SIZE.y; j++)
-		{
-			for (int k = 0; k < CHUNK_SIZE.z; k++)
-			{
-				output.append(std::to_string(blocks[i][j][k].type));
-				output.append(",");
-			}
-		}
-	}
-	output.append("\n");
-
-	std::ofstream file("dat/chunks.txt", std::ios_base::app | std::ios_base::out);
-	file << output;
-	file.close();*/
-}
+#include <string>
 
 void Chunk::generateChunk()
 {
@@ -86,7 +55,7 @@ void Chunk::generateTerrain()
 				{
 					blocks[x][y][z].type = 2;
 				}
-				else if (z < ground_height - 0)
+				else if (z < ground_height)
 				{
 					blocks[x][y][z].type = 1;
 				}
@@ -105,7 +74,6 @@ void Chunk::generateTerrain()
 			}
 		}
 	}
-	saveChunk();
 
 	auto t2 = std::chrono::high_resolution_clock::now();
 	auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
@@ -572,4 +540,74 @@ int World::getBlockType(glm::vec3 position)
 		}
 	}
 	return 0;
+}
+
+void World::save(std::string path)
+{
+	auto t1 = std::chrono::high_resolution_clock::now();
+
+	std::string output;
+
+	for (int i = 0; i < changes.size(); i++)
+	{
+		output.append(std::to_string((int)changes[i].pos.x));
+		output.append(",");
+		output.append(std::to_string((int)changes[i].pos.y));
+		output.append(",");
+		output.append(std::to_string((int)changes[i].pos.z));
+		output.append(",");
+		output.append(std::to_string(changes[i].type));
+		output.append("\n");
+	}
+
+	std::fstream file(path, std::ios_base::trunc | std::ios_base::out);
+	file << output;
+	file.close();
+
+	auto t2 = std::chrono::high_resolution_clock::now();
+	auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
+	std::cout << "saved changes: (" << changes.size() << "), " << ms_int << "\n";
+}
+
+void World::load(std::string path)
+{
+	auto t1 = std::chrono::high_resolution_clock::now();
+
+	std::fstream file(path, std::fstream::in);
+	std::string line;
+	std::string value;
+	std::vector<int> values;
+	changes = {};
+
+	while (std::getline(file, line, '\n'))
+	{
+		values = {};
+		std::istringstream iss_line(line);
+
+		while (std::getline(iss_line, value, ','))
+		{
+			values.push_back(std::stoi(value));
+		}
+
+		changes.push_back(Change(glm::vec3(values[0], values[1], values[2]), values[3]));
+	}
+
+	file.close();
+
+	for (int m = 0; m < WORLD_SIZE.x; m++)
+	{
+		for (int n = 0; n < WORLD_SIZE.y; n++)
+		{
+			chunks[m][n].generateChunk();
+		}
+	}
+
+	generateChunkMesh();
+	generateWorldMesh();
+	updateExposedBlocks();
+	updateVAO(complete_mesh);
+
+	auto t2 = std::chrono::high_resolution_clock::now();
+	auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
+	std::cout << "loaded changes: (" << changes.size() << "), " << ms_int << "\n";
 }

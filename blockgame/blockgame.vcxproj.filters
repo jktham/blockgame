@@ -73,9 +73,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\perlin.h">
-      <Filter>Library Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\stb_image.h">
       <Filter>Library Files</Filter>
     </ClInclude>
