@@ -39,7 +39,7 @@ void Player::applyGravity()
 			else
 			{
 				vertical_velocity = 0.0f;
-				position.z = collision_blocks_v[i].z - height;
+				position.z -= 0.01f;
 			}
 		}
 	}
@@ -113,7 +113,7 @@ bool Player::detectCollisionV()
 			(player_collision_min.y < block_collision_max.y && player_collision_max.y > block_collision_min.y) &&
 			(player_collision_min.z <= block_collision_max.z && player_collision_max.z > block_collision_min.z))
 		{
-			glm::vec3 collision_offset = player_collision_min - block_collision_min;
+			glm::vec3 collision_offset = player_collision_min - block_collision_min + glm::vec3(width - 0.5f);
 
 			if (abs(collision_offset.z) > abs(collision_offset.x) && abs(collision_offset.z) > abs(collision_offset.y))
 			{
@@ -149,7 +149,7 @@ bool Player::detectCollisionH()
 			(player_collision_min.y <= block_collision_max.y && player_collision_max.y >= block_collision_min.y) &&
 			(player_collision_min.z <= block_collision_max.z && player_collision_max.z >= block_collision_min.z))
 		{
-			glm::vec3 collision_offset = player_collision_min - block_collision_min;
+			glm::vec3 collision_offset = player_collision_min - block_collision_min + glm::vec3(width - 0.5f);
 
 			if (collision_offset.z < abs(collision_offset.x) || collision_offset.z < abs(collision_offset.y))
 			{
