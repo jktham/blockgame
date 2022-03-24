@@ -483,7 +483,7 @@ void World::placeBlock(glm::vec3 position, int type)
 	std::cout << "placed block: (" << (int)pos.x << ", " << (int)pos.y << ", " << (int)pos.z << "), " << type << ", " << ms_int << "\n";
 }
 
-void World::destroyBlock(glm::vec3 position)
+void World::breakBlock(glm::vec3 position)
 {
 	auto t1 = std::chrono::high_resolution_clock::now();
 
@@ -519,7 +519,7 @@ void World::destroyBlock(glm::vec3 position)
 
 	auto t2 = std::chrono::high_resolution_clock::now();
 	auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
-	std::cout << "destroyed block: (" << (int)pos.x << ", " << (int)pos.y << ", " << (int)pos.z << "), " << ms_int << "\n";
+	std::cout << "broke block: (" << (int)pos.x << ", " << (int)pos.y << ", " << (int)pos.z << "), " << ms_int << "\n";
 }
 
 int World::getBlockType(glm::vec3 position)

@@ -80,7 +80,7 @@ public:
 	// place block of global current type at given position with offset
 	void placeBlock(glm::vec3 position, int type);
 	// replace block at given position with air
-	void destroyBlock(glm::vec3 position);
+	void breakBlock(glm::vec3 position);
 	// get block type at given position
 	int getBlockType(glm::vec3 position);
 

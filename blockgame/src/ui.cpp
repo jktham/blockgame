@@ -12,17 +12,26 @@
 #include <vector>
 #include <functional>
 #include <map>
+#include <iostream>
 
 void Label::generateMesh()
 {
 	mesh = {};
 
+	std::string newline = "§";
 	float x = pos.x;
 	float y = pos.y;
 
 	std::string::const_iterator c;
 	for (c = text.begin(); c != text.end(); c++)
 	{
+		if (*c == *(newline.c_str()))
+		{
+			x = pos.x;
+			y += 1.0f * scale;
+			continue;
+		}
+
 		Glyph ch = ui->glyphs[*c];
 
 		float w = 1.0f * scale;
@@ -156,6 +165,13 @@ void UI::createMenu()
 	quit_label.scale = 80.0f;
 	quit_label.text = "Quit";
 	labels.push_back(quit_label);
+
+	Label info_label{};
+	info_label.pos = glm::vec2(WINDOW_WIDTH - 450, WINDOW_HEIGHT / 2.0f - 300);
+	info_label.color = glm::vec3(1.0f);
+	info_label.scale = 36.0f;
+	info_label.text = "WASD: Movement§SHIFT: Sprint§SPACE: Jump§§M1/J: Place Block§M2/L: Break Block§M3/K: Pick Block§MW: Change Type§§N: Save World§M: Load World§R: Reset World§§Q: Toggle Noclip§F: Toggle Fog§TAB: Toggle Wireframe§§ENTER: Start§ESCAPE: Quit";
+	labels.push_back(info_label);
 }
 
 void UI::updateMenu()

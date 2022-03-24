@@ -190,7 +190,7 @@ void Player::processAction(Action action)
 		applyJump();
 
 	if (action == Action::BLOCK_DESTROY)
-		world->destroyBlock(camera->getRayIntersect());
+		world->breakBlock(camera->getRayIntersect());
 	if (action == Action::BLOCK_PLACE)
 		world->placeBlock(camera->getRayIntersect(), current_type);
 	if (action == Action::BLOCK_PICK)

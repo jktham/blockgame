@@ -463,6 +463,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			world->save("data/save.txt");
 		if (key == GLFW_KEY_M && action == GLFW_PRESS)
 			world->load("data/save.txt");
+
+		if (key == GLFW_KEY_R && action == GLFW_PRESS)
+		{
+			game->quit();
+			game->start();
+		}
 	}
 }
 
