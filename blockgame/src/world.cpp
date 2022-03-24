@@ -548,6 +548,21 @@ void World::save(std::string path)
 
 	std::string output;
 
+	output.append(std::to_string(terrain->OFFSET));
+	output.append(",");
+	output.append(std::to_string(terrain->FREQUENCY));
+	output.append(",");
+	output.append(std::to_string(terrain->AMPLITUDE));
+	output.append(",");
+	output.append(std::to_string(terrain->OCTAVES));
+	output.append(",");
+	output.append(std::to_string(terrain->SHIFT));
+	output.append(",");
+	output.append(std::to_string(terrain->LACUNARITY));
+	output.append(",");
+	output.append(std::to_string(terrain->PERSISTENCE));
+	output.append("\n");
+
 	for (int i = 0; i < changes.size(); i++)
 	{
 		output.append(std::to_string((int)changes[i].pos.x));
@@ -576,20 +591,38 @@ void World::load(std::string path)
 	std::fstream file(path, std::fstream::in);
 	std::string line;
 	std::string value;
-	std::vector<int> values;
-	changes = {};
+	std::vector<float> values;
+	bool firstline = true;
 
+	changes = {};
 	while (std::getline(file, line, '\n'))
 	{
 		values = {};
 		std::istringstream iss_line(line);
 
-		while (std::getline(iss_line, value, ','))
+		if (firstline)
 		{
-			values.push_back(std::stoi(value));
+			while (std::getline(iss_line, value, ','))
+			{
+				values.push_back(std::stof(value));
+			}
+			terrain->OFFSET = (int)values[0];
+			terrain->FREQUENCY = values[1];
+			terrain->AMPLITUDE = values[2];
+			terrain->OCTAVES = (int)values[3];
+			terrain->SHIFT = (int)values[4];
+			terrain->LACUNARITY = values[5];
+			terrain->PERSISTENCE = values[6];
+			firstline = false;
 		}
-
-		changes.push_back(Change(glm::vec3(values[0], values[1], values[2]), values[3]));
+		else
+		{
+			while (std::getline(iss_line, value, ','))
+			{
+				values.push_back(std::stof(value));
+			}
+			changes.push_back(Change(glm::vec3(values[0], values[1], values[2]), (int)values[3]));
+		}
 	}
 
 	file.close();

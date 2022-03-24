@@ -34,7 +34,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 int main()
 {
 	game = new Game;
-	terrain = new Terrain;
+	//terrain = new Terrain;
 	//world = new World;
 	//player = new Player;
 	//camera = new Camera;

@@ -10,16 +10,16 @@ float Terrain::getGroundHeight(int x, int y)
 {
 	float h = (float)CHUNK_SIZE.z / 2.0f;
 
-	int offset = 0;
-	float frequency = 1.5f;
-	float amplitude = 3.0f;
+	int offset = OFFSET;
+	float frequency = FREQUENCY;
+	float amplitude = AMPLITUDE;
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < OCTAVES; i++)
 	{
 		h += getPerlin(x + offset, y + offset, frequency, amplitude);
-		offset += 1000;
-		frequency *= 0.5f;
-		amplitude *= 2.0f;
+		offset += SHIFT;
+		frequency *= LACUNARITY;
+		amplitude *= PERSISTENCE;
 	}
 
 	//h = sin(x * 0.1f) * 10.0f + 32.0f;
