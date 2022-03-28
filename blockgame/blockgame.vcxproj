@@ -154,6 +154,7 @@
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\global.cpp" />
     <ClCompile Include="src\effects.cpp" />
+    <ClCompile Include="src\inventory.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\player.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
@@ -173,6 +174,7 @@
     <ClInclude Include="src\game.h" />
     <ClInclude Include="src\global.h" />
     <ClInclude Include="src\effects.h" />
+    <ClInclude Include="src\inventory.h" />
     <ClInclude Include="src\player.h" />
     <ClInclude Include="src\terrain.h" />
     <ClInclude Include="src\stb_image.h" />

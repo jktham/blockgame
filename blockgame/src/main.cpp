@@ -3,6 +3,7 @@
 #include "game.h"
 #include "terrain.h"
 #include "world.h"
+#include "inventory.h"
 #include "player.h"
 #include "camera.h"
 #include "effects.h"
@@ -36,6 +37,7 @@ int main()
 	game = new Game;
 	//terrain = new Terrain;
 	//world = new World;
+	//inventory = new Inventory;
 	//player = new Player;
 	//camera = new Camera;
 	light = new Light;
@@ -397,7 +399,7 @@ void processInputState(GLFWwindow* window)
 		{
 			if (player->left_delay <= 0)
 			{
-				player->processAction(Action::BLOCK_DESTROY);
+				player->processAction(Action::INTERACT_PRIMARY);
 				player->left_delay = CLICK_DELAY;
 			}
 			player->left_delay -= 1;
@@ -411,7 +413,7 @@ void processInputState(GLFWwindow* window)
 		{
 			if (player->right_delay <= 0)
 			{
-				player->processAction(Action::BLOCK_PLACE);
+				player->processAction(Action::INTERACT_SECONDARY);
 				player->right_delay = CLICK_DELAY;
 			}
 			player->right_delay -= 1;
@@ -457,7 +459,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			fog->enabled = !fog->enabled;
 
 		if (key == GLFW_KEY_K && action == GLFW_PRESS)
-			player->processAction(Action::BLOCK_PICK);
+			player->processAction(Action::INTERACT_TERTIARY);
 
 		if (key == GLFW_KEY_N && action == GLFW_PRESS)
 			world->save("data/save.txt");
@@ -468,6 +470,25 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		{
 			game->quit();
 			game->start();
+		}
+
+		if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
+		{
+			inventory->current_slot -= 1;
+
+			if (inventory->current_slot > 9)
+				inventory->current_slot = 0;
+			if (inventory->current_slot < 0)
+				inventory->current_slot = 9;
+		}
+		if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
+		{
+			inventory->current_slot += 1;
+
+			if (inventory->current_slot > 9)
+				inventory->current_slot = 0;
+			if (inventory->current_slot < 0)
+				inventory->current_slot = 9;
 		}
 	}
 }
@@ -480,7 +501,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 	else if (game->state == State::ALIVE)
 	{
 		if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS)
-			player->processAction(Action::BLOCK_PICK);
+			player->processAction(Action::INTERACT_TERTIARY);
 	}
 }
 
@@ -516,12 +537,12 @@ void mouse_scroll_callback(GLFWwindow* window, double offset_x, double offset_y)
 	}
 	else if (game->state == State::ALIVE)
 	{
-		player->current_type -= (int)offset_y;
+		inventory->current_slot -= (int)offset_y;
 
-		if (player->current_type > MAX_TYPE)
-			player->current_type = 1;
-		if (player->current_type < 1)
-			player->current_type = MAX_TYPE;
+		if (inventory->current_slot > 9)
+			inventory->current_slot = 0;
+		if (inventory->current_slot < 0)
+			inventory->current_slot = 9;
 	}
 }
 

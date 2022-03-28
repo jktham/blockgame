@@ -1,11 +1,11 @@
 #version 460 core
 
 layout (location = 0) in vec2 a_pos;
-layout (location = 1) in vec3 a_color;
+layout (location = 1) in vec4 a_color;
 layout (location = 2) in vec2 a_tex_coord;
 layout (location = 3) in float a_tex_type;
 
-out vec3 color;
+out vec4 color;
 out vec2 tex_coord;
 out float tex_type;
 

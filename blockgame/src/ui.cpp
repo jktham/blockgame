@@ -1,6 +1,7 @@
 #include "ui.h"
 #include "player.h"
 #include "game.h"
+#include "inventory.h"
 #include "global.h"
 
 #include <glad/glad.h>
@@ -38,13 +39,13 @@ void Label::generateMesh()
 		float h = 1.0f * scale;
 
 		std::vector<float> character_vertices = {
-			x,     y + h, color.r, color.g, color.b, ch.tex_coord.x,				 ch.tex_coord.y,				 2.0f,
-			x,     y,     color.r, color.g, color.b, ch.tex_coord.x,				 ch.tex_coord.y + ch.tex_size.y, 2.0f,
-			x + w, y,     color.r, color.g, color.b, ch.tex_coord.x + ch.tex_size.x, ch.tex_coord.y + ch.tex_size.y, 2.0f,
+			x,     y + h, color.r, color.g, color.b, color.a, ch.tex_coord.x,				  ch.tex_coord.y,				  2.0f,
+			x,     y,     color.r, color.g, color.b, color.a, ch.tex_coord.x,				  ch.tex_coord.y + ch.tex_size.y, 2.0f,
+			x + w, y,     color.r, color.g, color.b, color.a, ch.tex_coord.x + ch.tex_size.x, ch.tex_coord.y + ch.tex_size.y, 2.0f,
 
-			x,     y + h, color.r, color.g, color.b, ch.tex_coord.x,				 ch.tex_coord.y,				 2.0f,
-			x + w, y,     color.r, color.g, color.b, ch.tex_coord.x + ch.tex_size.x, ch.tex_coord.y + ch.tex_size.y, 2.0f,
-			x + w, y + h, color.r, color.g, color.b, ch.tex_coord.x + ch.tex_size.x, ch.tex_coord.y,				 2.0f,
+			x,     y + h, color.r, color.g, color.b, color.a, ch.tex_coord.x,				  ch.tex_coord.y,				  2.0f,
+			x + w, y,     color.r, color.g, color.b, color.a, ch.tex_coord.x + ch.tex_size.x, ch.tex_coord.y + ch.tex_size.y, 2.0f,
+			x + w, y + h, color.r, color.g, color.b, color.a, ch.tex_coord.x + ch.tex_size.x, ch.tex_coord.y,				  2.0f,
 		};
 
 		x += ch.width * scale;
@@ -58,13 +59,13 @@ void Button::generateMesh()
 	mesh = {};
 
 	std::vector<float> button_vertices = {
-		pos.x,	 	     pos.y,			  color.r, color.g, color.b, 0.0f, 0.0f, 0.0f,
-		pos.x + width.x, pos.y,			  color.r, color.g, color.b, 0.0f, 0.0f, 0.0f,
-		pos.x + width.x, pos.y + width.y, color.r, color.g, color.b, 0.0f, 0.0f, 0.0f,
+		pos.x,	 	     pos.y,			  color.r, color.g, color.b, color.a, 0.0f, 0.0f, 0.0f,
+		pos.x + width.x, pos.y,			  color.r, color.g, color.b, color.a, 0.0f, 0.0f, 0.0f,
+		pos.x + width.x, pos.y + width.y, color.r, color.g, color.b, color.a, 0.0f, 0.0f, 0.0f,
 
-		pos.x,             pos.y,			  color.r, color.g, color.b, 0.0f, 0.0f, 0.0f,
-		pos.x,			 pos.y + width.y, color.r, color.g, color.b, 0.0f, 0.0f, 0.0f,
-		pos.x + width.x, pos.y + width.y, color.r, color.g, color.b, 0.0f, 0.0f, 0.0f,
+		pos.x,           pos.y,			  color.r, color.g, color.b, color.a, 0.0f, 0.0f, 0.0f,
+		pos.x,			 pos.y + width.y, color.r, color.g, color.b, color.a, 0.0f, 0.0f, 0.0f,
+		pos.x + width.x, pos.y + width.y, color.r, color.g, color.b, color.a, 0.0f, 0.0f, 0.0f,
 	};
 
 	mesh.insert(mesh.end(), button_vertices.begin(), button_vertices.end());
@@ -72,23 +73,23 @@ void Button::generateMesh()
 
 void Button::hover()
 {
-	color = glm::vec3(0.6f);
+	color = glm::vec4(0.6f, 0.6f, 0.6f, 1.0f);
 }
 
 void Button::click()
 {
-	color = glm::vec3(0.4f);
+	color = glm::vec4(0.4f, 0.4f, 0.4f, 1.0f);
 }
 
 void Button::release()
 {
-	color = glm::vec3(0.2f);
+	color = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
 	action();
 }
 
 void Button::reset()
 {
-	color = glm::vec3(1.0f);
+	color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 void UI::generateFont()
@@ -137,7 +138,7 @@ void UI::createMenu()
 	Button start_button{};
 	start_button.pos = glm::vec2(WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f - 300);
 	start_button.width = glm::vec2(800, 200);
-	start_button.color = glm::vec3(1.0f);
+	start_button.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	start_button.action = []() {
 		game->start();
 	};
@@ -146,7 +147,7 @@ void UI::createMenu()
 	Button quit_button{};
 	quit_button.pos = glm::vec2(WINDOW_WIDTH / 2.0f - 400, WINDOW_HEIGHT / 2.0f + 100);
 	quit_button.width = glm::vec2(800, 200);
-	quit_button.color = glm::vec3(1.0f);
+	quit_button.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	quit_button.action = []() {
 		glfwSetWindowShouldClose(window, true);
 	};
@@ -154,21 +155,21 @@ void UI::createMenu()
 
 	Label start_label{};
 	start_label.pos = glm::vec2(start_button.pos.x, start_button.pos.y);
-	start_label.color = glm::vec3(0.0f);
+	start_label.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	start_label.scale = 80.0f;
 	start_label.text = "Start";
 	labels.push_back(start_label);
 
 	Label quit_label{};
 	quit_label.pos = glm::vec2(quit_button.pos.x, quit_button.pos.y);
-	quit_label.color = glm::vec3(0.0f);
+	quit_label.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	quit_label.scale = 80.0f;
 	quit_label.text = "Quit";
 	labels.push_back(quit_label);
 
 	Label info_label{};
 	info_label.pos = glm::vec2(WINDOW_WIDTH - 450, WINDOW_HEIGHT / 2.0f - 300);
-	info_label.color = glm::vec3(1.0f);
+	info_label.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	info_label.scale = 36.0f;
 	info_label.text = "WASD: Movement§SHIFT: Sprint§SPACE: Jump§§M1/J: Place Block§M2/L: Break Block§M3/K: Pick Block§MW: Change Type§§N: Save World§M: Load World§R: Reset World§§Q: Toggle Noclip§F: Toggle Fog§TAB: Toggle Wireframe§§ENTER: Start§ESCAPE: Quit";
 	labels.push_back(info_label);
@@ -236,12 +237,8 @@ void UI::generateMenuMesh()
 
 void UI::updateHud()
 {
-	if (player->current_type != player->last_type)
-	{
-		generateHudMesh();
-		updateVAO();
-	}
-	player->last_type = player->current_type;
+	generateHudMesh();
+	updateVAO();
 }
 
 void UI::generateHudMesh()
@@ -249,39 +246,90 @@ void UI::generateHudMesh()
 	mesh = {};
 
 	std::vector<float> crosshair_vertices = {
-		// pos.x, pos.y, color.r, color.g, color.b, tex.x, tex.y, tex_type
-		WINDOW_WIDTH / 2.0f - CROSSHAIR_LENGTH, WINDOW_HEIGHT / 2.0f - CROSSHAIR_WIDTH, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-		WINDOW_WIDTH / 2.0f + CROSSHAIR_LENGTH, WINDOW_HEIGHT / 2.0f - CROSSHAIR_WIDTH, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-		WINDOW_WIDTH / 2.0f + CROSSHAIR_LENGTH, WINDOW_HEIGHT / 2.0f + CROSSHAIR_WIDTH, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+		// pos.x, pos.y, color.r, color.g, color.b, color.a, tex.x, tex.y, tex_type -> block texture if 1, font texture if 2
+		WINDOW_WIDTH / 2.0f - CROSSHAIR_LENGTH, WINDOW_HEIGHT / 2.0f - CROSSHAIR_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+		WINDOW_WIDTH / 2.0f + CROSSHAIR_LENGTH, WINDOW_HEIGHT / 2.0f - CROSSHAIR_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+		WINDOW_WIDTH / 2.0f + CROSSHAIR_LENGTH, WINDOW_HEIGHT / 2.0f + CROSSHAIR_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
 
-		WINDOW_WIDTH / 2.0f - CROSSHAIR_LENGTH, WINDOW_HEIGHT / 2.0f - CROSSHAIR_WIDTH, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-		WINDOW_WIDTH / 2.0f - CROSSHAIR_LENGTH, WINDOW_HEIGHT / 2.0f + CROSSHAIR_WIDTH, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-		WINDOW_WIDTH / 2.0f + CROSSHAIR_LENGTH, WINDOW_HEIGHT / 2.0f + CROSSHAIR_WIDTH, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+		WINDOW_WIDTH / 2.0f - CROSSHAIR_LENGTH, WINDOW_HEIGHT / 2.0f - CROSSHAIR_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+		WINDOW_WIDTH / 2.0f - CROSSHAIR_LENGTH, WINDOW_HEIGHT / 2.0f + CROSSHAIR_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+		WINDOW_WIDTH / 2.0f + CROSSHAIR_LENGTH, WINDOW_HEIGHT / 2.0f + CROSSHAIR_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
 
-		WINDOW_WIDTH / 2.0f - CROSSHAIR_WIDTH, WINDOW_HEIGHT / 2.0f - CROSSHAIR_LENGTH, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-		WINDOW_WIDTH / 2.0f + CROSSHAIR_WIDTH, WINDOW_HEIGHT / 2.0f - CROSSHAIR_LENGTH, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-		WINDOW_WIDTH / 2.0f + CROSSHAIR_WIDTH, WINDOW_HEIGHT / 2.0f + CROSSHAIR_LENGTH, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+		WINDOW_WIDTH / 2.0f - CROSSHAIR_WIDTH, WINDOW_HEIGHT / 2.0f - CROSSHAIR_LENGTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+		WINDOW_WIDTH / 2.0f + CROSSHAIR_WIDTH, WINDOW_HEIGHT / 2.0f - CROSSHAIR_LENGTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+		WINDOW_WIDTH / 2.0f + CROSSHAIR_WIDTH, WINDOW_HEIGHT / 2.0f + CROSSHAIR_LENGTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
 
-		WINDOW_WIDTH / 2.0f - CROSSHAIR_WIDTH, WINDOW_HEIGHT / 2.0f - CROSSHAIR_LENGTH, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-		WINDOW_WIDTH / 2.0f - CROSSHAIR_WIDTH, WINDOW_HEIGHT / 2.0f + CROSSHAIR_LENGTH, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-		WINDOW_WIDTH / 2.0f + CROSSHAIR_WIDTH, WINDOW_HEIGHT / 2.0f + CROSSHAIR_LENGTH, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+		WINDOW_WIDTH / 2.0f - CROSSHAIR_WIDTH, WINDOW_HEIGHT / 2.0f - CROSSHAIR_LENGTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+		WINDOW_WIDTH / 2.0f - CROSSHAIR_WIDTH, WINDOW_HEIGHT / 2.0f + CROSSHAIR_LENGTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+		WINDOW_WIDTH / 2.0f + CROSSHAIR_WIDTH, WINDOW_HEIGHT / 2.0f + CROSSHAIR_LENGTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
 	};
-
-	float atlas_y = ATLAS_SIZE_Y - player->current_type;
-
-	std::vector<float> block_icon_vertices = {
-		// pos.x, pos.y, color.r, color.g, color.b, tex.x, tex.y, tex_type -> use texture if > 0
-		BLOCK_ICON_POS_X + 0.0f * BLOCK_ICON_WIDTH, BLOCK_ICON_POS_Y + 0.0f * BLOCK_ICON_WIDTH, 0.0f, 0.0f, 0.0f, 0.0f / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
-		BLOCK_ICON_POS_X + 1.0f * BLOCK_ICON_WIDTH, BLOCK_ICON_POS_Y + 0.0f * BLOCK_ICON_WIDTH, 0.0f, 0.0f, 0.0f, 1.0f / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
-		BLOCK_ICON_POS_X + 1.0f * BLOCK_ICON_WIDTH, BLOCK_ICON_POS_Y + 1.0f * BLOCK_ICON_WIDTH, 0.0f, 0.0f, 0.0f, 1.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
-
-		BLOCK_ICON_POS_X + 0.0f * BLOCK_ICON_WIDTH, BLOCK_ICON_POS_Y + 0.0f * BLOCK_ICON_WIDTH, 0.0f, 0.0f, 0.0f, 0.0f / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
-		BLOCK_ICON_POS_X + 0.0f * BLOCK_ICON_WIDTH, BLOCK_ICON_POS_Y + 1.0f * BLOCK_ICON_WIDTH, 0.0f, 0.0f, 0.0f, 0.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
-		BLOCK_ICON_POS_X + 1.0f * BLOCK_ICON_WIDTH, BLOCK_ICON_POS_Y + 1.0f * BLOCK_ICON_WIDTH, 0.0f, 0.0f, 0.0f, 1.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
-	};
-
 	mesh.insert(mesh.end(), crosshair_vertices.begin(), crosshair_vertices.end());
-	mesh.insert(mesh.end(), block_icon_vertices.begin(), block_icon_vertices.end());
+
+	for (int i = 0; i < 10; i++)
+	{
+		float atlas_y = ATLAS_SIZE_Y - inventory->slots[i].id;
+
+		if (inventory->slots[i].id == 0)
+		{
+			std::vector<float> slot_vertices
+			{
+				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 0.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 0.0f * SLOT_WIDTH, 0.1f, 0.1f, 0.1f, 0.8f, 0.0f / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f,
+				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 1.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 0.0f * SLOT_WIDTH, 0.1f, 0.1f, 0.1f, 0.8f, 1.0f / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f,
+				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 1.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 1.0f * SLOT_WIDTH, 0.1f, 0.1f, 0.1f, 0.8f, 1.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f,
+
+				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 0.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 0.0f * SLOT_WIDTH, 0.1f, 0.1f, 0.1f, 0.8f, 0.0f / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f,
+				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 0.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 1.0f * SLOT_WIDTH, 0.1f, 0.1f, 0.1f, 0.8f, 0.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f,
+				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 1.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 1.0f * SLOT_WIDTH, 0.1f, 0.1f, 0.1f, 0.8f, 1.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f,
+			};
+			mesh.insert(mesh.end(), slot_vertices.begin(), slot_vertices.end());
+		}
+		else
+		{
+			std::vector<float> slot_vertices =
+			{
+				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 0.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 0.0f * SLOT_WIDTH, 1.0f, 1.0f, 1.0f, 0.8f, 0.0f / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
+				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 1.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 0.0f * SLOT_WIDTH, 1.0f, 1.0f, 1.0f, 0.8f, 1.0f / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
+				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 1.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 1.0f * SLOT_WIDTH, 1.0f, 1.0f, 1.0f, 0.8f, 1.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
+
+				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 0.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 0.0f * SLOT_WIDTH, 1.0f, 1.0f, 1.0f, 0.8f, 0.0f / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
+				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 0.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 1.0f * SLOT_WIDTH, 1.0f, 1.0f, 1.0f, 0.8f, 0.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
+				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 1.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 1.0f * SLOT_WIDTH, 1.0f, 1.0f, 1.0f, 0.8f, 1.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
+			};
+			mesh.insert(mesh.end(), slot_vertices.begin(), slot_vertices.end());
+		}
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+		if (inventory->slots[i].amount > 0)
+		{
+			Label slot_label{};
+			slot_label.pos = glm::vec2(WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 0.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 0.0f * SLOT_WIDTH);
+			slot_label.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+			slot_label.scale = 40.0f;
+			slot_label.text = std::to_string(inventory->slots[i].amount);
+			slot_label.generateMesh();
+
+			mesh.insert(mesh.end(), slot_label.mesh.begin(), slot_label.mesh.end());
+		}
+	}
+
+	float atlas_y = ATLAS_SIZE_Y - inventory->slots[inventory->current_slot].id;
+
+	if (inventory->slots[inventory->current_slot].id != 0)
+	{
+		std::vector<float> block_icon_vertices =
+		{
+			BLOCK_ICON_POS_X + 0.0f * BLOCK_ICON_WIDTH, BLOCK_ICON_POS_Y + 0.0f * BLOCK_ICON_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
+			BLOCK_ICON_POS_X + 1.0f * BLOCK_ICON_WIDTH, BLOCK_ICON_POS_Y + 0.0f * BLOCK_ICON_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
+			BLOCK_ICON_POS_X + 1.0f * BLOCK_ICON_WIDTH, BLOCK_ICON_POS_Y + 1.0f * BLOCK_ICON_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
+
+			BLOCK_ICON_POS_X + 0.0f * BLOCK_ICON_WIDTH, BLOCK_ICON_POS_Y + 0.0f * BLOCK_ICON_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
+			BLOCK_ICON_POS_X + 0.0f * BLOCK_ICON_WIDTH, BLOCK_ICON_POS_Y + 1.0f * BLOCK_ICON_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
+			BLOCK_ICON_POS_X + 1.0f * BLOCK_ICON_WIDTH, BLOCK_ICON_POS_Y + 1.0f * BLOCK_ICON_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
+		};
+		mesh.insert(mesh.end(), block_icon_vertices.begin(), block_icon_vertices.end());
+	}
 }
 
 void UI::updateVAO()
@@ -296,25 +344,25 @@ void UI::updateVAO()
 
 	// vertex attribute (position)
 	glBindBuffer(GL_ARRAY_BUFFER, ui_VBO);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// vertex attribute (color)
 	glBindBuffer(GL_ARRAY_BUFFER, ui_VBO);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(2 * sizeof(float)));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(2 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// vertex attribute (texture)
 	glBindBuffer(GL_ARRAY_BUFFER, ui_VBO);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// vertex attribute (type)
 	glBindBuffer(GL_ARRAY_BUFFER, ui_VBO);
-	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(7 * sizeof(float)));
+	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(8 * sizeof(float)));
 	glEnableVertexAttribArray(3);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 

@@ -8,6 +8,7 @@
 class Game;
 class Terrain;
 class World;
+class Inventory;
 class Player;
 class Camera;
 class Light;
@@ -19,6 +20,7 @@ class Threadpool;
 extern Game* game;
 extern Terrain* terrain;
 extern World* world;
+extern Inventory* inventory;
 extern Player* player;
 extern Camera* camera;
 extern Light* light;

@@ -19,7 +19,7 @@ class Label
 {
 public:
 	glm::vec2 pos = glm::vec3(0.0f);
-	glm::vec3 color = glm::vec3(0.0f);
+	glm::vec4 color = glm::vec4(0.0f);
 	std::vector<float> mesh;
 	std::string text = "";
 	float scale = 1.0f;
@@ -32,7 +32,7 @@ class Button
 public:
 	glm::vec2 pos = glm::vec3(0.0f);
 	glm::vec2 width = glm::vec3(0.0f);
-	glm::vec3 color = glm::vec3(0.0f);
+	glm::vec4 color = glm::vec4(0.0f);
 	bool clicked = false;
 	std::vector<float> mesh;
 	std::function<void()> action = []() {};
@@ -54,6 +54,8 @@ public:
 	const float BLOCK_ICON_POS_X = WINDOW_WIDTH - 200.0f;
 	const float BLOCK_ICON_POS_Y = WINDOW_HEIGHT - 200.0f;
 	const float BLOCK_ICON_WIDTH = 180.0f;
+
+	float SLOT_WIDTH = 80.0f;
 
 	std::vector<float> mesh;
 	std::vector<Button> buttons;

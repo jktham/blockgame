@@ -1,6 +1,7 @@
 ﻿#include "player.h"
 #include "world.h"
 #include "camera.h"
+#include "inventory.h"
 #include "global.h"
 
 #include <glm/glm.hpp>
@@ -189,15 +190,22 @@ void Player::processAction(Action action)
 	if (action == Action::MOVE_JUMP)
 		applyJump();
 
-	if (action == Action::BLOCK_DESTROY)
+	if (action == Action::INTERACT_PRIMARY)
 		world->breakBlock(camera->getRayIntersect());
-	if (action == Action::BLOCK_PLACE)
-		world->placeBlock(camera->getRayIntersect(), current_type);
-	if (action == Action::BLOCK_PICK)
+
+	if (action == Action::INTERACT_SECONDARY)
+		if (inventory->items[inventory->slots[inventory->current_slot].id].placeable)
+			world->placeBlock(camera->getRayIntersect(), inventory->slots[inventory->current_slot].id);
+
+	if (action == Action::INTERACT_TERTIARY)
 	{
 		int type = world->getBlockType(camera->getRayIntersect());
 		if (type != 0)
-			current_type = type;
+			for (int i = 0; i < 10; i++)
+			{
+				if (inventory->slots[inventory->current_slot].id == type)
+					inventory->current_slot = i;
+			}
 	}
 }
 

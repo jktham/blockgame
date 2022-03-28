@@ -8,6 +8,7 @@
 Game* game;
 Terrain* terrain;
 World* world;
+Inventory* inventory;
 Player* player;
 Camera* camera;
 Light* light;

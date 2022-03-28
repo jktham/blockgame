@@ -1,6 +1,7 @@
 ﻿#include "game.h"
 #include "terrain.h"
 #include "world.h"
+#include "inventory.h"
 #include "player.h"
 #include "camera.h"
 #include "global.h"
@@ -16,6 +17,7 @@ void Game::start()
 
 	terrain = new Terrain;
 	world = new World;
+	inventory = new Inventory;
 	player = new Player;
 	camera = new Camera;
 
@@ -24,6 +26,9 @@ void Game::start()
 	world->generateWorldMesh();
 	world->updateExposedBlocks();
 	world->updateVAO(world->complete_mesh);
+
+	inventory->createItems();
+	inventory->giveItem(5, 64);
 }
 
 void Game::quit()
@@ -32,6 +37,7 @@ void Game::quit()
 
 	delete terrain;
 	delete world;
+	delete inventory;
 	delete player;
 	delete camera;
 }

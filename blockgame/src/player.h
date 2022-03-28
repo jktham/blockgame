@@ -11,9 +11,9 @@ enum class Action
 	MOVE_LEFT,
 	MOVE_RIGHT,
 	MOVE_JUMP,
-	BLOCK_PLACE,
-	BLOCK_DESTROY,
-	BLOCK_PICK,
+	INTERACT_PRIMARY,
+	INTERACT_SECONDARY,
+	INTERACT_TERTIARY,
 };
 
 class Player
@@ -46,9 +46,6 @@ public:
 
 	bool noclip = false;
 	bool sprint = false;
-
-	int current_type = 5;
-	int last_type = 0;
 
 	int left_delay = 0;
 	int right_delay = 0;

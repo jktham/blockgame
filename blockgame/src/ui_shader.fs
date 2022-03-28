@@ -1,6 +1,6 @@
 #version 460 core
 
-in vec3 color;
+in vec4 color;
 in vec2 tex_coord;
 in float tex_type;
 
@@ -13,14 +13,14 @@ void main()
 {
     if (tex_type == 2.0f)
     {
-        frag_color = vec4(color, 1.0f) * texture(font_texture, tex_coord);
+        frag_color = color * texture(font_texture, tex_coord);
     }
     else if (tex_type == 1.0f)
     {
-        frag_color = texture(atlas_texture, tex_coord);
+        frag_color = color * texture(atlas_texture, tex_coord);
     }
     else
     {
-        frag_color = vec4(color, 1.0f);
+        frag_color = color;
     }
 }

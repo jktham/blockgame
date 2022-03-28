@@ -1,5 +1,6 @@
 ﻿#include "world.h"
 #include "terrain.h"
+#include "inventory.h"
 #include "global.h"
 
 #include <glad/glad.h>
@@ -465,6 +466,8 @@ void World::placeBlock(glm::vec3 position, int type)
 				{
 					if (pos.x >= chunks[m][n].chunk_pos.x && pos.x < chunks[m][n].chunk_pos.x + CHUNK_SIZE.x && pos.y >= chunks[m][n].chunk_pos.y && pos.y < chunks[m][n].chunk_pos.y + CHUNK_SIZE.y)
 					{
+						inventory->removeItem();
+
 						chunks[m][n].blocks[(int)(pos.x - chunks[m][n].chunk_pos.x)][(int)(pos.y - chunks[m][n].chunk_pos.y)][(int)pos.z].type = type;
 						changes.push_back(Change(pos, type));
 
@@ -499,13 +502,13 @@ void World::breakBlock(glm::vec3 position)
 				{
 					if (chunks[m][n].blocks[(int)(pos.x - chunks[m][n].chunk_pos.x)][(int)(pos.y - chunks[m][n].chunk_pos.y)][(int)pos.z].type != 4)
 					{
+						inventory->giveItem(chunks[m][n].blocks[(int)(pos.x - chunks[m][n].chunk_pos.x)][(int)(pos.y - chunks[m][n].chunk_pos.y)][(int)pos.z].type, 1);
+
 						chunks[m][n].blocks[(int)(pos.x - chunks[m][n].chunk_pos.x)][(int)(pos.y - chunks[m][n].chunk_pos.y)][(int)pos.z].type = 0;
 						changes.push_back(Change(pos, 0));
 
 						if (pos.z - 1 < chunks[m][n].min_z)
-						{
 							chunks[m][n].min_z = (int)pos.z - 1;
-						}
 
 						generateChunkMesh(m - 1, m + 2, n - 1, n + 2);
 						generateWorldMesh();
