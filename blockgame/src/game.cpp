@@ -21,13 +21,13 @@ void Game::start()
 	player = new Player;
 	camera = new Camera;
 
-	world->createChunks();
+	world->initializeChunks();
 	world->generateChunkMesh();
 	world->generateWorldMesh();
 	world->updateExposedBlocks();
 	world->updateVAO(world->complete_mesh);
 
-	inventory->createItems();
+	inventory->initializeItems();
 	inventory->giveItem(5, 64);
 }
 

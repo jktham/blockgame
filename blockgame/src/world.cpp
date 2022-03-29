@@ -81,7 +81,7 @@ void Chunk::generateTerrain()
 	std::cout << "generated terrain: (" << chunk_pos.x << ", " << chunk_pos.y << "), " << ms_int << "\n";
 }
 
-void World::createChunks()
+void World::initializeChunks()
 {
 	for (int m = 0; m < WORLD_SIZE.x; m++)
 	{
@@ -466,7 +466,7 @@ void World::placeBlock(glm::vec3 position, int type)
 				{
 					if (pos.x >= chunks[m][n].chunk_pos.x && pos.x < chunks[m][n].chunk_pos.x + CHUNK_SIZE.x && pos.y >= chunks[m][n].chunk_pos.y && pos.y < chunks[m][n].chunk_pos.y + CHUNK_SIZE.y)
 					{
-						inventory->removeItem();
+						inventory->removeItem(type);
 
 						chunks[m][n].blocks[(int)(pos.x - chunks[m][n].chunk_pos.x)][(int)(pos.y - chunks[m][n].chunk_pos.y)][(int)pos.z].type = type;
 						changes.push_back(Change(pos, type));

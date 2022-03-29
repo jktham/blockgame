@@ -59,7 +59,7 @@ public:
 	bool meshgen_done = false;
 
 	// set up initial grid of chunks
-	void createChunks();
+	void initializeChunks();
 
 	// check for chunk change, shift chunks, generate mesh and update VAO
 	void updateChunks(glm::vec2 shift_direction);

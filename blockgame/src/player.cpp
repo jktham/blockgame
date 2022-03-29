@@ -200,12 +200,7 @@ void Player::processAction(Action action)
 	if (action == Action::INTERACT_TERTIARY)
 	{
 		int type = world->getBlockType(camera->getRayIntersect());
-		if (type != 0)
-			for (int i = 0; i < 10; i++)
-			{
-				if (inventory->slots[inventory->current_slot].id == type)
-					inventory->current_slot = i;
-			}
+		inventory->selectItem(type);
 	}
 }
 

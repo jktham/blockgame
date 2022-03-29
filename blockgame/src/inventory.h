@@ -27,9 +27,9 @@ public:
 	std::vector<Item> items = std::vector<Item>(6);
 	std::vector<Stack> slots = std::vector<Stack>(10);
 	int current_slot = 0;
-	int last_slot = -1;
 
-	void createItems();
+	void initializeItems();
 	void giveItem(int id, int amount);
-	void removeItem();
+	void removeItem(int id);
+	void selectItem(int id);
 };

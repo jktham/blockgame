@@ -5,7 +5,7 @@
 #include <vector>
 #include <functional>
 
-void Inventory::createItems()
+void Inventory::initializeItems()
 {
 	items[0].name = "";
 	items[0].stacksize = 0;
@@ -48,14 +48,15 @@ void Inventory::giveItem(int id, int amount)
 {
 	for (int i = 0; i < slots.size(); i++)
 	{
-		if (slots[i].id == id && slots[i].amount <= items[slots[i].id].stacksize)
+		if (slots[i].id == id && slots[i].amount < items[slots[i].id].stacksize)
 		{
 			slots[i].id = id;
 			slots[i].amount += amount;
 			if (slots[i].amount > items[slots[i].id].stacksize)
 			{
-				giveItem(id, slots[i].amount - items[slots[i].id].stacksize);
+				int overflow = slots[i].amount - items[slots[i].id].stacksize;
 				slots[i].amount = items[slots[i].id].stacksize;
+				giveItem(id, overflow);
 			}
 			return;
 		}
@@ -66,14 +67,55 @@ void Inventory::giveItem(int id, int amount)
 		{
 			slots[i].id = id;
 			slots[i].amount = amount;
+			if (slots[i].amount > items[slots[i].id].stacksize)
+			{
+				int overflow = slots[i].amount - items[slots[i].id].stacksize;
+				slots[i].amount = items[slots[i].id].stacksize;
+				giveItem(id, overflow);
+			}
 			return;
 		}
 	}
 }
 
-void Inventory::removeItem()
+void Inventory::removeItem(int id)
 {
-	slots[current_slot].amount -= 1;
-	if (slots[current_slot].amount <= 0)
-		slots[current_slot].id = 0;
+	if (slots[current_slot].id == id)
+	{
+		slots[current_slot].amount -= 1;
+		if (slots[current_slot].amount <= 0)
+		{
+			slots[current_slot].id = 0;
+		}
+	}
+	else
+	{
+		for (int i = 0; i < slots.size(); i++)
+		{
+			if (slots[i].id == id)
+			{
+				slots[i].amount -= 1;
+				if (slots[i].amount <= 0)
+				{
+					slots[i].id = 0;
+				}
+				return;
+			}
+		}
+	}
+}
+
+void Inventory::selectItem(int id)
+{
+	if (id != 0)
+	{
+		for (int i = 0; i < slots.size(); i++)
+		{
+			if (slots[i].id == id)
+			{
+				current_slot = i;
+				return;
+			}
+		}
+	}
 }
