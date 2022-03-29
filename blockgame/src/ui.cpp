@@ -15,6 +15,23 @@
 #include <map>
 #include <iostream>
 
+void Rectangle::generateMesh()
+{
+	mesh = {};
+
+	std::vector<float> vertices = {
+		pos.x,	 	     pos.y,			  color.r, color.g, color.b, color.a, tex_pos.x,			   tex_pos.y + tex_width.y, (float)tex_mode,
+		pos.x + width.x, pos.y,			  color.r, color.g, color.b, color.a, tex_pos.x + tex_width.x, tex_pos.y + tex_width.y, (float)tex_mode,
+		pos.x + width.x, pos.y + width.y, color.r, color.g, color.b, color.a, tex_pos.x + tex_width.x, tex_pos.y,				(float)tex_mode,
+
+		pos.x,           pos.y,			  color.r, color.g, color.b, color.a, tex_pos.x,			   tex_pos.y + tex_width.y,	(float)tex_mode,
+		pos.x,			 pos.y + width.y, color.r, color.g, color.b, color.a, tex_pos.x,			   tex_pos.y,				(float)tex_mode,
+		pos.x + width.x, pos.y + width.y, color.r, color.g, color.b, color.a, tex_pos.x + tex_width.x, tex_pos.y,				(float)tex_mode,
+	};
+
+	mesh.insert(mesh.end(), vertices.begin(), vertices.end());
+}
+
 void Label::generateMesh()
 {
 	mesh = {};
@@ -39,13 +56,13 @@ void Label::generateMesh()
 		float h = 1.0f * scale;
 
 		std::vector<float> character_vertices = {
-			x,     y + h, color.r, color.g, color.b, color.a, ch.tex_coord.x,				  ch.tex_coord.y,				  2.0f,
-			x,     y,     color.r, color.g, color.b, color.a, ch.tex_coord.x,				  ch.tex_coord.y + ch.tex_size.y, 2.0f,
-			x + w, y,     color.r, color.g, color.b, color.a, ch.tex_coord.x + ch.tex_size.x, ch.tex_coord.y + ch.tex_size.y, 2.0f,
+			x,     y + h, color.r, color.g, color.b, color.a, ch.tex_pos.x,				     ch.tex_pos.y,				    2.0f,
+			x,     y,     color.r, color.g, color.b, color.a, ch.tex_pos.x,				     ch.tex_pos.y + ch.tex_width.y, 2.0f,
+			x + w, y,     color.r, color.g, color.b, color.a, ch.tex_pos.x + ch.tex_width.x, ch.tex_pos.y + ch.tex_width.y, 2.0f,
 
-			x,     y + h, color.r, color.g, color.b, color.a, ch.tex_coord.x,				  ch.tex_coord.y,				  2.0f,
-			x + w, y,     color.r, color.g, color.b, color.a, ch.tex_coord.x + ch.tex_size.x, ch.tex_coord.y + ch.tex_size.y, 2.0f,
-			x + w, y + h, color.r, color.g, color.b, color.a, ch.tex_coord.x + ch.tex_size.x, ch.tex_coord.y,				  2.0f,
+			x,     y + h, color.r, color.g, color.b, color.a, ch.tex_pos.x,				     ch.tex_pos.y,				    2.0f,
+			x + w, y,     color.r, color.g, color.b, color.a, ch.tex_pos.x + ch.tex_width.x, ch.tex_pos.y + ch.tex_width.y, 2.0f,
+			x + w, y + h, color.r, color.g, color.b, color.a, ch.tex_pos.x + ch.tex_width.x, ch.tex_pos.y,				    2.0f,
 		};
 
 		x += ch.width * scale;
@@ -58,7 +75,7 @@ void Button::generateMesh()
 {
 	mesh = {};
 
-	std::vector<float> button_vertices = {
+	std::vector<float> vertices = {
 		pos.x,	 	     pos.y,			  color.r, color.g, color.b, color.a, 0.0f, 0.0f, 0.0f,
 		pos.x + width.x, pos.y,			  color.r, color.g, color.b, color.a, 0.0f, 0.0f, 0.0f,
 		pos.x + width.x, pos.y + width.y, color.r, color.g, color.b, color.a, 0.0f, 0.0f, 0.0f,
@@ -68,7 +85,7 @@ void Button::generateMesh()
 		pos.x + width.x, pos.y + width.y, color.r, color.g, color.b, color.a, 0.0f, 0.0f, 0.0f,
 	};
 
-	mesh.insert(mesh.end(), button_vertices.begin(), button_vertices.end());
+	mesh.insert(mesh.end(), vertices.begin(), vertices.end());
 }
 
 void Button::hover()
@@ -170,8 +187,8 @@ void UI::createMenu()
 	Label info_label{};
 	info_label.pos = glm::vec2(WINDOW_WIDTH - 450, WINDOW_HEIGHT / 2.0f - 300);
 	info_label.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	info_label.scale = 36.0f;
-	info_label.text = "WASD: Movement§SHIFT: Sprint§SPACE: Jump§§M1/J: Place Block§M2/L: Break Block§M3/K: Pick Block§MW: Change Type§§N: Save World§M: Load World§R: Reset World§§Q: Toggle Noclip§F: Toggle Fog§TAB: Toggle Wireframe§§ENTER: Start§ESCAPE: Quit";
+	info_label.scale = 30.0f;
+	info_label.text = "WASD: Movement§SHIFT: Sprint§SPACE: Jump§§M1/J: Break Block§M2/L: Place Block§M3/K: Pick Block§MW/0-9: Select Slot§§N: Save World§M: Load World§R: Reset World§§Q: Toggle Noclip§F: Toggle Fog§TAB: Toggle Wireframe§§ENTER: Start§ESCAPE: Quit";
 	labels.push_back(info_label);
 }
 
@@ -245,90 +262,73 @@ void UI::generateHudMesh()
 {
 	mesh = {};
 
-	std::vector<float> crosshair_vertices = {
-		// pos.x, pos.y, color.r, color.g, color.b, color.a, tex.x, tex.y, tex_type -> block texture if 1, font texture if 2
-		WINDOW_WIDTH / 2.0f - CROSSHAIR_LENGTH, WINDOW_HEIGHT / 2.0f - CROSSHAIR_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-		WINDOW_WIDTH / 2.0f + CROSSHAIR_LENGTH, WINDOW_HEIGHT / 2.0f - CROSSHAIR_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-		WINDOW_WIDTH / 2.0f + CROSSHAIR_LENGTH, WINDOW_HEIGHT / 2.0f + CROSSHAIR_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+	Rectangle crosshair_h{};
+	crosshair_h.pos = glm::vec2(WINDOW_WIDTH / 2.0f - CROSSHAIR_LENGTH / 2.0f, WINDOW_HEIGHT / 2.0f - CROSSHAIR_WIDTH / 2.0f);
+	crosshair_h.width = glm::vec2(CROSSHAIR_LENGTH, CROSSHAIR_WIDTH);
+	crosshair_h.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	crosshair_h.generateMesh();
+	mesh.insert(mesh.end(), crosshair_h.mesh.begin(), crosshair_h.mesh.end());
 
-		WINDOW_WIDTH / 2.0f - CROSSHAIR_LENGTH, WINDOW_HEIGHT / 2.0f - CROSSHAIR_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-		WINDOW_WIDTH / 2.0f - CROSSHAIR_LENGTH, WINDOW_HEIGHT / 2.0f + CROSSHAIR_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-		WINDOW_WIDTH / 2.0f + CROSSHAIR_LENGTH, WINDOW_HEIGHT / 2.0f + CROSSHAIR_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-
-		WINDOW_WIDTH / 2.0f - CROSSHAIR_WIDTH, WINDOW_HEIGHT / 2.0f - CROSSHAIR_LENGTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-		WINDOW_WIDTH / 2.0f + CROSSHAIR_WIDTH, WINDOW_HEIGHT / 2.0f - CROSSHAIR_LENGTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-		WINDOW_WIDTH / 2.0f + CROSSHAIR_WIDTH, WINDOW_HEIGHT / 2.0f + CROSSHAIR_LENGTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-
-		WINDOW_WIDTH / 2.0f - CROSSHAIR_WIDTH, WINDOW_HEIGHT / 2.0f - CROSSHAIR_LENGTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-		WINDOW_WIDTH / 2.0f - CROSSHAIR_WIDTH, WINDOW_HEIGHT / 2.0f + CROSSHAIR_LENGTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-		WINDOW_WIDTH / 2.0f + CROSSHAIR_WIDTH, WINDOW_HEIGHT / 2.0f + CROSSHAIR_LENGTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-	};
-	mesh.insert(mesh.end(), crosshair_vertices.begin(), crosshair_vertices.end());
+	Rectangle crosshair_v{};
+	crosshair_v.pos = glm::vec2(WINDOW_WIDTH / 2.0f - CROSSHAIR_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f - CROSSHAIR_LENGTH / 2.0f);
+	crosshair_v.width = glm::vec2(CROSSHAIR_WIDTH, CROSSHAIR_LENGTH);
+	crosshair_v.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	crosshair_v.generateMesh();
+	mesh.insert(mesh.end(), crosshair_v.mesh.begin(), crosshair_v.mesh.end());
 
 	for (int i = 0; i < 10; i++)
 	{
-		float atlas_y = ATLAS_SIZE_Y - inventory->slots[i].id;
+		Rectangle slot{};
+		slot.pos = glm::vec2(HOTBAR_POS_X + SLOT_GAP / 2.0f - (5 - i) * (SLOT_WIDTH + SLOT_GAP), HOTBAR_POS_Y);
+		slot.width = glm::vec2(SLOT_WIDTH, SLOT_WIDTH);
+		slot.color = (i == inventory->current_slot) ? glm::vec4(0.1f, 0.1f, 0.1f, 0.9f) : glm::vec4(0.1f, 0.1f, 0.1f, 0.5f);
+		slot.generateMesh();
+		mesh.insert(mesh.end(), slot.mesh.begin(), slot.mesh.end());
 
-		if (inventory->slots[i].id == 0)
+		if (inventory->slots[i].id != 0)
 		{
-			std::vector<float> slot_vertices
-			{
-				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 0.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 0.0f * SLOT_WIDTH, 0.1f, 0.1f, 0.1f, 0.8f, 0.0f / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f,
-				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 1.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 0.0f * SLOT_WIDTH, 0.1f, 0.1f, 0.1f, 0.8f, 1.0f / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f,
-				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 1.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 1.0f * SLOT_WIDTH, 0.1f, 0.1f, 0.1f, 0.8f, 1.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f,
-
-				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 0.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 0.0f * SLOT_WIDTH, 0.1f, 0.1f, 0.1f, 0.8f, 0.0f / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f,
-				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 0.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 1.0f * SLOT_WIDTH, 0.1f, 0.1f, 0.1f, 0.8f, 0.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f,
-				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 1.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 1.0f * SLOT_WIDTH, 0.1f, 0.1f, 0.1f, 0.8f, 1.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 0.0f,
-			};
-			mesh.insert(mesh.end(), slot_vertices.begin(), slot_vertices.end());
+			Rectangle slot_icon{};
+			slot_icon.pos = glm::vec2(slot.pos.x + (SLOT_WIDTH - SLOT_ICON_WIDTH) / 2.0f, slot.pos.y + (SLOT_WIDTH - SLOT_ICON_WIDTH) / 2.0f);
+			slot_icon.width = glm::vec2(SLOT_ICON_WIDTH, SLOT_ICON_WIDTH);
+			slot_icon.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+			slot_icon.tex_pos = glm::vec2(0.0f, (ATLAS_SIZE_Y - inventory->slots[i].id) / ATLAS_SIZE_Y);
+			slot_icon.tex_width = glm::vec2(1.0f / ATLAS_SIZE_X, 1.0f / ATLAS_SIZE_Y);
+			slot_icon.tex_mode = 1;
+			slot_icon.generateMesh();
+			mesh.insert(mesh.end(), slot_icon.mesh.begin(), slot_icon.mesh.end());
 		}
-		else
-		{
-			std::vector<float> slot_vertices =
-			{
-				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 0.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 0.0f * SLOT_WIDTH, 1.0f, 1.0f, 1.0f, 0.8f, 0.0f / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
-				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 1.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 0.0f * SLOT_WIDTH, 1.0f, 1.0f, 1.0f, 0.8f, 1.0f / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
-				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 1.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 1.0f * SLOT_WIDTH, 1.0f, 1.0f, 1.0f, 0.8f, 1.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
 
-				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 0.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 0.0f * SLOT_WIDTH, 1.0f, 1.0f, 1.0f, 0.8f, 0.0f / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
-				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 0.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 1.0f * SLOT_WIDTH, 1.0f, 1.0f, 1.0f, 0.8f, 0.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
-				WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 1.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 1.0f * SLOT_WIDTH, 1.0f, 1.0f, 1.0f, 0.8f, 1.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
-			};
-			mesh.insert(mesh.end(), slot_vertices.begin(), slot_vertices.end());
-		}
-	}
-
-	for (int i = 0; i < 10; i++)
-	{
 		if (inventory->slots[i].amount > 0)
 		{
 			Label slot_label{};
-			slot_label.pos = glm::vec2(WINDOW_WIDTH / 2.0f - (5 - i) * SLOT_WIDTH + 0.0f * SLOT_WIDTH, WINDOW_HEIGHT - SLOT_WIDTH + 0.0f * SLOT_WIDTH);
+			slot_label.pos = glm::vec2(HOTBAR_POS_X + SLOT_GAP / 2.0f - (5 - i) * (SLOT_WIDTH + SLOT_GAP), HOTBAR_POS_Y + SLOT_WIDTH - 30.0f);
 			slot_label.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-			slot_label.scale = 40.0f;
+			slot_label.scale = 30.0f;
 			slot_label.text = std::to_string(inventory->slots[i].amount);
 			slot_label.generateMesh();
-
 			mesh.insert(mesh.end(), slot_label.mesh.begin(), slot_label.mesh.end());
 		}
 	}
 
-	float atlas_y = ATLAS_SIZE_Y - inventory->slots[inventory->current_slot].id;
-
 	if (inventory->slots[inventory->current_slot].id != 0)
 	{
-		std::vector<float> block_icon_vertices =
-		{
-			BLOCK_ICON_POS_X + 0.0f * BLOCK_ICON_WIDTH, BLOCK_ICON_POS_Y + 0.0f * BLOCK_ICON_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
-			BLOCK_ICON_POS_X + 1.0f * BLOCK_ICON_WIDTH, BLOCK_ICON_POS_Y + 0.0f * BLOCK_ICON_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
-			BLOCK_ICON_POS_X + 1.0f * BLOCK_ICON_WIDTH, BLOCK_ICON_POS_Y + 1.0f * BLOCK_ICON_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
+		Rectangle held_item{};
+		held_item.pos = glm::vec2(HELD_ITEM_POS_X, HELD_ITEM_POS_Y);
+		held_item.width = glm::vec2(HELD_ITEM_WIDTH, HELD_ITEM_WIDTH);
+		held_item.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		held_item.tex_pos = glm::vec2(0.0f, (ATLAS_SIZE_Y - inventory->slots[inventory->current_slot].id) / ATLAS_SIZE_Y);
+		held_item.tex_width = glm::vec2(1.0f / ATLAS_SIZE_X, 1.0f / ATLAS_SIZE_Y);
+		held_item.tex_mode = 1;
+		held_item.generateMesh();
+		mesh.insert(mesh.end(), held_item.mesh.begin(), held_item.mesh.end());
 
-			BLOCK_ICON_POS_X + 0.0f * BLOCK_ICON_WIDTH, BLOCK_ICON_POS_Y + 0.0f * BLOCK_ICON_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f / ATLAS_SIZE_X, (1.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
-			BLOCK_ICON_POS_X + 0.0f * BLOCK_ICON_WIDTH, BLOCK_ICON_POS_Y + 1.0f * BLOCK_ICON_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
-			BLOCK_ICON_POS_X + 1.0f * BLOCK_ICON_WIDTH, BLOCK_ICON_POS_Y + 1.0f * BLOCK_ICON_WIDTH, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f / ATLAS_SIZE_X, (0.0f + atlas_y) / ATLAS_SIZE_Y, 1.0f,
-		};
-		mesh.insert(mesh.end(), block_icon_vertices.begin(), block_icon_vertices.end());
+		Label held_item_label{};
+		held_item_label.pos = glm::vec2(HELD_ITEM_POS_X, HELD_ITEM_POS_Y - 30.0f);
+		held_item_label.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		held_item_label.scale = 30.0f;
+		held_item_label.text = inventory->items[inventory->slots[inventory->current_slot].id].name;
+		held_item_label.generateMesh();
+		mesh.insert(mesh.end(), held_item_label.mesh.begin(), held_item_label.mesh.end());
 	}
 }
 
@@ -354,13 +354,13 @@ void UI::updateVAO()
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	// vertex attribute (texture)
+	// vertex attribute (texcoord)
 	glBindBuffer(GL_ARRAY_BUFFER, ui_VBO);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	// vertex attribute (type)
+	// vertex attribute (mode)
 	glBindBuffer(GL_ARRAY_BUFFER, ui_VBO);
 	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(8 * sizeof(float)));
 	glEnableVertexAttribArray(3);

@@ -352,7 +352,7 @@ int main()
 
 				glUseProgram(ui_shader);
 				glBindVertexArray(ui_VAO);
-				glDrawArrays(GL_TRIANGLES, 0, (GLsizei)ui->mesh.size() / 8);
+				glDrawArrays(GL_TRIANGLES, 0, (GLsizei)ui->mesh.size() / 9);
 				glBindVertexArray(0);
 				glUseProgram(0);
 
@@ -490,6 +490,27 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			if (inventory->current_slot < 0)
 				inventory->current_slot = 9;
 		}
+
+		if (key == GLFW_KEY_1 && action == GLFW_PRESS)
+			inventory->current_slot = 0;
+		if (key == GLFW_KEY_2 && action == GLFW_PRESS)
+			inventory->current_slot = 1;
+		if (key == GLFW_KEY_3 && action == GLFW_PRESS)
+			inventory->current_slot = 2;
+		if (key == GLFW_KEY_4 && action == GLFW_PRESS)
+			inventory->current_slot = 3;
+		if (key == GLFW_KEY_5 && action == GLFW_PRESS)
+			inventory->current_slot = 4;
+		if (key == GLFW_KEY_6 && action == GLFW_PRESS)
+			inventory->current_slot = 5;
+		if (key == GLFW_KEY_7 && action == GLFW_PRESS)
+			inventory->current_slot = 6;
+		if (key == GLFW_KEY_8 && action == GLFW_PRESS)
+			inventory->current_slot = 7;
+		if (key == GLFW_KEY_9 && action == GLFW_PRESS)
+			inventory->current_slot = 8;
+		if (key == GLFW_KEY_0 && action == GLFW_PRESS)
+			inventory->current_slot = 9;
 	}
 }
 

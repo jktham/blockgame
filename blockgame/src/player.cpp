@@ -119,7 +119,7 @@ bool Player::detectCollisionV()
 			if (abs(collision_offset.z) > abs(collision_offset.x) && abs(collision_offset.z) > abs(collision_offset.y))
 			{
 				collision_blocks_v.push_back(world->exposed_blocks[i]);
-				std::cout << "vertical collision: (" << i << "/" << world->exposed_blocks.size() << ")\n";
+				//std::cout << "vertical collision: (" << i << "/" << world->exposed_blocks.size() << ")\n";
 			}
 		}
 	}
@@ -155,7 +155,7 @@ bool Player::detectCollisionH()
 			if (collision_offset.z < abs(collision_offset.x) || collision_offset.z < abs(collision_offset.y))
 			{
 				collision_blocks_h.push_back(world->exposed_blocks[i]);
-				std::cout << "horizontal collision: (" << i << "/" << world->exposed_blocks.size() << ")\n";
+				//std::cout << "horizontal collision: (" << i << "/" << world->exposed_blocks.size() << ")\n";
 			}
 		}
 	}
