@@ -462,9 +462,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			player->processAction(Action::INTERACT_TERTIARY);
 
 		if (key == GLFW_KEY_N && action == GLFW_PRESS)
-			world->save("data/save.txt");
+			game->save("data/save.txt");
 		if (key == GLFW_KEY_M && action == GLFW_PRESS)
-			world->load("data/save.txt");
+			game->load("data/save.txt");
 
 		if (key == GLFW_KEY_R && action == GLFW_PRESS)
 		{

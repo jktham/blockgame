@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <string>
+
 enum class State
 {
 	MENU,
@@ -13,4 +15,7 @@ public:
 
 	void start();
 	void quit();
+
+	void save(std::string path);
+	void load(std::string path);
 };

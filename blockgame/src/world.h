@@ -83,9 +83,4 @@ public:
 	void breakBlock(glm::vec3 position);
 	// get block type at given position
 	int getBlockType(glm::vec3 position);
-
-	// save changes to file
-	void save(std::string path);
-	// load changes from file and generate chunks
-	void load(std::string path);
 };
