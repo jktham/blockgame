@@ -30,8 +30,8 @@ const int CLICK_DELAY = 30;
 
 const int MAX_TYPE = 5;
 
-const float ATLAS_SIZE_X = 6.0f;
-const float ATLAS_SIZE_Y = 6.0f;
+const int ATLAS_SIZE_X = 6;
+const int ATLAS_SIZE_Y = 7;
 
 float delta_time = 0.0f;
 float current_frame = 0.0f;

@@ -11,6 +11,7 @@
 #include <vector>
 #include <chrono>
 #include <string>
+#include <random>
 
 void Chunk::generateChunk()
 {
@@ -36,6 +37,7 @@ void Chunk::generateTerrain()
 {
 	auto t1 = std::chrono::high_resolution_clock::now();
 
+	// generate ground
 	for (int x = 0; x < CHUNK_SIZE.x; x++)
 	{
 		for (int y = 0; y < CHUNK_SIZE.y; y++)
@@ -48,15 +50,15 @@ void Chunk::generateTerrain()
 				{
 					blocks[x][y][z].type = 4;
 				}
-				else if (z < ground_height - 5)
+				else if (z < (int)ground_height - 5)
 				{
 					blocks[x][y][z].type = 3;
 				}
-				else if (z < ground_height - 1)
+				else if (z < (int)ground_height - 1)
 				{
 					blocks[x][y][z].type = 2;
 				}
-				else if (z < ground_height)
+				else if (z < (int)ground_height)
 				{
 					blocks[x][y][z].type = 1;
 				}
@@ -72,6 +74,81 @@ void Chunk::generateTerrain()
 						min_z = z - 1;
 					}
 				}
+			}
+		}
+	}
+
+	// generate trees
+	for (int x = 2; x < CHUNK_SIZE.x - 2; x++)
+	{
+		for (int y = 2; y < CHUNK_SIZE.y - 2; y++)
+		{
+			float ground_height = terrain->getGroundHeight(x + (int)chunk_pos.x, y + (int)chunk_pos.y);
+
+			int terrain_params = (int)(terrain->OFFSET + terrain->AMPLITUDE + terrain->FREQUENCY + terrain->OCTAVES + terrain->SHIFT + terrain->LACUNARITY + terrain->PERSISTENCE);
+
+			int a = x + (int)chunk_pos.x;
+			int b = y + (int)chunk_pos.y;
+			a = (a < 0) ? (a * -2) - 1 : (a * 2);
+			b = (b < 0) ? (b * -2) - 1 : (b * 2);
+			int cantor = (int)(0.5f * (a + b) * (a + b + 1) + b);
+
+			unsigned int seed = terrain_params + cantor;
+
+			std::mt19937 rnd(seed);
+			std::uniform_real_distribution<float> dis(0.0f, 1.0f);
+
+			//std::cout << dis(rnd) << "\n";
+
+			if (dis(rnd) < 0.01f)
+			{
+				int tree_height = (int)(5.0f + dis(rnd) * 3.0f);
+
+				// trunk
+				for (int i = 0; i < tree_height; i++)
+					blocks[x][y][(int)ground_height + i].type = 6;
+
+				// layer 1
+				for (int ix = -1; ix <= 1; ix++)
+					for (int iy = -1; iy <= 1; iy++)
+						if (blocks[x + ix][y + iy][(int)ground_height + tree_height].type == 0)
+						{
+							if (abs(ix * iy) < 1)
+								blocks[x + ix][y + iy][(int)ground_height + tree_height].type = 7;
+						}
+
+				// layer 2
+				for (int ix = -1; ix <= 1; ix++)
+					for (int iy = -1; iy <= 1; iy++)
+						if (blocks[x + ix][y + iy][(int)ground_height + tree_height - 1].type == 0)
+						{
+							if (abs(ix * iy) < 1)
+								blocks[x + ix][y + iy][(int)ground_height + tree_height - 1].type = 7;
+							else if (dis(rnd) < 0.5f)
+								blocks[x + ix][y + iy][(int)ground_height + tree_height - 1].type = 7;
+						}
+
+				// layer 3
+				for (int ix = -2; ix <= 2; ix++)
+					for (int iy = -2; iy <= 2; iy++)
+						if ((blocks[x + ix][y + iy][(int)ground_height + tree_height - 2].type == 0))
+						{
+							if (abs(ix * iy) < 4)
+								blocks[x + ix][y + iy][(int)ground_height + tree_height - 2].type = 7;
+							else if (dis(rnd) < 0.4f)
+								blocks[x + ix][y + iy][(int)ground_height + tree_height - 2].type = 7;
+						}
+
+				// layer 4
+				for (int ix = -2; ix <= 2; ix++)
+					for (int iy = -2; iy <= 2; iy++)
+						if ((blocks[x + ix][y + iy][(int)ground_height + tree_height - 3].type == 0))
+						{
+							if (abs(ix * iy) < 4)
+								blocks[x + ix][y + iy][(int)ground_height + tree_height - 3].type = 7;
+							else if (dis(rnd) < 0.5f)
+								blocks[x + ix][y + iy][(int)ground_height + tree_height - 3].type = 7;
+						}
 			}
 		}
 	}
@@ -241,7 +318,7 @@ void World::generateChunkMesh(int m_start, int m_end, int n_start, int n_end)
 						{
 							float chunk_x = chunks[m][n].chunk_pos.x;
 							float chunk_y = chunks[m][n].chunk_pos.y;
-							float atlas_y = ATLAS_SIZE_Y - chunks[m][n].blocks[x][y][z].type;
+							float atlas_y = (float)(ATLAS_SIZE_Y - chunks[m][n].blocks[x][y][z].type);
 							float block_x = (float)(chunk_x + x);
 							float block_y = (float)(chunk_y + y);
 							float block_z = (float)z;

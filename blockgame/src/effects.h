@@ -9,7 +9,7 @@ public:
 	glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
 	glm::vec3 ambient = glm::vec3(0.4f);
 	glm::vec3 diffuse = glm::vec3(0.5f);
-	glm::vec3 specular = glm::vec3(0.3f);
+	glm::vec3 specular = glm::vec3(0.2f);
 
 	void update();
 };
