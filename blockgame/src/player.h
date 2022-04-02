@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "terrain.h"
 #include "global.h"
 
 #include <glm/glm.hpp>
@@ -19,7 +20,10 @@ enum class Action
 class Player
 {
 public:
-	glm::vec3 position = glm::vec3(0.0f, 0.0f, CHUNK_SIZE.z / 2.0f + 16.0f);
+	const float SPEED = 7.5f;
+	const float GRAVITY = 10.0f;
+
+	glm::vec3 position = glm::vec3(0.0f, 0.0f, terrain->getGroundHeight(0, 0) + 2.0f);
 	glm::vec3 up{};
 	glm::vec3 front{};
 	glm::vec3 front_plane{};
@@ -35,13 +39,13 @@ public:
 	float yaw = 45.0f;
 	float pitch = 0.0f;
 
-	float speed = 7.5f;
+	float speed = SPEED;
 	float sensitivity = 0.1f;
 
 	float height = 1.75f;
 	float width = 0.25f;
 
-	float gravity = 10.0f;
+	float gravity = GRAVITY;
 	float vertical_velocity = 0.0f;
 
 	bool noclip = false;

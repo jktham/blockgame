@@ -98,8 +98,6 @@ void Chunk::generateTerrain()
 			std::mt19937 rnd(seed);
 			std::uniform_real_distribution<float> dis(0.0f, 1.0f);
 
-			//std::cout << dis(rnd) << "\n";
-
 			if (dis(rnd) < 0.01f)
 			{
 				int tree_height = (int)(5.0f + dis(rnd) * 3.0f);

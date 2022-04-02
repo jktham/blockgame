@@ -56,9 +56,9 @@ void Player::applyGravity()
 void Player::applyMovement(glm::vec3 direction)
 {
 	if (sprint)
-		speed = 7.5f * 5.0f;
+		speed = SPEED * 5.0f;
 	else
-		speed = 7.5f;
+		speed = SPEED;
 
 	float velocity = speed * delta_time;
 	position += direction * velocity;

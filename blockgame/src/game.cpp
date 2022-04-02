@@ -18,6 +18,7 @@ void Game::start()
 {
 	state = State::ALIVE;
 	first_mouse = true;
+	first_frame = true;
 
 	terrain = new Terrain;
 	world = new World;
@@ -105,6 +106,8 @@ void Game::save(std::string path)
 void Game::load(std::string path)
 {
 	auto t1 = std::chrono::high_resolution_clock::now();
+
+	first_frame = true;
 
 	std::fstream file(path, std::fstream::in);
 	std::vector<std::string> lines;

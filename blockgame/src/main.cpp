@@ -227,6 +227,12 @@ int main()
 			delta_time = current_frame - last_frame;
 			last_frame = current_frame;
 
+			if (first_frame)
+			{
+				delta_time = 0.0f;
+				first_frame = false;
+			}
+
 			if (past_frames.size() >= 10)
 			{
 				past_frames.pop_front();

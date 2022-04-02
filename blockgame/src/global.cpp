@@ -25,6 +25,7 @@ float last_y = WINDOW_HEIGHT / 2.0f;
 
 bool first_mouse = true;
 bool wireframe_mode = false;
+bool first_frame = true;
 
 const int CLICK_DELAY = 30;
 

@@ -37,6 +37,7 @@ extern float last_y;
 
 extern bool first_mouse;
 extern bool wireframe_mode;
+extern bool first_frame;
 
 extern const int CLICK_DELAY;
 
