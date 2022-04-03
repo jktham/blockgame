@@ -91,6 +91,19 @@ void Chunk::generateTerrain()
 		}
 	}
 
+	int terrain_params = (int)(terrain->OFFSET + terrain->AMPLITUDE + terrain->FREQUENCY + terrain->OCTAVES + terrain->SHIFT + terrain->LACUNARITY + terrain->PERSISTENCE);
+
+	int a = (int)chunk_pos.x;
+	int b = (int)chunk_pos.y;
+	a = (a < 0) ? (a * -2) - 1 : (a * 2);
+	b = (b < 0) ? (b * -2) - 1 : (b * 2);
+	int cantor = (int)(0.5f * (a + b) * (a + b + 1) + b);
+
+	unsigned int seed = terrain_params + cantor;
+
+	std::mt19937 rnd(seed);
+	std::uniform_real_distribution<float> dis(0.0f, 1.0f);
+
 	// generate trees
 	for (int x = 2; x < CHUNK_SIZE.x - 2; x++)
 	{
@@ -98,22 +111,19 @@ void Chunk::generateTerrain()
 		{
 			float ground_height = terrain->getGroundHeight(x + (int)chunk_pos.x, y + (int)chunk_pos.y);
 
-			int terrain_params = (int)(terrain->OFFSET + terrain->AMPLITUDE + terrain->FREQUENCY + terrain->OCTAVES + terrain->SHIFT + terrain->LACUNARITY + terrain->PERSISTENCE);
-
-			int a = x + (int)chunk_pos.x;
-			int b = y + (int)chunk_pos.y;
-			a = (a < 0) ? (a * -2) - 1 : (a * 2);
-			b = (b < 0) ? (b * -2) - 1 : (b * 2);
-			int cantor = (int)(0.5f * (a + b) * (a + b + 1) + b);
-
-			unsigned int seed = terrain_params + cantor;
-
-			std::mt19937 rnd(seed);
-			std::uniform_real_distribution<float> dis(0.0f, 1.0f);
-
 			if (dis(rnd) < 0.01f && ground_height < CHUNK_SIZE.z - 8.0f && blocks[x][y][(int)ground_height].type == 0)
 			{
 				int tree_height = (int)(5.0f + dis(rnd) * 3.0f);
+
+				bool tree_adjacent = false;
+				for (int ix = -1; ix <= 1; ix++)
+					for (int iy = -1; iy <= 1; iy++)
+						for (int i = 0; i < tree_height; i++)
+							if (blocks[x + ix][y + iy][(int)ground_height + i].type == 6)
+								tree_adjacent = true;
+
+				if (tree_adjacent)
+					continue;
 
 				// trunk
 				for (int i = 0; i < tree_height; i++)
@@ -171,6 +181,8 @@ void Chunk::generateTerrain()
 
 void World::initializeChunks()
 {
+	auto t1 = std::chrono::high_resolution_clock::now();
+
 	for (int m = 0; m < WORLD_SIZE.x; m++)
 	{
 		for (int n = 0; n < WORLD_SIZE.y; n++)
@@ -179,6 +191,10 @@ void World::initializeChunks()
 			chunks[m][n].generateChunk();
 		}
 	}
+
+	auto t2 = std::chrono::high_resolution_clock::now();
+	auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
+	std::cout << "initialized chunks: " << WORLD_SIZE.x * WORLD_SIZE.y << " chunks, " << ms_int << "\n";
 }
 
 void World::updateChunks(glm::vec2 shift_direction)
