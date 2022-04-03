@@ -41,8 +41,6 @@ extern bool first_frame;
 
 extern const int CLICK_DELAY;
 
-extern const int MAX_TYPE;
-
 extern const int ATLAS_SIZE_X;
 extern const int ATLAS_SIZE_Y;
 

@@ -29,10 +29,8 @@ bool first_frame = true;
 
 const int CLICK_DELAY = 30;
 
-const int MAX_TYPE = 5;
-
 const int ATLAS_SIZE_X = 6;
-const int ATLAS_SIZE_Y = 7;
+const int ATLAS_SIZE_Y = 8;
 
 float delta_time = 0.0f;
 float current_frame = 0.0f;

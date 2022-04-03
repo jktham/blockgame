@@ -54,6 +54,12 @@ void Inventory::initializeItems()
 	items[7].placeable = true;
 	items[7].usable = false;
 	items[7].use = []() {};
+
+	items[8].name = "Water";
+	items[8].stacksize = 64;
+	items[8].placeable = true;
+	items[8].usable = false;
+	items[8].use = []() {};
 }
 
 void Inventory::giveItem(int id, int amount)

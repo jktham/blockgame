@@ -78,6 +78,19 @@ void Chunk::generateTerrain()
 		}
 	}
 
+	// generate water
+	for (int x = 0; x < CHUNK_SIZE.x; x++)
+	{
+		for (int y = 0; y < CHUNK_SIZE.y; y++)
+		{
+			for (int z = min_z; z < 21; z++)
+			{
+				if (blocks[x][y][z].type == 0)
+					blocks[x][y][z].type = 8;
+			}
+		}
+	}
+
 	// generate trees
 	for (int x = 2; x < CHUNK_SIZE.x - 2; x++)
 	{
@@ -98,7 +111,7 @@ void Chunk::generateTerrain()
 			std::mt19937 rnd(seed);
 			std::uniform_real_distribution<float> dis(0.0f, 1.0f);
 
-			if (dis(rnd) < 0.01f)
+			if (dis(rnd) < 0.01f && ground_height < CHUNK_SIZE.z - 8.0f && blocks[x][y][(int)ground_height].type == 0)
 			{
 				int tree_height = (int)(5.0f + dis(rnd) * 3.0f);
 
