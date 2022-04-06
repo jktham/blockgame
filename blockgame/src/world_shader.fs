@@ -34,7 +34,7 @@ void main()
 
     if (round(block) == round(selected_block))
     {
-        frag_color += vec4(vec3(0.1f), 1.0f);
+        frag_color += vec4(vec3(0.1f), 0.0f);
     }
 
     //vec3 light_dir = normalize(light.position - frag_pos);

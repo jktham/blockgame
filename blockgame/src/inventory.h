@@ -24,7 +24,7 @@ public:
 class Inventory
 {
 public:
-	std::vector<Item> items = std::vector<Item>(9);
+	std::vector<Item> items = std::vector<Item>(11);
 	std::vector<Stack> slots = std::vector<Stack>(10);
 	int current_slot = 0;
 
@@ -32,4 +32,7 @@ public:
 	void giveItem(int id, int amount);
 	void removeItem(int id);
 	void selectItem(int id);
+
+	void dig(int size);
+	void excavate(int limit);
 };

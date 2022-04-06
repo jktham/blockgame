@@ -83,4 +83,7 @@ public:
 	void breakBlock(glm::vec3 position);
 	// get block type at given position
 	int getBlockType(glm::vec3 position);
+
+	// update mesh after block change at position
+	void updateBlockChange(glm::vec3 position);
 };

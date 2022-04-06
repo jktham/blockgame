@@ -188,7 +188,7 @@ void UI::createMenu()
 	info_label.pos = glm::vec2(WINDOW_WIDTH - 450, WINDOW_HEIGHT / 2.0f - 300);
 	info_label.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	info_label.scale = 30.0f;
-	info_label.text = "WASD: Movement§SHIFT: Sprint§SPACE: Jump§§M1/J: Break Block§M2/L: Place Block§M3/K: Pick Block§MW/0-9: Select Slot§§N: Save World§M: Load World§R: Reset World§§Q: Toggle Noclip§F: Toggle Fog§TAB: Toggle Wireframe§§ENTER: Start§ESCAPE: Quit";
+	info_label.text = "WASD: Movement§SHIFT: Sprint§SPACE: Jump§§M1/J: Break Block§M2/L: Place Block / Use Item§M3/K: Pick Block§MW/0-9: Select Slot§G: Drop Slot§§N: Save World§M: Load World§R: Reset World§§Q: Toggle Noclip§F: Toggle Fog§TAB: Toggle Wireframe§§ENTER: Start§ESCAPE: Quit";
 	labels.push_back(info_label);
 }
 

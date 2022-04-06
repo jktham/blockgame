@@ -34,6 +34,8 @@ void Game::start()
 
 	inventory->initializeItems();
 	inventory->giveItem(5, 64);
+	inventory->giveItem(9, 1);
+	inventory->giveItem(10, 1);
 }
 
 void Game::quit()

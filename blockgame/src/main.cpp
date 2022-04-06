@@ -82,7 +82,7 @@ int main()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, atlas_texture);
 	data = stbi_load("res/textures/atlas.png", &width, &height, &channels, 0);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(data);
 
@@ -496,6 +496,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			if (inventory->current_slot < 0)
 				inventory->current_slot = 9;
 		}
+
+		if (key == GLFW_KEY_G && action == GLFW_PRESS)
+			player->processAction(Action::DROP);
 
 		if (key == GLFW_KEY_1 && action == GLFW_PRESS)
 			inventory->current_slot = 0;

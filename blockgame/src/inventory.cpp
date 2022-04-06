@@ -1,9 +1,14 @@
 #include "inventory.h"
 #include "player.h"
+#include "world.h"
+#include "camera.h"
 
 #include <string>
+#include <iostream>
 #include <vector>
+#include <deque>
 #include <functional>
+#include <algorithm>
 
 void Inventory::initializeItems()
 {
@@ -60,10 +65,29 @@ void Inventory::initializeItems()
 	items[8].placeable = true;
 	items[8].usable = false;
 	items[8].use = []() {};
+
+	items[9].name = "Dig Tool";
+	items[9].stacksize = 1;
+	items[9].placeable = false;
+	items[9].usable = true;
+	items[9].use = [this]() {
+		dig(2);
+	};
+
+	items[10].name = "Excavate Tool";
+	items[10].stacksize = 1;
+	items[10].placeable = false;
+	items[10].usable = true;
+	items[10].use = [this]() {
+		excavate(64);
+	};
 }
 
 void Inventory::giveItem(int id, int amount)
 {
+	if (id == 0)
+		return;
+
 	for (int i = 0; i < slots.size(); i++)
 	{
 		if (slots[i].id == id && slots[i].amount < items[slots[i].id].stacksize)
@@ -136,4 +160,60 @@ void Inventory::selectItem(int id)
 			}
 		}
 	}
+}
+
+void Inventory::dig(int size)
+{
+	glm::vec3 pos = glm::floor(camera->getRayIntersect());
+	if (pos == glm::vec3(-1.0f))
+		return;
+
+	for (int i = -size; i <= size; i++)
+		for (int j = -size; j <= size; j++)
+			for (int k = -size; k <= size; k++)
+			{
+				world->breakBlock(pos + glm::vec3(i, j, k));
+			}
+
+	world->updateBlockChange(pos);
+}
+
+void Inventory::excavate(int limit)
+{
+	glm::vec3 pos = glm::floor(camera->getRayIntersect());
+	if (pos == glm::vec3(-1.0f))
+		return;
+
+	int type = world->getBlockType(pos);
+	std::vector<glm::vec3> found;
+	std::deque<glm::vec3> queue;
+	queue.push_back(pos);
+	int iterations = 0;
+
+	while (queue.size() > 0 && found.size() < limit && iterations < 1000)
+	{
+		iterations += 1;
+		glm::vec3 new_pos = queue.front();
+		queue.pop_front();
+
+		if (world->getBlockType(new_pos) == type)
+		{
+			for (int i = -1; i <= 1; i++)
+				for (int j = -1; j <= 1; j++)
+					for (int k = -1; k <= 1; k++)
+					{
+						glm::vec3 next_pos = new_pos + glm::vec3(i, j, k);
+						if (std::count(queue.begin(), queue.end(), next_pos) == 0 && std::count(found.begin(), found.end(), next_pos) == 0 && !(i == 0 && j == 0 && k == 0))
+							queue.push_back(next_pos);
+					}
+
+			if (std::count(found.begin(), found.end(), new_pos) == 0)
+				found.push_back(new_pos);
+		}
+	}
+
+	for (int i = 0; i < found.size(); i++)
+		world->breakBlock(found[i]);
+
+	world->updateBlockChange(pos);
 }

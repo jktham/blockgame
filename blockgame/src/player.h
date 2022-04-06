@@ -15,6 +15,7 @@ enum class Action
 	INTERACT_PRIMARY,
 	INTERACT_SECONDARY,
 	INTERACT_TERTIARY,
+	DROP,
 };
 
 class Player

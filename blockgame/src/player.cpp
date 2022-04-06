@@ -191,16 +191,46 @@ void Player::processAction(Action action)
 		applyJump();
 
 	if (action == Action::INTERACT_PRIMARY)
-		world->breakBlock(camera->getRayIntersect());
+	{
+		glm::vec3 pos = camera->getRayIntersect();
+		if (pos == glm::vec3(-1.0f))
+			return;
+
+		world->breakBlock(pos);
+		world->updateBlockChange(pos);
+	}
 
 	if (action == Action::INTERACT_SECONDARY)
+	{
 		if (inventory->items[inventory->slots[inventory->current_slot].id].placeable)
-			world->placeBlock(camera->getRayIntersect(), inventory->slots[inventory->current_slot].id);
+		{
+			glm::vec3 pos = camera->getRayIntersect();
+			if (pos == glm::vec3(-1.0f))
+				return;
+
+			world->placeBlock(pos, inventory->slots[inventory->current_slot].id);
+			world->updateBlockChange(pos);
+		}
+		else if (inventory->items[inventory->slots[inventory->current_slot].id].usable)
+		{
+			inventory->items[inventory->slots[inventory->current_slot].id].use();
+		}
+	}
 
 	if (action == Action::INTERACT_TERTIARY)
 	{
-		int type = world->getBlockType(camera->getRayIntersect());
+		glm::vec3 pos = camera->getRayIntersect();
+		if (pos == glm::vec3(-1.0f))
+			return;
+
+		int type = world->getBlockType(pos);
 		inventory->selectItem(type);
+	}
+
+	if (action == Action::DROP)
+	{
+		inventory->slots[inventory->current_slot].id = 0;
+		inventory->slots[inventory->current_slot].amount = 0;
 	}
 }
 

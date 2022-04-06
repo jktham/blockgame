@@ -574,11 +574,6 @@ void World::placeBlock(glm::vec3 position, int type)
 
 						chunks[m][n].blocks[(int)(pos.x - chunks[m][n].chunk_pos.x)][(int)(pos.y - chunks[m][n].chunk_pos.y)][(int)pos.z].type = type;
 						changes.push_back(Change(pos, type));
-
-						generateChunkMesh(m - 1, m + 2, n - 1, n + 2);
-						generateWorldMesh();
-						updateExposedBlocks();
-						updateVAO(complete_mesh);
 					}
 				}
 			}
@@ -613,11 +608,6 @@ void World::breakBlock(glm::vec3 position)
 
 						if (pos.z - 1 < chunks[m][n].min_z)
 							chunks[m][n].min_z = (int)pos.z - 1;
-
-						generateChunkMesh(m - 1, m + 2, n - 1, n + 2);
-						generateWorldMesh();
-						updateExposedBlocks();
-						updateVAO(complete_mesh);
 					}
 				}
 			}
@@ -647,4 +637,32 @@ int World::getBlockType(glm::vec3 position)
 		}
 	}
 	return 0;
+}
+
+void World::updateBlockChange(glm::vec3 position)
+{
+	auto t1 = std::chrono::high_resolution_clock::now();
+
+	glm::vec3 pos = glm::floor(position);
+
+	if (pos.z >= 0 && pos.z < CHUNK_SIZE.z)
+	{
+		for (int m = WORLD_SIZE.x / 2 - 1; m < WORLD_SIZE.x / 2 + 2; m++)
+		{
+			for (int n = WORLD_SIZE.y / 2 - 1; n < WORLD_SIZE.y / 2 + 2; n++)
+			{
+				if (pos.x >= chunks[m][n].chunk_pos.x && pos.x < chunks[m][n].chunk_pos.x + CHUNK_SIZE.x && pos.y >= chunks[m][n].chunk_pos.y && pos.y < chunks[m][n].chunk_pos.y + CHUNK_SIZE.y)
+				{
+					generateChunkMesh(m - 1, m + 2, n - 1, n + 2);
+					generateWorldMesh();
+					updateExposedBlocks();
+					updateVAO(complete_mesh);
+				}
+			}
+		}
+	}
+
+	auto t2 = std::chrono::high_resolution_clock::now();
+	auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
+	std::cout << "updated block change: (" << (int)pos.x << ", " << (int)pos.y << ", " << (int)pos.z << "), " << ms_int << "\n";
 }
