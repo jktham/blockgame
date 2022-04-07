@@ -1,6 +1,7 @@
 ﻿#include "world.h"
 #include "terrain.h"
 #include "inventory.h"
+#include "threadpool.h"
 #include "global.h"
 
 #include <glad/glad.h>
@@ -201,11 +202,14 @@ void World::updateChunks(glm::vec2 shift_direction)
 {
 	auto t1 = std::chrono::high_resolution_clock::now();
 
+	threadpool->update_mutex.lock();
 	meshgen_done = false;
+
 	shiftChunks(shift_direction);
 	generateWorldMesh();
+
 	meshgen_done = true;
-	//updateVAO(front_mesh);
+	threadpool->update_mutex.unlock();
 
 	auto t2 = std::chrono::high_resolution_clock::now();
 	auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
@@ -642,6 +646,7 @@ int World::getBlockType(glm::vec3 position)
 void World::updateBlockChange(glm::vec3 position)
 {
 	auto t1 = std::chrono::high_resolution_clock::now();
+	threadpool->update_mutex.lock();
 
 	glm::vec3 pos = glm::floor(position);
 
@@ -662,6 +667,7 @@ void World::updateBlockChange(glm::vec3 position)
 		}
 	}
 
+	threadpool->update_mutex.unlock();
 	auto t2 = std::chrono::high_resolution_clock::now();
 	auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
 	std::cout << "updated block change: (" << (int)pos.x << ", " << (int)pos.y << ", " << (int)pos.z << "), " << ms_int << "\n";

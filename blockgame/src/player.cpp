@@ -2,6 +2,7 @@
 #include "world.h"
 #include "camera.h"
 #include "inventory.h"
+#include "threadpool.h"
 #include "global.h"
 
 #include <glm/glm.hpp>

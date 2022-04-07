@@ -18,14 +18,17 @@ void Threadpool::awaitJob()
 {
 	while (true)
 	{
+		queue_mutex.lock();
 		if (!queue.empty())
 		{
 			std::function job = queue.front();
 			queue.pop_front();
+			queue_mutex.unlock();
 			job();
 		}
 		else
 		{
+			queue_mutex.unlock();
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		}
 	}
