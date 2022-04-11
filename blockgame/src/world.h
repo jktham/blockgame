@@ -27,9 +27,6 @@ public:
 
 	// generate chunk and apply stored changes
 	void generateChunk();
-
-	// generate terrain for a chunk
-	void generateTerrain();
 };
 
 class Change

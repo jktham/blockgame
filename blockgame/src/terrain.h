@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "world.h"
+
 #include "glm/glm.hpp"
 
 class Terrain
@@ -13,6 +15,8 @@ public:
 	int SHIFT = 1000; // offset summand
 	float LACUNARITY = 2.0f; // frequency factor
 	float PERSISTENCE = 0.5f; // amplitude factor
+
+	void generateChunkTerrain(Chunk* chunk);
 
 	float getGroundHeight(int x, int y);
 

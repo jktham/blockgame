@@ -81,6 +81,24 @@ void Inventory::initializeItems()
 	items[10].use = [this]() {
 		excavate(64);
 	};
+
+	items[11].name = "Iron Ore";
+	items[11].stacksize = 64;
+	items[11].placeable = true;
+	items[11].usable = false;
+	items[11].use = []() {};
+
+	items[12].name = "Gold Ore";
+	items[12].stacksize = 64;
+	items[12].placeable = true;
+	items[12].usable = false;
+	items[12].use = []() {};
+
+	items[13].name = "Diamond Ore";
+	items[13].stacksize = 64;
+	items[13].placeable = true;
+	items[13].usable = false;
+	items[13].use = []() {};
 }
 
 void Inventory::giveItem(int id, int amount)

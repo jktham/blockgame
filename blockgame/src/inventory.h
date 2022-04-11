@@ -24,7 +24,7 @@ public:
 class Inventory
 {
 public:
-	std::vector<Item> items = std::vector<Item>(11);
+	std::vector<Item> items = std::vector<Item>(14);
 	std::vector<Stack> slots = std::vector<Stack>(10);
 	int current_slot = 0;
 

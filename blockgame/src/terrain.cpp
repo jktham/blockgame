@@ -1,10 +1,178 @@
 ﻿#include "terrain.h"
+#include "world.h"
 #include "global.h"
 
 #include <glm/glm.hpp>
 
 #include <vector>
 #include <iostream>
+#include <random>
+
+void Terrain::generateChunkTerrain(Chunk* chunk)
+{
+	// generate ground
+	for (int x = 0; x < CHUNK_SIZE.x; x++)
+	{
+		for (int y = 0; y < CHUNK_SIZE.y; y++)
+		{
+			float ground_height = getGroundHeight(x + (int)chunk->chunk_pos.x, y + (int)chunk->chunk_pos.y);
+
+			for (int z = 0; z < CHUNK_SIZE.z; z++)
+			{
+				if (z == 0)
+				{
+					chunk->blocks[x][y][z].type = 4;
+				}
+				else if (z < (int)ground_height - 5)
+				{
+					chunk->blocks[x][y][z].type = 3;
+				}
+				else if (z < (int)ground_height - 1)
+				{
+					chunk->blocks[x][y][z].type = 2;
+				}
+				else if (z < (int)ground_height)
+				{
+					chunk->blocks[x][y][z].type = 1;
+				}
+				else
+				{
+					chunk->blocks[x][y][z].type = 0;
+				}
+
+				if (chunk->blocks[x][y][z].type == 0)
+				{
+					if (z - 1 < chunk->min_z)
+					{
+						chunk->min_z = z - 1;
+					}
+				}
+			}
+		}
+	}
+
+	// generate water
+	float water_level = 21.0f;
+	for (int x = 0; x < CHUNK_SIZE.x; x++)
+	{
+		for (int y = 0; y < CHUNK_SIZE.y; y++)
+		{
+			for (int z = chunk->min_z; z < water_level; z++)
+			{
+				if (chunk->blocks[x][y][z].type == 0)
+					chunk->blocks[x][y][z].type = 8;
+			}
+		}
+	}
+
+	int terrain_params = (int)(OFFSET + AMPLITUDE + FREQUENCY + OCTAVES + SHIFT + LACUNARITY + PERSISTENCE);
+
+	int a = (int)chunk->chunk_pos.x;
+	int b = (int)chunk->chunk_pos.y;
+	a = (a < 0) ? (a * -2) - 1 : (a * 2);
+	b = (b < 0) ? (b * -2) - 1 : (b * 2);
+	int cantor = (int)(0.5f * (a + b) * (a + b + 1) + b);
+
+	unsigned int seed = terrain_params + cantor;
+
+	std::mt19937 rnd(seed);
+	std::uniform_real_distribution<float> dis(0.0f, 1.0f);
+
+	// generate trees
+	for (int x = 2; x < CHUNK_SIZE.x - 2; x++)
+	{
+		for (int y = 2; y < CHUNK_SIZE.y - 2; y++)
+		{
+			float ground_height = terrain->getGroundHeight(x + (int)chunk->chunk_pos.x, y + (int)chunk->chunk_pos.y);
+
+			if (dis(rnd) < 0.01f && ground_height < CHUNK_SIZE.z - 8.0f && chunk->blocks[x][y][(int)ground_height].type == 0)
+			{
+				int tree_height = (int)(5.0f + dis(rnd) * 3.0f);
+
+				bool tree_adjacent = false;
+				for (int ix = -1; ix <= 1; ix++)
+					for (int iy = -1; iy <= 1; iy++)
+						for (int i = 0; i < tree_height; i++)
+							if (chunk->blocks[x + ix][y + iy][(int)ground_height + i].type == 6)
+								tree_adjacent = true;
+
+				if (tree_adjacent)
+					continue;
+
+				// trunk
+				for (int i = 0; i < tree_height; i++)
+					chunk->blocks[x][y][(int)ground_height + i].type = 6;
+
+				// layer 1
+				for (int ix = -1; ix <= 1; ix++)
+					for (int iy = -1; iy <= 1; iy++)
+						if (chunk->blocks[x + ix][y + iy][(int)ground_height + tree_height].type == 0)
+						{
+							if (abs(ix * iy) < 1)
+								chunk->blocks[x + ix][y + iy][(int)ground_height + tree_height].type = 7;
+						}
+
+				// layer 2
+				for (int ix = -1; ix <= 1; ix++)
+					for (int iy = -1; iy <= 1; iy++)
+						if (chunk->blocks[x + ix][y + iy][(int)ground_height + tree_height - 1].type == 0)
+						{
+							if (abs(ix * iy) < 1)
+								chunk->blocks[x + ix][y + iy][(int)ground_height + tree_height - 1].type = 7;
+							else if (dis(rnd) < 0.5f)
+								chunk->blocks[x + ix][y + iy][(int)ground_height + tree_height - 1].type = 7;
+						}
+
+				// layer 3
+				for (int ix = -2; ix <= 2; ix++)
+					for (int iy = -2; iy <= 2; iy++)
+						if ((chunk->blocks[x + ix][y + iy][(int)ground_height + tree_height - 2].type == 0))
+						{
+							if (abs(ix * iy) < 4)
+								chunk->blocks[x + ix][y + iy][(int)ground_height + tree_height - 2].type = 7;
+							else if (dis(rnd) < 0.4f)
+								chunk->blocks[x + ix][y + iy][(int)ground_height + tree_height - 2].type = 7;
+						}
+
+				// layer 4
+				for (int ix = -2; ix <= 2; ix++)
+					for (int iy = -2; iy <= 2; iy++)
+						if ((chunk->blocks[x + ix][y + iy][(int)ground_height + tree_height - 3].type == 0))
+						{
+							if (abs(ix * iy) < 4)
+								chunk->blocks[x + ix][y + iy][(int)ground_height + tree_height - 3].type = 7;
+							else if (dis(rnd) < 0.5f)
+								chunk->blocks[x + ix][y + iy][(int)ground_height + tree_height - 3].type = 7;
+						}
+			}
+		}
+	}
+
+	// generate ores
+	for (int x = 0; x < CHUNK_SIZE.x; x++)
+	{
+		for (int y = 0; y < CHUNK_SIZE.y; y++)
+		{
+			float ground_height = getGroundHeight(x + (int)chunk->chunk_pos.x, y + (int)chunk->chunk_pos.y);
+			for (int z = 1; z < ground_height; z++)
+			{
+				float depth = abs(ground_height - z);
+				if (dis(rnd) < 0.001f * (depth - 8.0f) && chunk->blocks[x][y][z].type == 3)
+				{
+					chunk->blocks[x][y][z].type = 11;
+				}
+				if (dis(rnd) < 0.0001f * (depth - 8.0f) && chunk->blocks[x][y][z].type == 3)
+				{
+					chunk->blocks[x][y][z].type = 12;
+				}
+				if (dis(rnd) < 0.00001f * (depth - 8.0f) && chunk->blocks[x][y][z].type == 3)
+				{
+					chunk->blocks[x][y][z].type = 13;
+				}
+			}
+		}
+	}
+}
 
 float Terrain::getGroundHeight(int x, int y)
 {
