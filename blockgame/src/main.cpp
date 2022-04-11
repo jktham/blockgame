@@ -85,6 +85,8 @@ int main()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(data);
+	atlas_width = (int)(width / 16);
+	atlas_height = (int)(height / 16);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -220,7 +222,7 @@ int main()
 	// render loop
 	while (!glfwWindowShouldClose(window))
 	{
-		if ((float)glfwGetTime() - last_frame >= 1.0f / FRAME_RATE_LIMIT)
+		if ((float)glfwGetTime() - last_frame >= 1.0f / frame_rate_limit)
 		{
 			// timing
 			current_frame = (float)glfwGetTime();
@@ -240,22 +242,25 @@ int main()
 			past_frames.push_back(delta_time);
 			frame_rate = 10.0f / std::accumulate(past_frames.begin(), past_frames.end(), 0.0f);
 
-			std::cout << std::fixed;
+			std::ostringstream msg;
+			msg << std::fixed;
 			if (game->state == State::MENU)
 			{
-				std::cout << "pos: (" << last_x << ", " << last_y << "),  ";
+				msg << std::setprecision(2);
+				msg << "pos: (" << last_x << ", " << last_y << "),  ";
 			}
 			else if (game->state == State::ALIVE)
 			{
-				std::cout << std::setprecision(2);
-				std::cout << "pos: (" << player->position.x << ", " << player->position.y << ", " << player->position.z << "),  ";
-				std::cout << "chunk: (" << player->current_chunk.x << ", " << player->current_chunk.y << "),  ";
-				std::cout << "vert: " << player->vertical_velocity << ",  ";
+				msg << std::setprecision(2);
+				msg << "pos: (" << player->position.x << ", " << player->position.y << ", " << player->position.z << "),  ";
+				msg << "chunk: (" << player->current_chunk.x << ", " << player->current_chunk.y << "),  ";
+				msg << "vert: " << player->vertical_velocity << ",  ";
 			}
-			std::cout << std::setprecision(4);
-			std::cout << "delta: " << delta_time << ",  ";
-			std::cout << std::setprecision(2);
-			std::cout << "fps: " << frame_rate << "\n";
+			msg << std::setprecision(4);
+			msg << "delta: " << delta_time << ",  ";
+			msg << std::setprecision(2);
+			msg << "fps: " << frame_rate << "\n";
+			std::cout << msg.str();
 
 			// clear buffers
 			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -406,7 +411,7 @@ void processInputState(GLFWwindow* window)
 			if (player->left_delay <= 0)
 			{
 				player->processAction(Action::INTERACT_PRIMARY);
-				player->left_delay = CLICK_DELAY;
+				player->left_delay = click_delay;
 			}
 			player->left_delay -= 1;
 		}
@@ -420,7 +425,7 @@ void processInputState(GLFWwindow* window)
 			if (player->right_delay <= 0)
 			{
 				player->processAction(Action::INTERACT_SECONDARY);
-				player->right_delay = CLICK_DELAY;
+				player->right_delay = click_delay;
 			}
 			player->right_delay -= 1;
 		}

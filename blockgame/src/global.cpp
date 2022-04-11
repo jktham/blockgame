@@ -27,17 +27,17 @@ bool first_mouse = true;
 bool wireframe_mode = false;
 bool first_frame = true;
 
-const int CLICK_DELAY = 30;
+int click_delay = 30;
 
-const int ATLAS_SIZE_X = 6;
-const int ATLAS_SIZE_Y = 10;
+int atlas_width = 0;
+int atlas_height = 0;
 
 float delta_time = 0.0f;
 float current_frame = 0.0f;
 float last_frame = 0.0f;
 float frame_rate = 0.0f;
 std::deque<float> past_frames = {};
-const float FRAME_RATE_LIMIT = 120.0f;
+float frame_rate_limit = 120.0f;
 
 unsigned int world_VAO;
 unsigned int world_VBO;

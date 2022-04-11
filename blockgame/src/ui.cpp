@@ -291,8 +291,8 @@ void UI::generateHudMesh()
 			slot_icon.pos = glm::vec2(slot.pos.x + (SLOT_WIDTH - SLOT_ICON_WIDTH) / 2.0f, slot.pos.y + (SLOT_WIDTH - SLOT_ICON_WIDTH) / 2.0f);
 			slot_icon.width = glm::vec2(SLOT_ICON_WIDTH, SLOT_ICON_WIDTH);
 			slot_icon.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-			slot_icon.tex_pos = glm::vec2(0.0f, (float)(ATLAS_SIZE_Y - inventory->slots[i].id) / ATLAS_SIZE_Y);
-			slot_icon.tex_width = glm::vec2(1.0f / ATLAS_SIZE_X, 1.0f / ATLAS_SIZE_Y);
+			slot_icon.tex_pos = glm::vec2(0.0f, (float)(atlas_height - inventory->slots[i].id) / atlas_height);
+			slot_icon.tex_width = glm::vec2(1.0f / atlas_width, 1.0f / atlas_height);
 			slot_icon.tex_mode = 1;
 			slot_icon.generateMesh();
 			mesh.insert(mesh.end(), slot_icon.mesh.begin(), slot_icon.mesh.end());
@@ -316,8 +316,8 @@ void UI::generateHudMesh()
 		held_item.pos = glm::vec2(HELD_ITEM_POS_X, HELD_ITEM_POS_Y);
 		held_item.width = glm::vec2(HELD_ITEM_WIDTH, HELD_ITEM_WIDTH);
 		held_item.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-		held_item.tex_pos = glm::vec2(0.0f, (float)(ATLAS_SIZE_Y - inventory->slots[inventory->current_slot].id) / ATLAS_SIZE_Y);
-		held_item.tex_width = glm::vec2(1.0f / ATLAS_SIZE_X, 1.0f / ATLAS_SIZE_Y);
+		held_item.tex_pos = glm::vec2(0.0f, (float)(atlas_height - inventory->slots[inventory->current_slot].id) / atlas_height);
+		held_item.tex_width = glm::vec2(1.0f / atlas_width, 1.0f / atlas_height);
 		held_item.tex_mode = 1;
 		held_item.generateMesh();
 		mesh.insert(mesh.end(), held_item.mesh.begin(), held_item.mesh.end());
