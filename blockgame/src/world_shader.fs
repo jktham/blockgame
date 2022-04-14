@@ -32,7 +32,7 @@ uniform vec2 atlas_size;
 
 void main()
 {
-    vec2 corrected_tex_coord = floor(tex_coord_pos * atlas_size) + clamp(tex_coord_offset * atlas_size, 1.0f / 32.0f, 1.0f - 1.0f / 32.0f);
+    vec2 corrected_tex_coord = tex_coord_pos * atlas_size + clamp(tex_coord_offset * atlas_size, 1.0f / 32.0f, 1.0f - 1.0f / 32.0f);
     frag_color = texture(atlas_texture, corrected_tex_coord / atlas_size);
 
     if (round(block_pos) == round(selected_block))
