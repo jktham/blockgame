@@ -18,21 +18,24 @@ struct Fog {
 out vec4 frag_color;
 
 in vec3 frag_pos;
-in vec2 tex_coord;
+in vec2 tex_coord_pos;
+in vec2 tex_coord_offset;
 in vec3 normal;
-in vec3 block;
+in vec3 block_pos;
 
 uniform Light light;
 uniform Fog fog;
 uniform vec3 view_pos;
 uniform vec3 selected_block;
 uniform sampler2D atlas_texture;
+uniform vec2 atlas_size;
 
 void main()
 {
-    frag_color = texture(atlas_texture, tex_coord);
+    vec2 corrected_tex_coord = floor(tex_coord_pos * atlas_size) + clamp(tex_coord_offset * atlas_size, 1.0f / 32.0f, 1.0f - 1.0f / 32.0f);
+    frag_color = texture(atlas_texture, corrected_tex_coord / atlas_size);
 
-    if (round(block) == round(selected_block))
+    if (round(block_pos) == round(selected_block))
     {
         frag_color += vec4(vec3(0.1f), 0.0f);
     }

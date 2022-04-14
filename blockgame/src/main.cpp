@@ -213,6 +213,7 @@ int main()
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glLineWidth(1.0f);
 
 	// setup
 	threadpool->createThreads(1);
@@ -343,6 +344,7 @@ int main()
 				glUniform1i(glGetUniformLocation(world_shader, "fog.enabled"), (int)fog->enabled);
 				glUniform3f(glGetUniformLocation(world_shader, "view_pos"), camera->position.x, camera->position.y, camera->position.z);
 				glUniform3f(glGetUniformLocation(world_shader, "selected_block"), player->selected_block.x, player->selected_block.y, player->selected_block.z);
+				glUniform2f(glGetUniformLocation(world_shader, "atlas_size"), (float)atlas_width, (float)atlas_height);
 				glUseProgram(0);
 
 				glUseProgram(ui_shader);
@@ -354,7 +356,7 @@ int main()
 				// draw vertices
 				glUseProgram(world_shader);
 				glBindVertexArray(world_VAO);
-				glDrawArrays(GL_TRIANGLES, 0, (GLsizei)world->complete_mesh.size() / 11);
+				glDrawArrays(GL_TRIANGLES, 0, (GLsizei)world->complete_mesh.size() / 13);
 				glBindVertexArray(0);
 				glUseProgram(0);
 
