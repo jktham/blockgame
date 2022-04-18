@@ -9,6 +9,7 @@
 #include "effects.h"
 #include "ui.h"
 #include "threadpool.h"
+#include "console.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -44,6 +45,7 @@ int main()
 	fog = new Fog;
 	ui = new UI;
 	threadpool = new Threadpool;
+	//console = new Console;
 
 	// window setup
 	glfwInit();
@@ -372,6 +374,52 @@ int main()
 				glEnable(GL_DEPTH_TEST);
 				glEnable(GL_CULL_FACE);
 			}
+			else if (game->state == State::CONSOLE)
+			{
+				ui->updateConsole();
+
+				glUseProgram(world_shader);
+				glUniformMatrix4fv(glGetUniformLocation(world_shader, "model"), 1, GL_FALSE, glm::value_ptr(world_model));
+				glUniformMatrix4fv(glGetUniformLocation(world_shader, "view"), 1, GL_FALSE, glm::value_ptr(world_view));
+				glUniformMatrix4fv(glGetUniformLocation(world_shader, "projection"), 1, GL_FALSE, glm::value_ptr(world_projection));
+				glUniform3f(glGetUniformLocation(world_shader, "light.direction"), light->direction.x, light->direction.y, light->direction.z);
+				glUniform3f(glGetUniformLocation(world_shader, "light.color"), light->color.x, light->color.y, light->color.z);
+				glUniform3f(glGetUniformLocation(world_shader, "light.ambient"), light->ambient.x, light->ambient.y, light->ambient.z);
+				glUniform3f(glGetUniformLocation(world_shader, "light.diffuse"), light->diffuse.x, light->diffuse.y, light->diffuse.z);
+				glUniform3f(glGetUniformLocation(world_shader, "light.specular"), light->specular.x, light->specular.y, light->specular.z);
+				glUniform1f(glGetUniformLocation(world_shader, "fog.start"), fog->start);
+				glUniform1f(glGetUniformLocation(world_shader, "fog.end"), fog->end);
+				glUniform1f(glGetUniformLocation(world_shader, "fog.exponent"), fog->exponent);
+				glUniform1i(glGetUniformLocation(world_shader, "fog.enabled"), (int)fog->enabled);
+				glUniform3f(glGetUniformLocation(world_shader, "view_pos"), camera->position.x, camera->position.y, camera->position.z);
+				glUniform3f(glGetUniformLocation(world_shader, "selected_block"), player->selected_block.x, player->selected_block.y, player->selected_block.z);
+				glUseProgram(0);
+
+				glUseProgram(ui_shader);
+				glUniformMatrix4fv(glGetUniformLocation(ui_shader, "model"), 1, GL_FALSE, glm::value_ptr(ui_model));
+				glUniformMatrix4fv(glGetUniformLocation(ui_shader, "view"), 1, GL_FALSE, glm::value_ptr(ui_view));
+				glUniformMatrix4fv(glGetUniformLocation(ui_shader, "projection"), 1, GL_FALSE, glm::value_ptr(ui_projection));
+				glUseProgram(0);
+
+				// draw vertices
+				glUseProgram(world_shader);
+				glBindVertexArray(world_VAO);
+				glDrawArrays(GL_TRIANGLES, 0, (GLsizei)world->complete_mesh.size() / 11);
+				glBindVertexArray(0);
+				glUseProgram(0);
+
+				glDisable(GL_DEPTH_TEST);
+				glDisable(GL_CULL_FACE);
+
+				glUseProgram(ui_shader);
+				glBindVertexArray(ui_VAO);
+				glDrawArrays(GL_TRIANGLES, 0, (GLsizei)ui->mesh.size() / 9);
+				glBindVertexArray(0);
+				glUseProgram(0);
+
+				glEnable(GL_DEPTH_TEST);
+				glEnable(GL_CULL_FACE);
+			}
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
@@ -527,6 +575,20 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			inventory->current_slot = 8;
 		if (key == GLFW_KEY_0 && action == GLFW_PRESS)
 			inventory->current_slot = 9;
+
+		if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
+			game->enableConsole();
+	}
+	else if (game->state == State::CONSOLE)
+	{
+		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+			game->disableConsole();
+		if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
+			console->submit();
+		if ((key == 32 || key >= 48 && key <= 57 || key >= 65 && key <= 90) && action == GLFW_PRESS)
+			console->addLetter(key);
+		if (key == GLFW_KEY_BACKSPACE && action == GLFW_PRESS)
+			console->removeLetter();
 	}
 }
 

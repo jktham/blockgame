@@ -16,6 +16,7 @@ class Fog;
 class UI;
 struct GLFWwindow;
 class Threadpool;
+class Console;
 
 extern Game* game;
 extern Terrain* terrain;
@@ -28,6 +29,7 @@ extern Fog* fog;
 extern UI* ui;
 extern GLFWwindow* window;
 extern Threadpool* threadpool;
+extern Console* console;
 
 extern const unsigned int WINDOW_WIDTH;
 extern const unsigned int WINDOW_HEIGHT;

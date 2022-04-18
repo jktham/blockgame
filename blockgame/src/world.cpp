@@ -424,10 +424,11 @@ void World::updateVAO(std::vector<float> data)
 	std::cout << msg.str();
 }
 
-void World::placeBlock(glm::vec3 position, int type)
+int World::placeBlock(glm::vec3 position, int type)
 {
 	auto t1 = std::chrono::high_resolution_clock::now();
 
+	int item = 0;
 	glm::vec3 pos = glm::floor(position);
 	glm::vec3 offset = position - glm::floor(position) - glm::vec3(0.5f);
 
@@ -454,10 +455,9 @@ void World::placeBlock(glm::vec3 position, int type)
 				{
 					if (pos.x >= chunks[m][n].chunk_pos.x && pos.x < chunks[m][n].chunk_pos.x + CHUNK_SIZE.x && pos.y >= chunks[m][n].chunk_pos.y && pos.y < chunks[m][n].chunk_pos.y + CHUNK_SIZE.y)
 					{
-						inventory->removeItem(type);
-
 						chunks[m][n].blocks[(int)(pos.x - chunks[m][n].chunk_pos.x)][(int)(pos.y - chunks[m][n].chunk_pos.y)][(int)pos.z].type = type;
 						changes.push_back(Change(pos, type));
+						item = type;
 					}
 				}
 			}
@@ -469,12 +469,14 @@ void World::placeBlock(glm::vec3 position, int type)
 	std::ostringstream msg;
 	msg << "placed block: (" << (int)pos.x << ", " << (int)pos.y << ", " << (int)pos.z << "), " << type << ", " << ms_int << "\n";
 	std::cout << msg.str();
+	return item;
 }
 
-void World::breakBlock(glm::vec3 position)
+int World::breakBlock(glm::vec3 position)
 {
 	auto t1 = std::chrono::high_resolution_clock::now();
 
+	int item = 0;
 	glm::vec3 pos = glm::floor(position);
 
 	if (pos.z >= 0 && pos.z < CHUNK_SIZE.z)
@@ -487,8 +489,7 @@ void World::breakBlock(glm::vec3 position)
 				{
 					if (chunks[m][n].blocks[(int)(pos.x - chunks[m][n].chunk_pos.x)][(int)(pos.y - chunks[m][n].chunk_pos.y)][(int)pos.z].type != 4)
 					{
-						inventory->giveItem(chunks[m][n].blocks[(int)(pos.x - chunks[m][n].chunk_pos.x)][(int)(pos.y - chunks[m][n].chunk_pos.y)][(int)pos.z].type, 1);
-
+						item = chunks[m][n].blocks[(int)(pos.x - chunks[m][n].chunk_pos.x)][(int)(pos.y - chunks[m][n].chunk_pos.y)][(int)pos.z].type;
 						chunks[m][n].blocks[(int)(pos.x - chunks[m][n].chunk_pos.x)][(int)(pos.y - chunks[m][n].chunk_pos.y)][(int)pos.z].type = 0;
 						changes.push_back(Change(pos, 0));
 
@@ -505,6 +506,7 @@ void World::breakBlock(glm::vec3 position)
 	std::ostringstream msg;
 	msg << "broke block: (" << (int)pos.x << ", " << (int)pos.y << ", " << (int)pos.z << "), " << ms_int << "\n";
 	std::cout << msg.str();
+	return item;
 }
 
 int World::getBlockType(glm::vec3 position)

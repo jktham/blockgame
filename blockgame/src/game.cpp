@@ -4,6 +4,7 @@
 #include "inventory.h"
 #include "player.h"
 #include "camera.h"
+#include "console.h"
 #include "global.h"
 
 #include <glm/glm.hpp>
@@ -25,6 +26,7 @@ void Game::start()
 	inventory = new Inventory;
 	player = new Player;
 	camera = new Camera;
+	console = new Console;
 
 	world->initializeChunks();
 	world->generateChunkMesh();
@@ -47,6 +49,7 @@ void Game::quit()
 	delete inventory;
 	delete player;
 	delete camera;
+	delete console;
 }
 
 void Game::save(std::string path)
@@ -187,4 +190,15 @@ void Game::load(std::string path)
 	auto t2 = std::chrono::high_resolution_clock::now();
 	auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
 	std::cout << "loaded changes: (" << world->changes.size() << "), " << ms_int << "\n";
+}
+
+void Game::enableConsole()
+{
+	state = State::CONSOLE;
+}
+
+void Game::disableConsole()
+{
+	state = State::ALIVE;
+	console->entry = "";
 }

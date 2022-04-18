@@ -30,7 +30,7 @@ public:
 
 	void initializeItems();
 	void giveItem(int id, int amount);
-	void removeItem(int id);
+	void takeItem(int id, int amount);
 	void selectItem(int id);
 
 	void dig(int size);

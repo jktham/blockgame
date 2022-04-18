@@ -197,7 +197,8 @@ void Player::processAction(Action action)
 		if (pos == glm::vec3(-1.0f))
 			return;
 
-		world->breakBlock(pos);
+		int item = world->breakBlock(pos);
+		inventory->giveItem(item, 1);
 		world->updateBlockChange(pos);
 	}
 
@@ -209,9 +210,11 @@ void Player::processAction(Action action)
 			if (pos == glm::vec3(-1.0f))
 				return;
 
-			world->placeBlock(pos, inventory->slots[inventory->current_slot].id);
+			int item = world->placeBlock(pos, inventory->slots[inventory->current_slot].id);
+			inventory->takeItem(item, 1);
 			world->updateBlockChange(pos);
 		}
+
 		else if (inventory->items[inventory->slots[inventory->current_slot].id].usable)
 		{
 			inventory->items[inventory->slots[inventory->current_slot].id].use();

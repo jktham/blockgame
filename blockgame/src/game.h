@@ -6,6 +6,7 @@ enum class State
 {
 	MENU,
 	ALIVE,
+	CONSOLE,
 };
 
 class Game
@@ -18,4 +19,7 @@ public:
 
 	void save(std::string path);
 	void load(std::string path);
+
+	void enableConsole();
+	void disableConsole();
 };

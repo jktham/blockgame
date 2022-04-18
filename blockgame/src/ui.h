@@ -91,4 +91,6 @@ public:
 	void generateHudMesh();
 
 	void updateVAO();
+
+	void updateConsole();
 };

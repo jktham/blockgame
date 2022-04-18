@@ -103,7 +103,7 @@ void Inventory::initializeItems()
 
 void Inventory::giveItem(int id, int amount)
 {
-	if (id == 0)
+	if (id == 0 || amount == 0)
 		return;
 
 	for (int i = 0; i < slots.size(); i++)
@@ -138,8 +138,11 @@ void Inventory::giveItem(int id, int amount)
 	}
 }
 
-void Inventory::removeItem(int id)
+void Inventory::takeItem(int id, int amount) // TODO: implement amount
 {
+	if (id == 0 || amount == 0)
+		return;
+
 	if (slots[current_slot].id == id)
 	{
 		slots[current_slot].amount -= 1;
@@ -167,15 +170,15 @@ void Inventory::removeItem(int id)
 
 void Inventory::selectItem(int id)
 {
-	if (id != 0)
+	if (id == 0)
+		return;
+
+	for (int i = 0; i < slots.size(); i++)
 	{
-		for (int i = 0; i < slots.size(); i++)
+		if (slots[i].id == id)
 		{
-			if (slots[i].id == id)
-			{
-				current_slot = i;
-				return;
-			}
+			current_slot = i;
+			return;
 		}
 	}
 }
@@ -190,7 +193,8 @@ void Inventory::dig(int size)
 		for (int j = -size; j <= size; j++)
 			for (int k = -size; k <= size; k++)
 			{
-				world->breakBlock(pos + glm::vec3(i, j, k));
+				int item = world->breakBlock(pos + glm::vec3(i, j, k));
+				inventory->giveItem(item, 1);
 			}
 
 	world->updateBlockChange(pos);
@@ -231,7 +235,10 @@ void Inventory::excavate(int limit)
 	}
 
 	for (int i = 0; i < found.size(); i++)
-		world->breakBlock(found[i]);
+	{
+		int item = world->breakBlock(found[i]);
+		inventory->giveItem(item, 1);
+	}
 
 	world->updateBlockChange(pos);
 }

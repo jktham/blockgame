@@ -74,10 +74,10 @@ public:
 	// Update VAO and VBO
 	void updateVAO(std::vector<float> data);
 
-	// place block of global current type at given position with offset
-	void placeBlock(glm::vec3 position, int type);
-	// replace block at given position with air
-	void breakBlock(glm::vec3 position);
+	// place block of global current type at given position with offset and return type of placed block
+	int placeBlock(glm::vec3 position, int type);
+	// replace block at given position with air and return type of broken block
+	int breakBlock(glm::vec3 position);
 	// get block type at given position
 	int getBlockType(glm::vec3 position);
 

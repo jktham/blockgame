@@ -2,6 +2,7 @@
 #include "player.h"
 #include "game.h"
 #include "inventory.h"
+#include "console.h"
 #include "global.h"
 
 #include <glad/glad.h>
@@ -188,7 +189,7 @@ void UI::createMenu()
 	info_label.pos = glm::vec2(WINDOW_WIDTH - 450, WINDOW_HEIGHT / 2.0f - 300);
 	info_label.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	info_label.scale = 30.0f;
-	info_label.text = "WASD: Movement§SHIFT: Sprint§SPACE: Jump§§M1/J: Break Block§M2/L: Place Block / Use Item§M3/K: Pick Block§MW/0-9: Select Slot§G: Drop Slot§§N: Save World§M: Load World§R: Reset World§§Q: Toggle Noclip§F: Toggle Fog§TAB: Toggle Wireframe§§ENTER: Start§ESCAPE: Quit";
+	info_label.text = "WASD: Movement§SHIFT: Sprint§SPACE: Jump§§M1/J: Break Block§M2/L: Place Block / Use Item§M3/K: Pick Block§MW/0-9: Select Slot§G: Drop Slot§§N: Save World§M: Load World§R: Reset World§§Q: Toggle Noclip§F: Toggle Fog§TAB: Toggle Wireframe§§ENTER: Open Console§ESCAPE: Quit";
 	labels.push_back(info_label);
 }
 
@@ -367,4 +368,19 @@ void UI::updateVAO()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindVertexArray(0);
+}
+
+void UI::updateConsole()
+{
+	mesh = {};
+
+	Label console_label{};
+	console_label.pos = glm::vec2(0.0f, 0.0f);
+	console_label.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	console_label.scale = 40.0f;
+	console_label.text = console->entry + "_";
+	console_label.generateMesh();
+	mesh.insert(mesh.end(), console_label.mesh.begin(), console_label.mesh.end());
+
+	updateVAO();
 }
