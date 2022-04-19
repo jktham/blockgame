@@ -12,7 +12,7 @@
 
 void Inventory::initializeItems()
 {
-	items[0].name = "";
+	items[0].name = "Air";
 	items[0].stacksize = 0;
 	items[0].placeable = false;
 	items[0].usable = false;
@@ -126,7 +126,7 @@ void Inventory::giveItem(int id, int amount)
 		if (slots[i].id == 0)
 		{
 			slots[i].id = id;
-			slots[i].amount = amount;
+			slots[i].amount += amount;
 			if (slots[i].amount > items[slots[i].id].stacksize)
 			{
 				int overflow = slots[i].amount - items[slots[i].id].stacksize;
@@ -138,17 +138,20 @@ void Inventory::giveItem(int id, int amount)
 	}
 }
 
-void Inventory::takeItem(int id, int amount) // TODO: implement amount
+void Inventory::takeItem(int id, int amount)
 {
 	if (id == 0 || amount == 0)
 		return;
 
 	if (slots[current_slot].id == id)
 	{
-		slots[current_slot].amount -= 1;
+		slots[current_slot].amount -= amount;
 		if (slots[current_slot].amount <= 0)
 		{
+			int overflow = -slots[current_slot].amount;
 			slots[current_slot].id = 0;
+			slots[current_slot].amount = 0;
+			takeItem(id, overflow);
 		}
 	}
 	else
@@ -157,10 +160,13 @@ void Inventory::takeItem(int id, int amount) // TODO: implement amount
 		{
 			if (slots[i].id == id)
 			{
-				slots[i].amount -= 1;
+				slots[i].amount -= amount;
 				if (slots[i].amount <= 0)
 				{
+					int overflow = -slots[i].amount;
 					slots[i].id = 0;
+					slots[i].amount = 0;
+					takeItem(id, overflow);
 				}
 				return;
 			}

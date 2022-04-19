@@ -382,5 +382,19 @@ void UI::updateConsole()
 	console_label.generateMesh();
 	mesh.insert(mesh.end(), console_label.mesh.begin(), console_label.mesh.end());
 
+	std::string id_names;
+	for (int i = 0; i < inventory->items.size(); i++)
+	{
+		id_names += std::to_string(i) + ": " + inventory->items[i].name + "§";
+	}
+
+	Label info_label{};
+	info_label.pos = glm::vec2(0.0f, 100.0f);
+	info_label.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	info_label.scale = 30.0f;
+	info_label.text = "Commands:§GIVE id amount§TAKE id amount§PLACE x y z id§BREAK x y z§§IDs:§" + id_names;
+	info_label.generateMesh();
+	mesh.insert(mesh.end(), info_label.mesh.begin(), info_label.mesh.end());
+
 	updateVAO();
 }
