@@ -213,7 +213,7 @@ void World::generateChunkMesh(int m_start, int m_end, int n_start, int n_end)
 					{
 						bool exposed = false;
 
-						if (chunks[m][n].blocks[x][y][z].type > 0)
+						if (chunks[m][n].blocks[x][y][z].type != 0)
 						{
 							float chunk_x = chunks[m][n].chunk_pos.x;
 							float chunk_y = chunks[m][n].chunk_pos.y;
@@ -226,57 +226,57 @@ void World::generateChunkMesh(int m_start, int m_end, int n_start, int n_end)
 								// pos.x, pos.y, pos.z, tex_posx, tex_pos.y, tex_offset.x, tex_offset.y, norm.x, norm.y, norm.z, block.x, block.y, block.z
 								// left
 								{
-								0.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, 0.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
-								0.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, 0.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 0.0f / atlas_height, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
-								0.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, 0.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
-								0.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, 0.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
-								0.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, 0.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 1.0f / atlas_height, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
-								0.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, 0.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+								0.0f + block_x, 1.0f + block_y, 1.0f + block_z, 0.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+								0.0f + block_x, 1.0f + block_y, 0.0f + block_z, 0.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 0.0f / atlas_height, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+								0.0f + block_x, 0.0f + block_y, 0.0f + block_z, 0.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+								0.0f + block_x, 0.0f + block_y, 0.0f + block_z, 0.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+								0.0f + block_x, 0.0f + block_y, 1.0f + block_z, 0.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 1.0f / atlas_height, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+								0.0f + block_x, 1.0f + block_y, 1.0f + block_z, 0.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, -1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
 								},
-								// right
+								// righ
 								{
-								1.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, 1.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
-								1.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, 1.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
-								1.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, 1.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 0.0f / atlas_height, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
-								1.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, 1.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
-								1.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, 1.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
-								1.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, 1.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 1.0f / atlas_height, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+								1.0f + block_x, 1.0f + block_y, 1.0f + block_z, 1.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+								1.0f + block_x, 0.0f + block_y, 0.0f + block_z, 1.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+								1.0f + block_x, 1.0f + block_y, 0.0f + block_z, 1.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 0.0f / atlas_height, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+								1.0f + block_x, 0.0f + block_y, 0.0f + block_z, 1.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+								1.0f + block_x, 1.0f + block_y, 1.0f + block_z, 1.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
+								1.0f + block_x, 0.0f + block_y, 1.0f + block_z, 1.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 1.0f / atlas_height, 1.0f, 0.0f, 0.0f, block_x, block_y, block_z,
 								},
-								// front
+								// fron
 								{
-								0.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, 2.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
-								1.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, 2.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 0.0f / atlas_height, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
-								1.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, 2.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
-								1.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, 2.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
-								0.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, 2.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 1.0f / atlas_height, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
-								0.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, 2.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
+								0.0f + block_x, 0.0f + block_y, 0.0f + block_z, 2.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
+								1.0f + block_x, 0.0f + block_y, 0.0f + block_z, 2.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 0.0f / atlas_height, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
+								1.0f + block_x, 0.0f + block_y, 1.0f + block_z, 2.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
+								1.0f + block_x, 0.0f + block_y, 1.0f + block_z, 2.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
+								0.0f + block_x, 0.0f + block_y, 1.0f + block_z, 2.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 1.0f / atlas_height, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
+								0.0f + block_x, 0.0f + block_y, 0.0f + block_z, 2.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, 0.0f, -1.0f, 0.0f, block_x, block_y, block_z,
 								},
 								// back
 								{
-								0.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, 3.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
-								1.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, 3.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
-								1.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, 3.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 0.0f / atlas_height, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
-								1.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, 3.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
-								0.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, 3.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
-								0.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, 3.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 1.0f / atlas_height, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
+								0.0f + block_x, 1.0f + block_y, 0.0f + block_z, 3.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
+								1.0f + block_x, 1.0f + block_y, 1.0f + block_z, 3.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
+								1.0f + block_x, 1.0f + block_y, 0.0f + block_z, 3.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 0.0f / atlas_height, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
+								1.0f + block_x, 1.0f + block_y, 1.0f + block_z, 3.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
+								0.0f + block_x, 1.0f + block_y, 0.0f + block_z, 3.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
+								0.0f + block_x, 1.0f + block_y, 1.0f + block_z, 3.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 1.0f / atlas_height, 0.0f, 1.0f, 0.0f, block_x, block_y, block_z,
 								},
-								// bottom
+								// bott
 								{
-								0.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, 4.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
-								1.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, 4.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
-								1.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, 4.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 0.0f / atlas_height, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
-								1.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, 4.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
-								0.0f + chunk_x + x, 0.0f + chunk_y + y, 0.0f + z, 4.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
-								0.0f + chunk_x + x, 1.0f + chunk_y + y, 0.0f + z, 4.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 1.0f / atlas_height, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
+								0.0f + block_x, 0.0f + block_y, 0.0f + block_z, 4.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
+								1.0f + block_x, 1.0f + block_y, 0.0f + block_z, 4.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
+								1.0f + block_x, 0.0f + block_y, 0.0f + block_z, 4.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 0.0f / atlas_height, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
+								1.0f + block_x, 1.0f + block_y, 0.0f + block_z, 4.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
+								0.0f + block_x, 0.0f + block_y, 0.0f + block_z, 4.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
+								0.0f + block_x, 1.0f + block_y, 0.0f + block_z, 4.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 1.0f / atlas_height, 0.0f, 0.0f, -1.0f, block_x, block_y, block_z,
 								},
 								// top
 								{
-								0.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, 5.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
-								1.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, 5.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 0.0f / atlas_height, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
-								1.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, 5.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
-								1.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, 5.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
-								0.0f + chunk_x + x, 1.0f + chunk_y + y, 1.0f + z, 5.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 1.0f / atlas_height, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
-								0.0f + chunk_x + x, 0.0f + chunk_y + y, 1.0f + z, 5.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
+								0.0f + block_x, 0.0f + block_y, 1.0f + block_z, 5.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
+								1.0f + block_x, 0.0f + block_y, 1.0f + block_z, 5.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 0.0f / atlas_height, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
+								1.0f + block_x, 1.0f + block_y, 1.0f + block_z, 5.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
+								1.0f + block_x, 1.0f + block_y, 1.0f + block_z, 5.0f / atlas_width, atlas_y / atlas_height, 1.0f / atlas_width, 1.0f / atlas_height, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
+								0.0f + block_x, 1.0f + block_y, 1.0f + block_z, 5.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 1.0f / atlas_height, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
+								0.0f + block_x, 0.0f + block_y, 1.0f + block_z, 5.0f / atlas_width, atlas_y / atlas_height, 0.0f / atlas_width, 0.0f / atlas_height, 0.0f, 0.0f, 1.0f, block_x, block_y, block_z,
 								},
 							};
 

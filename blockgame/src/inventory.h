@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/glm.hpp>
+
 #include <string>
 #include <vector>
 #include <functional>
@@ -11,7 +13,9 @@ public:
 	int stacksize = 0;
 	bool placeable = false;
 	bool usable = false;
+	bool interactable = false;
 	std::function<void()> use = []() {};
+	std::function<void()> interact = []() {};
 };
 
 class Stack
@@ -24,7 +28,7 @@ public:
 class Inventory
 {
 public:
-	std::vector<Item> items = std::vector<Item>(14);
+	std::vector<Item> items = std::vector<Item>(15);
 	std::vector<Stack> slots = std::vector<Stack>(10);
 	int current_slot = 0;
 
@@ -35,4 +39,6 @@ public:
 
 	void dig(int size);
 	void excavate(int limit);
+
+	void openChest(glm::vec3 pos);
 };

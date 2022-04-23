@@ -204,9 +204,17 @@ void Player::processAction(Action action)
 
 	if (action == Action::INTERACT_SECONDARY)
 	{
-		if (inventory->items[inventory->slots[inventory->current_slot].id].placeable)
+		glm::vec3 pos = camera->getRayIntersect();
+
+		if (inventory->items[world->getBlockType(pos)].interactable)
 		{
-			glm::vec3 pos = camera->getRayIntersect();
+			if (pos == glm::vec3(-1.0f))
+				return;
+
+			inventory->items[world->getBlockType(pos)].interact();
+		}
+		else if (inventory->items[inventory->slots[inventory->current_slot].id].placeable)
+		{
 			if (pos == glm::vec3(-1.0f))
 				return;
 
@@ -214,7 +222,6 @@ void Player::processAction(Action action)
 			inventory->takeItem(item, 1);
 			world->updateBlockChange(pos);
 		}
-
 		else if (inventory->items[inventory->slots[inventory->current_slot].id].usable)
 		{
 			inventory->items[inventory->slots[inventory->current_slot].id].use();
