@@ -37,7 +37,7 @@ void Label::generateMesh()
 {
 	mesh = {};
 
-	std::string newline = "§";
+	std::string newline = "Â§";
 	float x = pos.x;
 	float y = pos.y;
 
@@ -189,7 +189,7 @@ void UI::createMenu()
 	info_label.pos = glm::vec2(WINDOW_WIDTH - 450, WINDOW_HEIGHT / 2.0f - 300);
 	info_label.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	info_label.scale = 30.0f;
-	info_label.text = "WASD: Movement§SHIFT: Sprint§SPACE: Jump§§M1/J: Break Block§M2/L: Place Block / Use Item§M3/K: Pick Block§MW/0-9: Select Slot§G: Drop Slot§§N: Save World§M: Load World§R: Reset World§§Q: Toggle Noclip§F: Toggle Fog§TAB: Toggle Wireframe§§ENTER: Open Console§ESCAPE: Quit";
+	info_label.text = "WASD: MovementÂ§SHIFT: SprintÂ§SPACE: JumpÂ§Â§M1/J: Break BlockÂ§M2/L: Place Block / Use ItemÂ§M3/K: Pick BlockÂ§MW/0-9: Select SlotÂ§G: Drop SlotÂ§Â§N: Save WorldÂ§M: Load WorldÂ§R: Reset WorldÂ§Â§Q: Toggle NoclipÂ§F: Toggle FogÂ§TAB: Toggle WireframeÂ§Â§ENTER: Open ConsoleÂ§ESCAPE: Quit";
 	labels.push_back(info_label);
 }
 
@@ -385,14 +385,14 @@ void UI::updateConsole()
 	std::string id_names;
 	for (int i = 0; i < inventory->items.size(); i++)
 	{
-		id_names += std::to_string(i) + ": " + inventory->items[i].name + "§";
+		id_names += std::to_string(i) + ": " + inventory->items[i].name + "Â§";
 	}
 
 	Label info_label{};
 	info_label.pos = glm::vec2(0.0f, 100.0f);
 	info_label.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	info_label.scale = 30.0f;
-	info_label.text = "Commands:§GIVE id amount§TAKE id amount§PLACE x y z id§BREAK x y z§§IDs:§" + id_names;
+	info_label.text = "Commands:Â§GIVE id amountÂ§TAKE id amountÂ§PLACE x y z idÂ§BREAK x y zÂ§Â§IDs:Â§" + id_names;
 	info_label.generateMesh();
 	mesh.insert(mesh.end(), info_label.mesh.begin(), info_label.mesh.end());
 
