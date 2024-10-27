@@ -432,15 +432,15 @@ int World::placeBlock(glm::vec3 position, int type)
 	glm::vec3 pos = glm::floor(position);
 	glm::vec3 offset = position - glm::floor(position) - glm::vec3(0.5f);
 
-	if (abs(offset.x) > abs(offset.y) && abs(offset.x) > abs(offset.z))
+	if (glm::abs(offset.x) > glm::abs(offset.y) && glm::abs(offset.x) > glm::abs(offset.z))
 	{
 		pos.x += (int)glm::sign(offset.x);
 	}
-	if (abs(offset.y) > abs(offset.z) && abs(offset.y) > abs(offset.x))
+	if (glm::abs(offset.y) > glm::abs(offset.z) && glm::abs(offset.y) > glm::abs(offset.x))
 	{
 		pos.y += (int)glm::sign(offset.y);
 	}
-	if (abs(offset.z) > abs(offset.x) && abs(offset.z) > abs(offset.y))
+	if (glm::abs(offset.z) > glm::abs(offset.x) && glm::abs(offset.z) > glm::abs(offset.y))
 	{
 		pos.z += (int)glm::sign(offset.z);
 	}
